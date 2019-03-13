@@ -1,1 +1,3 @@
-# scripts
+# scripts #
+
+Generic bash scripts
