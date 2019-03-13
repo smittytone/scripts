@@ -1,5 +1,8 @@
 #!/bin/bash
+
 # Convert .docx files downloaded from Google Docs into PDFs
+# Uses textutil (macOS/BSD) and cupsfilter (CUPS) 
+
 for f in "$(pwd)"/*.docx
 do
     # Strip the extension
