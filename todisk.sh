@@ -1,9 +1,16 @@
 #! /bin/bash
 
-read -n1 -r -p "Connect MEDIA2 then press any key when it has mounted" key
+# Backup to Disk Script
+# Version 1.0.1
+
+echo "Backup to Disk"
+read -n1 -s -p "Press [ENTER] to start" key
+echo " "
+read -n1 -s -p "Connect MEDIA2 then press [ENTER] when it has mounted" key
+echo " "
 
 if [ -d /Volumes/MEDIA2 ]; then
-    echo -e "Disk MEDIA2 mounted.\n"
+    echo "Disk MEDIA2 mounted."
     echo "Syncing Comics"
     rsync -avz ~/Documents/Comics /Volumes/MEDIA2 --exclude ".DS_Store"
     echo "Syncing eBooks"

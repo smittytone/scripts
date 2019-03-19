@@ -1,10 +1,20 @@
 #!/bin/bash
 
 # Backup to Server Script
-# Version 1.1.0
+# Version 1.1.1
+
+echo "Backup to Server"
+read -n1 -s -p "Press [ENTER] to start" key
+echo " "
 
 pwd="$(pwd)"
-read -n 1 -r -p "Press Enter to start" key
+bmk="/Users/smitty/.config/sync/bookmarks"
+count=0
+
+if [ ! -f $bmk ]; then
+	echo "No bookmarks file found -- backup cannot continue"
+	exit 1
+fi
 
 while IFS= read -r line; do 
     mkdir $pwd/.mntpoint
@@ -12,14 +22,20 @@ while IFS= read -r line; do
     mkdir $pwd/.mntpoint/music
     mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
     mount -t smbfs //$line@192.168.0.3/home .mntpoint/home
-done < '/Users/smitty/.config/sync/bookmarks'
+	count=$count+1
+done < $bmk
+
+if [ $count -eq 0 ]; then
+	echo "No bookmarks present -- backup cannot continue"
+	exit 1
+fi
 
 if [ -d .mntpoint/home ]; then
-    echo -e "\nBacking-up Comics and Books"
+    echo "Backing-up Comics and Books"
     rsync -avz ~/Documents/Comics/ .mntpoint/home/Comics --exclude ".*"
 	rsync -avz ~/OneDrive/eBooks/ .mntpoint/home/eBooks --exclude ".*"
 else
-    echo -e "\nThe server’s ‘home’ partition is not mounted -- backup cannot continue"
+    echo "The server’s HOME partition is not mounted -- backup cannot continue"
 fi
 
 if [ -d .mntpoint/music ]; then
@@ -42,7 +58,8 @@ else
     echo "The server's MUSIC directory is not mounted -- backup cannot continue"
 fi
 
-read -n 1 -r -p "Press Enter to finish" key
+read -n1 -s -p "Press [ENTER] to finish" key
+echo " "
 
 # Unmount the shares; keep the operation success value for each
 umount .mntpoint/music
@@ -56,9 +73,9 @@ if [[ $success1 -eq 0 && $success2 -eq 0 ]]; then
 	rm -r .mntpoint
 else
     if [ $success1 -eq 0 ]; then
-		echo $pwd"/.mntpoint/music failed to unmount - please unmount it manually and remove the mointpoint"
+		echo $pwd"/.mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
 	fi
 	if [ $success2-eq 0 ]; then
-		echo $pwd"/.mntpoint/home failed to unmount - please unmount it manually and remove the mointpoint"
+		echo $pwd"/.mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
 	fi
 fi
