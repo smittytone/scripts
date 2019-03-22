@@ -9,6 +9,7 @@ alias python='python3'
 alias gogit='cd ~/documents/github'
 
 # Set ls colors
+# See http://linux-sxs.org/housekeeping/lscolors.html
 # NOTE Using gls
 # 
 # directories: plain cyan
