@@ -1,8 +1,9 @@
 #! /bin/bash
 
 # Backup to Disk Script
-# Version 1.0.1
+# Version 1.0.2
 
+clear
 echo "Backup to Disk"
 read -n1 -s -p "Press [ENTER] to start" key
 echo " "

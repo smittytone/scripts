@@ -3,6 +3,7 @@
 # Backup to Server Script
 # Version 1.1.2
 
+clear
 echo "Backup to Server"
 read -n1 -s -p "Press [ENTER] to start" key
 echo " "
