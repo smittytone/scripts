@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Backup to Server Script
-# Version 1.1.1
+# Version 1.1.2
 
 echo "Backup to Server"
 read -n1 -s -p "Press [ENTER] to start" key
@@ -11,15 +11,24 @@ pwd="$(pwd)"
 bmk="/Users/smitty/.config/sync/bookmarks"
 count=0
 
-if [ ! -f $bmk ]; then
+if [ ! -e $bmk ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
 
 while IFS= read -r line; do 
-    mkdir $pwd/.mntpoint
-    mkdir $pwd/.mntpoint/home
-    mkdir $pwd/.mntpoint/music
+    if [ ! -d $pwd/.mntpoint ]; then
+        mkdir $pwd/.mntpoint
+    fi
+    
+    if [ ! -d $pwd/.mntpoint/home ]; then
+        mkdir $pwd/.mntpoint/home
+    fi
+    
+    if [ ! -d $pwd/.mntpoint/music ]; then
+        mkdir $pwd/.mntpoint/music
+    fi
+    
     mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
     mount -t smbfs //$line@192.168.0.3/home .mntpoint/home
     ((count++))
