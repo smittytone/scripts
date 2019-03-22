@@ -1,0 +1,17 @@
+# Set shell prompt
+#export PS1='\u@\h:\w > '
+export PS1='$PWD > '
+
+# Set aliases
+alias ls='gls -lhF --group-directories-first --color=auto'
+alias la='gls -lahF --group-directories-first --color=auto'
+alias python='python3'
+alias gogit='cd ~/documents/github'
+
+# Set ls colors
+# NOTE Using gls
+# 
+# directories: plain cyan
+# aliases: plain yellow
+# executable: plain purple
+LS_COLORS=$LS_COLORS:'di=0;36:ln=0;93:ex=0;35:' ; export LS_COLORS
