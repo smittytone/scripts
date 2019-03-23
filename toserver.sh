@@ -1,39 +1,39 @@
-#!/bin/bash
+#!/usr/local/bin/bash
+# NOTE You may need to change the above line to /bin/bash
 
 # Backup to Server Script
 # Version 1.1.2
 
 clear
 echo "Backup to Server"
-read -n1 -s -p "Press [ENTER] to start" key
-echo " "
+read -n 1 -s -p "Press [ENTER] to start "
+echo 
 
-pwd="$(pwd)"
-bmk="/Users/smitty/.config/sync/bookmarks"
+bookmark="/Users/smitty/.config/sync/bookmarks"
 count=0
 
-if [ ! -e $bmk ]; then
+if [ ! -e $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
 
 while IFS= read -r line; do 
-    if [ ! -d $pwd/.mntpoint ]; then
-        mkdir $pwd/.mntpoint
+    if ! [ -d .mntpoint ]; then
+        mkdir .mntpoint
     fi
     
-    if [ ! -d $pwd/.mntpoint/home ]; then
-        mkdir $pwd/.mntpoint/home
+    if ! [ -d .mntpoint/home ]; then
+        mkdir .mntpoint/home
     fi
     
-    if [ ! -d $pwd/.mntpoint/music ]; then
-        mkdir $pwd/.mntpoint/music
+    if ! [ -d .mntpoint/music ]; then
+        mkdir .mntpoint/music
     fi
     
     mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
-    mount -t smbfs //$line@192.168.0.3/home .mntpoint/home
+    mount -t smbfs //$line@192.168.0.3/home  .mntpoint/home
     ((count++))
-done < $bmk
+done < $bookmark
 
 if [ $count -eq 0 ]; then
     echo "No bookmarks present -- backup cannot continue"
@@ -68,8 +68,8 @@ else
     echo "The server's MUSIC directory is not mounted -- backup cannot continue"
 fi
 
-read -n1 -s -p "Press [ENTER] to finish" key
-echo " "
+read -n 1 -s -p "Press [ENTER] to finish "
+echo 
 
 # Unmount the shares; keep the operation success value for each
 umount .mntpoint/music
@@ -83,10 +83,10 @@ if [[ $success1 -eq 0 && $success2 -eq 0 ]]; then
     rm -r .mntpoint
 else
     if [ $success1 -ne 0 ]; then
-        echo $pwd"/.mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
+        echo ~+"/.mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
     fi
 
     if [ $success2 -ne 0 ]; then
-        echo $pwd"/.mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
+        echo ~+"/.mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
     fi
 fi

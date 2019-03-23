@@ -1,14 +1,15 @@
-#! /bin/bash
+#!/usr/local/bin/bash
+# NOTE You may need to change the above line to /bin/bash
 
 # Backup to Disk Script
 # Version 1.0.2
 
 clear
 echo "Backup to Disk"
-read -n1 -s -p "Press [ENTER] to start" key
-echo " "
-read -n1 -s -p "Connect MEDIA2 then press [ENTER] when it has mounted" key
-echo " "
+read -n 1 -s -p "Press [ENTER] to start"
+echo 
+read -n 1 -s -p "Connect MEDIA2 then press [ENTER] when it has mounted"
+echo 
 
 if [ -d /Volumes/MEDIA2 ]; then
     echo "Disk MEDIA2 mounted."
