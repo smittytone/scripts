@@ -24,7 +24,7 @@ function showHelp() {
 # Set inital state values
 path=~+
 color=FFFFFF
-type=c
+dtype=c
 cheight=2182
 cwidth=1668
 pheight=2224
@@ -47,13 +47,13 @@ for arg in $@; do
         case "$argIsAValue" in
             1)  path=$arg ;;
             2)  color=$arg ;;
-            3)  type=$arg ;;
-            4)  if [ $type = "c" ]; then
+            3)  dtype=$arg ;;
+            4)  if [ $dtype = "c" ]; then
                     cheight=$arg
                 else
                     pheight=$arg
                 fi ;;
-            5)  if [ $type = "c" ]; then
+            5)  if [ $dtype = "c" ]; then
                     cwidth=$arg
                 else
                     pwidth=$arg
