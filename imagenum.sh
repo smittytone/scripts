@@ -25,7 +25,7 @@ function showHelp() {
 start=1
 digits=2
 name=Untitled
-source=~+
+path=~+
 sep=space
 argIsAValue=0
 args=(-n -s -d -c -p)
@@ -47,7 +47,7 @@ for arg in $@; do
             2) start=$arg ;;
             3) digits=$arg ;;
             4) sep=$arg ;;
-            5) source=$arg ;;
+            5) path=$arg ;;
             *) echo "Error: Unknown argument" exit 1 ;;
         esac
 
@@ -78,7 +78,7 @@ done
 
 # Check that the maximum file sequence number is not greater than 'digits'
 fileCount=$start
-for file in "$source"/*; do
+for file in "$path"/*; do
     if [ -f "$file" ]; then
         # Get the extension and make it uppercase
         extension=${file##*.}
@@ -97,7 +97,7 @@ if [ ${#fileCount} -gt $digits ]; then
 fi
 
 count=$start
-for file in "$source"/*; do
+for file in "$path"/*; do
     if [ -f "$file" ]; then 
         # Get the extension and make it uppercase
         extension=${file##*.}
