@@ -8,12 +8,12 @@
 
 for file in ~+/*
 do
-    # Get the extension and make it uppercase
-    extension=${file##*.}
-    extension=${extension^^*}
+    # Only process files
+    if [ -f "$file" ]; then 
+        # Get the extension and make it uppercase
+        extension=${file##*.}
+        extension=${extension^^*}
 
-    # Ignore directories
-    if ! [ -d $file ]; then 
         # Make sure the file's of the right type
         if [ $extension = "DOCX" ]; then
             # Strip off the extension
@@ -29,7 +29,7 @@ do
             rm "$file" "$filename.html" >/dev/null
         else
             # Skipping a file...
-            echo -e "Skipping "$file" with extension "$extension
+            echo -e "Skipping $file with extension $extension"
         fi
     fi
 done
