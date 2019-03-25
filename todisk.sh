@@ -6,8 +6,6 @@
 
 clear
 echo "Backup to Disk"
-read -n 1 -s -p "Press [ENTER] to start"
-echo 
 read -n 1 -s -p "Connect MEDIA2 then press [ENTER] when it has mounted"
 echo 
 

@@ -9,13 +9,16 @@ echo "Backup to Server"
 read -n 1 -s -p "Press [ENTER] to start "
 echo 
 
-bookmark="/Users/smitty/.config/sync/bookmarks"
+bookmark=~/.config/sync/bookmarks
 count=0
 
 if [ ! -e $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
+
+musicMounted=0
+homeMounted=0
 
 while IFS= read -r line; do 
     if ! [ -d .mntpoint ]; then
@@ -31,7 +34,15 @@ while IFS= read -r line; do
     fi
     
     mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
+    if [ $? -eq 0 ]; then
+        musicMounted=1
+    fi
+    
     mount -t smbfs //$line@192.168.0.3/home  .mntpoint/home
+    if [ $? -eq 0 ]; then
+        homeMounted=1
+    fi
+
     ((count++))
 done < $bookmark
 
@@ -40,7 +51,7 @@ if [ $count -eq 0 ]; then
     exit 1
 fi
 
-if [ -d .mntpoint/home ]; then
+if [[ -d .mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books"
     rsync -avz ~/Documents/Comics/ .mntpoint/home/Comics --exclude ".*"
     rsync -avz ~/OneDrive/eBooks/ .mntpoint/home/eBooks --exclude ".*"
@@ -48,7 +59,7 @@ else
     echo "The server’s HOME partition is not mounted -- backup cannot continue"
 fi
 
-if [ -d .mntpoint/music ]; then
+if [[ -d .mntpoint/music && $musicMounted -eq 1 ]]; then
     echo "Backing-up Music"
     rsync -avz ~/Music/Alternative .mntpoint/music --exclude ".DS_Store"
     rsync -avz ~/Music/Classical .mntpoint/music --exclude ".DS_Store"
@@ -72,10 +83,15 @@ read -n 1 -s -p "Press [ENTER] to finish "
 echo 
 
 # Unmount the shares; keep the operation success value for each
-umount .mntpoint/music
-success1=$?
-umount .mntpoint/home
-success2=$?
+if [ $musicMounted -eq 1 ]; then
+    umount .mntpoint/music
+    success1=$?
+fi
+
+if [ $homeMounted -eq 1 ]; then
+    umount .mntpoint/home
+    success2=$?
+fi
 
 # Make sure the unmount operations succeeded, warning if not
 if [[ $success1 -eq 0 && $success2 -eq 0 ]]; then
