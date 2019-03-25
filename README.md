@@ -12,8 +12,16 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 ### to&lt;disk/server&gt;.sh ###
 
-Local media back-up scripts &mdash; [View Disk Script](todisk.sh) [View Server Script](toserver.sh)
+Local media back-up scripts &mdash; [View Disk Script](todisk.sh) &bull; [View Server Script](toserver.sh)
 
 ### pireadonly.sh ###
 
 Hack a Raspberry Pi to run in read-only mode (no writes to the SD) &mdash; [View Script](pireadonly.sh)
+
+### image&lt;num/pad&gt;.sh ###
+
+Screengrab image processing scrips &mdash; [View imagepad Script](imagepad.sh) &bull; [View imagenum Script](imagenum.sh)
+
+### lowerext.sh ###
+
+Convert working directory’s file extensions to lowercase &mdash; [View Script](lowerext.sh)
