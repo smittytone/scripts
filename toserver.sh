@@ -9,16 +9,17 @@ echo "Backup to Server"
 read -n 1 -s -p "Press [ENTER] to start "
 echo 
 
-bookmark=~/.config/sync/bookmarks
 count=0
+success1=99
+success2=99
+musicMounted=0
+homeMounted=0
+bookmark=~/.config/sync/bookmarks
 
 if [ ! -e $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
-
-musicMounted=0
-homeMounted=0
 
 while IFS= read -r line; do 
     if ! [ -d .mntpoint ]; then
