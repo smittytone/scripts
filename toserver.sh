@@ -7,7 +7,7 @@
 clear
 echo "Backup to Server"
 read -n 1 -s -p "Press [ENTER] to start "
-echo 
+echo
 
 count=0
 success1=99
@@ -16,29 +16,29 @@ musicMounted=0
 homeMounted=0
 bookmark=~/.config/sync/bookmarks
 
-if [ ! -e $bookmark ]; then
+if [ ! -f $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
 
-while IFS= read -r line; do 
+while IFS= read -r line; do
     if ! [ -d .mntpoint ]; then
         mkdir .mntpoint
     fi
-    
+
     if ! [ -d .mntpoint/home ]; then
         mkdir .mntpoint/home
     fi
-    
+
     if ! [ -d .mntpoint/music ]; then
         mkdir .mntpoint/music
     fi
-    
+
     mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
     if [ $? -eq 0 ]; then
         musicMounted=1
     fi
-    
+
     mount -t smbfs //$line@192.168.0.3/home  .mntpoint/home
     if [ $? -eq 0 ]; then
         homeMounted=1
@@ -81,7 +81,7 @@ else
 fi
 
 read -n 1 -s -p "Press [ENTER] to finish "
-echo 
+echo
 
 # Unmount the shares; keep the operation success value for each
 if [ $musicMounted -eq 1 ]; then
