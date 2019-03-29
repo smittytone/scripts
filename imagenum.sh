@@ -3,13 +3,14 @@
 
 # Rename and number a sequence of PNG files, and convert them to JPEG
 #
-# Version 1.0.0
+# Version 1.0.1
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
     echo -e "\nImage Renumber Utility\n"
-    echo -e "Usage: renum [-p path] [-n name] [-s start] [-d digits] [-c separator]\n"
+    echo -e "Important: Run this script from the destination folder\n"
+    echo -e "Usage:\n  imagenum [-p path] [-n name] [-s start] [-d digits] [-c separator]\n"
     echo    "Options:"
     echo    "  -p / --path      [path]     The path to the source images. Default: ~/Downloads"
     echo    "  -n / --name      [name]     The name of the image sequence. Default: Untitled"
@@ -32,13 +33,14 @@ args=(-n -s -d -c -p)
 
 # Process the arguments
 argCount=0
-for arg in $@; do
+for arg in "$@"
+do
     if [[ $argIsAValue -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
         if [ ${arg:0:1} = "-" ]; then
             # Next value is an option: ie. missing value
             echo "Error: Missing value for ${args[((argIsAValue - 1))]}"
-            exit 1 
+            exit 1
         fi
 
         # Set the appropriate internal value
@@ -66,6 +68,9 @@ for arg in $@; do
         elif [[ $arg = "-h" || $arg = "--help" ]]; then
             showHelp
             exit 0
+        else
+            echo "Error: Unknown argument ($arg)"
+            exit 1
         fi
     fi
 
@@ -77,8 +82,9 @@ for arg in $@; do
 done
 
 # Check that the maximum file sequence number is not greater than 'digits'
-fileCount=$start
-for file in "$path"/*; do
+fileCount=0
+for file in $path/*
+do
     if [ -f "$file" ]; then
         # Get the extension and make it uppercase
         extension=${file##*.}
@@ -96,17 +102,25 @@ if [ ${#fileCount} -gt $digits ]; then
     exit 1
 fi
 
+if [ $fileCount -eq 0 ]; then
+    echo "There are no PNG files to convert in folder $path"
+    exit 0
+else
+    echo "$fileCount PNG files will now be converted..."
+fi
+
 count=$start
-for file in "$path"/*; do
-    if [ -f "$file" ]; then 
+for file in $path/*
+do
+    if [ -f "$file" ]; then
         # Get the extension and make it uppercase
         extension=${file##*.}
         extension=${extension^^*}
 
         # Make sure the file's of the right type
         if [ $extension = "PNG" ]; then
-            
-            # Make the new file name 
+
+            # Make the new file name
             value=$count
             digitCount=${#value}
 

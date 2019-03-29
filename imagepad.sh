@@ -3,13 +3,14 @@
 
 # Crop then pad image files
 #
-# Version 1.0.0
+# Version 1.0.1
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
     echo -e "\nImage Size Adjust Utility\n"
-    echo -e "Usage: resize [-p path] [-c color] [-d c crop_height crop_width] [-d p pad_height pad_width]\n"
+    echo -e "Important: Run this script from the destination folder\n"
+    echo -e "Usage:\n  imagepad [-p path] [-c color] [-d c crop_height crop_width] [-d p pad_height pad_width]\n"
     echo    "Options:"
     echo    "  -p / --path   [path]   The path to the images. Default: current working directory"
     echo    "  -c / --colour [color]  The padding colour in Hex, eg. A1B2C3. Default: FFFFFF"
@@ -34,13 +35,14 @@ args=(-p -c -d)
 
 # Process the arguments
 argCount=0
-for arg in $@; do
+for arg in "$@"
+do
     if [[ $argIsAValue -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
         if [ ${arg:0:1} = "-" ]; then
             # Next value is an option: ie. missing value
             echo "Error: Missing value for ${args[((argIsAValue - 1))]}"
-            exit 1 
+            exit 1
         fi
 
         # Set the appropriate internal value
@@ -87,8 +89,9 @@ for arg in $@; do
 done
 
 count=0
-for file in "$path"/*; do
-    if [ -f "$file" ]; then 
+for file in $path/*
+do
+    if [ -f "$file" ]; then
         # Get the extension and make it uppercase
         extension=${file##*.}
         extension=${extension^^*}
@@ -98,7 +101,7 @@ for file in "$path"/*; do
             echo "Converting $file..."
             sips "$file" -c "$cheight" "$cwidth" --padColor "$color" -i > /dev/null
             sips "$file" -p "$pheight" "$pwidth" --padColor "$color" -i > /dev/null
-            
+
             # Increment the file count
             ((count++))
         fi
