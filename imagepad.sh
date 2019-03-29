@@ -1,3 +1,4 @@
+
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
 
@@ -112,4 +113,6 @@ if [ $count -eq 1 ]; then
     echo "1 file converted"
 elif [ $count -gt 1 ]; then
     echo "$count files converted"
+else
+    echo "No files converted"
 fi

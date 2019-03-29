@@ -83,7 +83,7 @@ done
 
 # Check that the maximum file sequence number is not greater than 'digits'
 fileCount=0
-for file in $path/*
+for file in "$path"/*
 do
     if [ -f "$file" ]; then
         # Get the extension and make it uppercase
@@ -98,19 +98,21 @@ do
 done
 
 if [ ${#fileCount} -gt $digits ]; then
-    echo "Error: Specified digits ($digits) is less than the number of digits required (${#fileCount})"
+    echo "Error: Specified digits ($digits) is less than the number of digits required (${#fileCount}) - use -d to set the number of output digits"
     exit 1
 fi
 
 if [ $fileCount -eq 0 ]; then
     echo "There are no PNG files to convert in folder $path"
     exit 0
+elif if [ $fileCount -eq 1 ]; then
+    echo "1 PNG file in folder $path will now be converted..."
 else
-    echo "$fileCount PNG files will now be converted..."
+    echo "$fileCount PNG files in folder $path will now be converted..."
 fi
 
 count=$start
-for file in $path/*
+for file in "$path"/*
 do
     if [ -f "$file" ]; then
         # Get the extension and make it uppercase
