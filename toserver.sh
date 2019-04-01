@@ -16,7 +16,7 @@ musicMounted=0
 homeMounted=0
 bookmark=~/.config/sync/bookmarks
 
-if [ ! -f $bookmark ]; then
+if ! [ -f $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
     exit 1
 fi
@@ -34,12 +34,12 @@ while IFS= read -r line; do
         mkdir .mntpoint/music
     fi
 
-    mount -t smbfs //$line@192.168.0.3/music .mntpoint/music
+    mount -t smbfs "//$line@192.168.0.3/music" .mntpoint/music
     if [ $? -eq 0 ]; then
         musicMounted=1
     fi
 
-    mount -t smbfs //$line@192.168.0.3/home  .mntpoint/home
+    mount -t smbfs "//$line@192.168.0.3/home"  .mntpoint/home
     if [ $? -eq 0 ]; then
         homeMounted=1
     fi
@@ -54,8 +54,8 @@ fi
 
 if [[ -d .mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books"
-    rsync -avz ~/Documents/Comics/ .mntpoint/home/Comics --exclude ".*"
-    rsync -avz ~/OneDrive/eBooks/ .mntpoint/home/eBooks --exclude ".*"
+    rsync -avz ~/Documents/Comics .mntpoint/home --exclude ".*"
+    rsync -avz ~/OneDrive/eBooks .mntpoint/home --exclude ".*"
 else
     echo "The server’s HOME partition is not mounted -- backup cannot continue"
 fi
