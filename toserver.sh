@@ -27,17 +27,17 @@ while IFS= read -r line; do
         mkdir mntpoint
     fi
 
-    if ! [ -d mntpoint/home ]; then
-        echo "Making mntpoint/home..."
-        mkdir mntpoint/home
-    fi
-
     if ! [ -d mntpoint/music ]; then
         echo "Making mntpoint/music..."
         mkdir mntpoint/music
     fi
 
-    echo "Mounting mntpoint/home..."
+    if ! [ -d mntpoint/home ]; then
+        echo "Making mntpoint/home..."
+        mkdir mntpoint/home
+    fi
+
+    echo "Mounting mntpoint/music..."
     mount -t smbfs "//$line@192.168.0.3/music" mntpoint/music
     if [ $? -eq 0 ]; then
         musicMounted=1
