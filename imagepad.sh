@@ -1,4 +1,3 @@
-
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
 
@@ -40,7 +39,7 @@ for arg in "$@"
 do
     if [[ $argIsAValue -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
-        if [ ${arg:0:1} = "-" ]; then
+        if [[ ${arg:0:1} = "-" ]]; then
             # Next value is an option: ie. missing value
             echo "Error: Missing value for ${args[((argIsAValue - 1))]}"
             exit 1
@@ -51,12 +50,12 @@ do
             1)  path=$arg ;;
             2)  color=$arg ;;
             3)  dtype=$arg ;;
-            4)  if [ $dtype = "c" ]; then
+            4)  if [[ $dtype = "c" ]]; then
                     cheight=$arg
                 else
                     pheight=$arg
                 fi ;;
-            5)  if [ $dtype = "c" ]; then
+            5)  if [[ $dtype = "c" ]]; then
                     cwidth=$arg
                 else
                     pwidth=$arg
@@ -90,7 +89,7 @@ do
 done
 
 count=0
-for file in $path/*
+for file in "$path"/*
 do
     if [ -f "$file" ]; then
         # Get the extension and make it uppercase

@@ -13,13 +13,13 @@ for file in ~+/*; do
         extension=${file##*.}
 
         # Only proceed if there *is* an extension
-        if ! [ -z $extension ]; then
+        if [ -n "$extension" ]; then
             # Make the extension lowercase
             newextension=${extension,,}
 
-            # No need to re-convert lowercase extensions, 
+            # No need to re-convert lowercase extensions,
             # so check new and old version don't match
-            if [ $extension != $newextension ]; then
+            if [ "$extension" != "$newextension" ]; then
                 # Get the filename and add back the extension
                 newfile=${file%.*}
                 newfile="$newfile.$newextension"

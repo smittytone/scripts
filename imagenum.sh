@@ -37,7 +37,7 @@ for arg in "$@"
 do
     if [[ $argIsAValue -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
-        if [ ${arg:0:1} = "-" ]; then
+        if [ "${arg:0:1}" = "-" ]; then
             # Next value is an option: ie. missing value
             echo "Error: Missing value for ${args[((argIsAValue - 1))]}"
             exit 1
@@ -91,13 +91,13 @@ do
         extension=${extension^^*}
 
         # Make sure the file's of the right type
-        if [ $extension = "PNG" ]; then
+        if [ "$extension" = "PNG" ]; then
             ((fileCount++))
         fi
     fi
 done
 
-if [ ${#fileCount} -gt $digits ]; then
+if [ ${#fileCount} -gt "$digits" ]; then
     echo "Error: Specified digits ($digits) is less than the number of digits required (${#fileCount}) - use -d to set the number of output digits"
     exit 1
 fi
@@ -105,7 +105,7 @@ fi
 if [ $fileCount -eq 0 ]; then
     echo "There are no PNG files to convert in folder $path"
     exit 0
-elif if [ $fileCount -eq 1 ]; then
+elif [ $fileCount -eq 1 ]; then
     echo "1 PNG file in folder $path will now be converted..."
 else
     echo "$fileCount PNG files in folder $path will now be converted..."
@@ -120,21 +120,21 @@ do
         extension=${extension^^*}
 
         # Make sure the file's of the right type
-        if [ $extension = "PNG" ]; then
+        if [ "$extension" = "PNG" ]; then
 
             # Make the new file name
             value=$count
             digitCount=${#value}
 
             # Prefix the sequence number with zeroes
-            while [ $digitCount -lt $digits ]; do
+            while [ "$digitCount" -lt "$digits" ]; do
                 value="0$value"
                 ((digitCount++))
             done
 
             # Add in the separator: either one of the set strings
             # (space, underscore, under, hash, minus) or the passed-in string
-            if [ $sep = "space" ]; then
+            if [ "$sep" = "space" ]; then
                 filename=~+/"$name $value.jpg"
             else
                 case $sep in

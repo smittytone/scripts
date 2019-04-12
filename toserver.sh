@@ -38,14 +38,12 @@ while IFS= read -r line; do
     fi
 
     echo "Mounting mntpoint/music..."
-    mount -t smbfs "//$line@192.168.0.3/music" mntpoint/music
-    if [ $? -eq 0 ]; then
+    if mount -t smbfs "//$line@192.168.0.3/music" mntpoint/music; then
         musicMounted=1
     fi
 
     echo "Mounting mntpoint/home..."
-    mount -t smbfs "//$line@192.168.0.3/home"  mntpoint/home
-    if [ $? -eq 0 ]; then
+    if mount -t smbfs "//$line@192.168.0.3/home"  mntpoint/home; then
         homeMounted=1
     fi
 

@@ -9,22 +9,22 @@
 for file in ~+/*
 do
     # Only process files
-    if [ -f "$file" ]; then 
+    if [ -f "$file" ]; then
         # Get the extension and make it uppercase
         extension=${file##*.}
         extension=${extension^^*}
 
         # Make sure the file's of the right type
-        if [ $extension = "DOCX" ]; then
+        if [ "$extension" = "DOCX" ]; then
             # Strip off the extension
             filename=${file%.*}
-            
+
             # Convert the DOCX to HTML
             textutil -convert html -output "$filename.html" "$file"
 
             # Convert the HTML to PDF
             cupsfilter "$filename.html" > "$filename.pdf"
-            
+
             # Remove the original file and the HTML file
             rm "$file" "$filename.html" >/dev/null
         else
