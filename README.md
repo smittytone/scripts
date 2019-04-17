@@ -25,3 +25,7 @@ Screengrab image processing scrips &mdash; [View imagepad Script](imagepad.sh) &
 ### lowerext.sh ###
 
 Convert working directory’s file extensions to lowercase &mdash; [View Script](lowerext.sh)
+
+### &lt;p/z&gt;install.sh ###
+
+Setup scripts for [Raspberry Pi](pinstall.sh) and [Pi Zero](zinstall.sh) **Note** These run on the Pi; there will be a separate script for SD card setup on macOS
