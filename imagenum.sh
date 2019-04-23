@@ -3,7 +3,7 @@
 
 # Rename and number a sequence of PNG files, and convert them to JPEG
 #
-# Version 1.0.1
+# Version 1.0.2
 
 
 # Function to show help info - keeps this out of the code
@@ -12,7 +12,7 @@ function showHelp() {
     echo -e "Important: Run this script from the destination folder\n"
     echo -e "Usage:\n  imagenum [-p path] [-n name] [-s start] [-d digits] [-c separator]\n"
     echo    "Options:"
-    echo    "  -p / --path      [path]     The path to the source images. Default: ~/Downloads"
+    echo    "  -p / --path      [path]     The path to the source images. Default: current directory"
     echo    "  -n / --name      [name]     The name of the image sequence. Default: Untitled"
     echo    "  -s / --start     [number]   The first number in the sequence. Default: 01"
     echo    "  -d / --digits    [number]   The number of digits in the sequence number. Default: 2"
