@@ -1,25 +1,39 @@
 #!/bin/bash
 
-# Update the apt-get database, etc.
-sudo apt-get update -y
-sudo apt-get upgrade -y
-sudo apt-get autoremove -y
+# Pi Installation Script 1.0.0
+
+# Switch to home directory
+cd /home/pi
 
 # Remove stock folders
-rm -r Pictures
-rm -r Music
-rm -r Videos
-rm -r python_games
-rm -r Templates
-rm -r MagPi
+echo "Removing home sub-directories..."
+rm -rf Pictures
+rm -rf Music
+rm -rf Videos
+rm -rf python_games
+rm -rf Templates
+rm -rf MagPi
+
+# Update the apt-get database, etc.
+echo -e "\nUpdating system..."
+sudo apt-get update -y
+sudo apt-get dist-pgrade -y
+sudo apt-get autoremove -y
+
+# Make directories
+echo -e "\nCreating directories..."
+mkdir Documents/GitHub
+mkdir Python
 
 # Update .bashrc
-echo "export PS1='\u@\h:\w > '" >> .bashrc
+echo -e "\nConfiguring command line..."
+echo "export PS1='$PWD > '" >> .bashrc
 echo "alias la='ls -lah --color=auto'" > .bash_aliases
 echo "alias ls='ls -l --color=auto'" >> .bash_aliases
 echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
 echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
 echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
+export PATH=$PATH:/usr/local/bin
 
 # Wifi setup
 read -p "Enter your WiFi SSID"
@@ -36,7 +50,7 @@ if [ -z "$REPLY" ]; then
 fi
 pwd=$REPLY
 
-sudo echo "network={ ssid='boobaahoobaa' psk='stanth0rpe$' }" >> /etc/wpa_supplicant/wpa_supplicant.conf
+sudo echo "network={ ssid=$ssid psk=$psk }" >> /etc/wpa_supplicant/wpa_supplicant.conf
 
 # Set netdrive to autoload
 mkdir /home/pi/netdrive

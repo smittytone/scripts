@@ -32,13 +32,27 @@ echo "alias la='ls -lahF --color=auto'" > .bash_aliases
 echo "alias ls='ls -lhF --color=auto'" >> .bash_aliases
 echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
 echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
-echo "python=python3" >> .bash_aliases
+echo "alias python=python3" >> .bash_aliases
 echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
 export PATH=$PATH:/usr/local/bin
 
 # Wifi setup
 
-#sudo echo "network={ ssid='boobaahoobaa' psk='stanth0rpe$' }" >> /etc/wpa_supplicant/wpa_supplicant.conf
+read -p "Enter your WiFi SSID: "
+if [ -z "$REPLY" ]; then
+    echo "Not a vaild SSID -- cancelling..."
+    exit 1
+fi
+ssid=$REPLY
+
+read -s -p "Enter your WiFi password (just hit [ENTER] for no password): "
+if [ -z "$REPLY" ]; then
+    read -n 1 -s -p "You have entered no password -- is that correct?"
+    exit 1
+fi
+psk=$REPLY
+
+sudo echo "network={ ssid=$ssid psk=$psk }" >> /etc/wpa_supplicant/wpa_supplicant.conf
 
 # Applications
 echo -e "\nAdding utilities..."
@@ -46,13 +60,13 @@ sudo apt-get install -y screen nginx ruby scrot
 sudo gem install mdless
 
 # Node
-VERSION="10.13.0"
+version="10.13.0"
 echo -e "\nInstalling Node..."
 mdkir tmp
 cd tmp
-wget https://nodejs.org/dist/v$VERSION/node-v$VERSION-linux-armv6l.tar.gz
-tar -xzf node-v$VERSION-linux-armv6l.tar.gz
-cd node-v$VERSION-linux-armv6l
+wget "https://nodejs.org/dist/v$version/node-v$version-linux-armv6l.tar.gz"
+tar -xzf "node-v$version-linux-armv6l.tar.gz"
+cd "node-v$version-linux-armv6l"
 sudo cp -R * /usr/local/
 cd ~
 rm -r tmp
