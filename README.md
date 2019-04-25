@@ -33,3 +33,7 @@ Setup scripts for [Raspberry Pi](pinstall.sh) and [Pi Zero](zinstall.sh) **Note*
 ### pi.sh ###
 
 SD card preparation script for [Raspberry Pi](pi.sh).
+
+### upconf.sh ###
+
+Update local config files from the `dotfiles` repo &mdash; [View Script](upconf.sh).
