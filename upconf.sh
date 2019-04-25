@@ -1,34 +1,33 @@
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
+#      but I use brew-installed bash under macOS
 
-# Update user config files
-# Version 1.0.0
+# Update local user config files
+# Version 1.0.1
 
 source=~/documents/github/dotfiles
 
 if ! [ -e "$source" ]; then
-    echo "Please clone the repo \"dotfiles\" -- exiting "
+    echo "Please clone the repo \'dotfiles\' before proceeding-- exiting "
     exit 1
 fi
 
-read -n 1 -s -p "All [A] or partial [P] update? " choice
+read -n 1 -s -p "Full [F] or partial [P] update? " choice
 if [ -z "$choice" ]; then
-    echo
-    echo "Cancelling..."
+    echo -e "/nCancelling..."
     exit 0
 fi
 
 choice=${choice^^*}
 
-if [[ "$choice" != "A" && "$choice" != "P" ]]; then
-    echo
-    echo "Invalid option selected ($choice) -- cancelling... "
+if [[ "$choice" != "F" && "$choice" != "P" ]]; then
+    echo -e "/nInvalid option selected ($choice) -- cancelling... "
     exit 0
 fi
 
 echo "Updating primary config files... "
-cp -v  "$source"/nanorc "$HOME"/.nanorc
-cp -v  "$source"/bash_profile "$HOME"/.bash_profile
+cp -v "$source"/nanorc "$HOME"/.nanorc
+cp -v "$source"/bash_profile "$HOME"/.bash_profile
 
 if ! [ -e "$HOME"/.config ]; then
     echo "Adding ~/.config... "
@@ -42,8 +41,9 @@ fi
 
 cp -v "$source"/bookmarks "$HOME"/.config/gitup/bookmarks;
 
-if [ "$choice" = "A" ]; then
+if [ "$choice" = "F" ]; then
     echo "Updating additional config files... "
+    # These are items that won't be overwritten
     target="$HOME/Library"
     cp -nvR "$source"/Services/'Copy File Path'.workflow "$target"/Services/'Copy File Path'.workflow
     cp -nvR "$source"/LaunchAgents "$target"/LaunchAgents
@@ -52,10 +52,11 @@ if [ "$choice" = "A" ]; then
 
     echo "Adding ~/.config/git... "
     if ! [ -e "$HOME"/.config/git ]; then
-        mkdir ~/.config/githup
+        mkdir ~/.config/git
     fi
 
     if cp -nv "$source"/gitignore_global "$HOME"/.config/git/gitignore_global; then
+        # Add a reference to the file to git (assumes git installed)
         git config --global core.excludesfile "$HOME"/.config/git/gitignore_global
     fi
 
