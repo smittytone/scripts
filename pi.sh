@@ -1,5 +1,6 @@
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
+#      but I use brew-installed bash under macOS
 
 # Pi Image Installation
 # Version 1.0.0
@@ -10,39 +11,39 @@ clear
 read -n 1 -s -p "Install Pi 3 [3] or Zero [Z] " choice
 echo
 
-choice=${choice,,}
+choice=${choice^^*}
 
-if [[ "$choice" != "3" && "$choice" != "z" ]]; then
+if [[ "$choice" != "3" && "$choice" != "Z" ]]; then
     exit 0
 fi
 
 pitype=Zero
+
 if [ "$choice" = "3" ]; then
     pitype=3
 fi
 
 if ! [ -e "tmp" ]; then
     mkdir tmp
-    cd tmp || exit 1
+fi
 
-    if ! [ -e "tmp/p.img" ]; then
-        echo "Downloading Raspberry Pi $pitype OS image... "
-        curl -O -L -# "$url"
-    fi
+cd tmp || exit 1
+
+if ! [ -e "p.img" ]; then
+    echo "Downloading Raspberry Pi $pitype OS image... "
+    curl -O -L -# "$url"
 
     echo "Decompressing Raspberry Pi $pitype OS image... "
     mv raspbian_latest r.zip
     unzip r.zip
     mv *.img p.img
-else
-    cd tmp || exit 1
 fi
 
 read -n 1 -s -p "Insert SD card and press any key when it has appeared on the desktop "
 echo
 
 ok=0
-while [ $ok -eq 0 ] ; do
+while [ $ok -eq 0 ]; do
     echo "Disk list... "
     diskutil list
 
@@ -54,22 +55,27 @@ while [ $ok -eq 0 ] ; do
     fi
 
     unmountname="/dev/disk$disknum"
-    copyname="/dev/rdisk$disknum"
+    ddname="/dev/rdisk$disknum"
 
     if diskutil unmountdisk "$unmountname"; then
 
         if [ -e "p.img" ]; then
             echo "About to copy Raspberry Pi $pitype OS image to SD card $unmountname... "
 
-            read -n 1 -s -p "Are you sure? [Y/N] " key
+            read -n 1 -s -p "Are you sure? [Y]es, [N]o or [C]ancel " key
+            
             if [ ${key^^*} != "Y" ]; then
                 echo
-                continue
+                if [ ${key^^*} = "C" ]; then
+                    exit 0
+                else
+                    continue
+                fi
             fi
 
             echo "Copying Raspberry Pi $pitype OS image to SD card $unmountname... "
-            sudo dd if=p.img of="$copyname" bs=1m
-        fi
+            sudo dd if=p.img of="$ddname" bs=1m
+        fi            
 
         read -n 1 -s -p "Press any key when 'boot' has appeared on the desktop "
         echo
