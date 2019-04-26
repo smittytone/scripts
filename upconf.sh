@@ -6,6 +6,7 @@
 # Version 1.0.1
 
 source=~/documents/github/dotfiles
+target="$HOME/Library"
 
 if ! [ -e "$source" ]; then
     echo "Please clone the repo \'dotfiles\' before proceeding-- exiting "
@@ -40,15 +41,16 @@ if ! [ -e "$HOME"/.config/gitup ]; then
 fi
 
 cp -v "$source"/bookmarks "$HOME"/.config/gitup/bookmarks;
+cp -v "$source"/vs_settings.json "$target/Application Support/Code/User/settings.json"
 
 if [ "$choice" = "F" ]; then
     echo "Updating additional config files... "
     # These are items that won't be overwritten
-    target="$HOME/Library"
+
     cp -nvR "$source"/Services/'Copy File Path'.workflow "$target"/Services/'Copy File Path'.workflow
     cp -nvR "$source"/LaunchAgents "$target"/LaunchAgents
     cp -nvR "$source"/Quicklook "$target"/Quicklook
-    cp -nvR "$source"/vs_settings.json "$target"/'Application Support'/Code/User/settings.json
+
 
     echo "Adding ~/.config/git... "
     if ! [ -e "$HOME"/.config/git ]; then
