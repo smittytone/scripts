@@ -63,7 +63,7 @@ while [ $ok -eq 0 ]; do
             echo "About to copy Raspberry Pi $pitype OS image to SD card $unmountname... "
 
             read -n 1 -s -p "Are you sure? [Y]es, [N]o or [C]ancel " key
-            
+
             if [ ${key^^*} != "Y" ]; then
                 echo
                 if [ ${key^^*} = "C" ]; then
@@ -75,7 +75,7 @@ while [ $ok -eq 0 ]; do
 
             echo "Copying Raspberry Pi $pitype OS image to SD card $unmountname... "
             sudo dd if=p.img of="$ddname" bs=1m
-        fi            
+        fi
 
         read -n 1 -s -p "Press any key when 'boot' has appeared on the desktop "
         echo
@@ -89,7 +89,7 @@ while [ $ok -eq 0 ]; do
         if [ -n "$ssid" ]; then
             read -p "Enter your WiFi password " psk
             echo "Setting up WiFi... SSID: \"$ssid\", PWD: \"$psk\""
-            echo -e "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\ncountry=GB\n\nnetwork={ ssid=\"$ssid\" psk=\"$psk\" key_mgmt=WPA-PSK }" > "/Volumes/boot/wpa_supplicant.conf"
+            echo -e "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\ncountry=GB\n\nnetwork={\n  ssid=\"$ssid\"\n  psk=\"$psk\"\n  key_mgmt=WPA-PSK\n}" > "/Volumes/boot/wpa_supplicant.conf"
         fi
 
         echo "Cleaning up... "
