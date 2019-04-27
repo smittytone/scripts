@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Zero Installation Script 1.0.1
+# Pi Zero Installation Script 1.0.2
 
 # Switch to home directory
 cd "$HOME"
@@ -27,7 +27,7 @@ mkdir Python
 
 # Update .bashrc
 echo -e "\nConfiguring command line..."
-echo "export PS1='$(pwd) > '" >> .bashrc
+echo "export PS1='\$(pwd) > '" >> .bashrc
 echo "GIT=~/Documents/GitHub" >> .bashrc
 echo "alias la='ls -lahF --color=auto'" > .bash_aliases
 echo "alias ls='ls -lhF --color=auto'" >> .bash_aliases
@@ -38,9 +38,17 @@ echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-g
 export PATH=$PATH:/usr/local/bin
 
 # Applications
-echo -e "\nAdding utilities..."
+echo -e "\nInstalling screen..."
 sudo apt-get install -y screen nginx ruby scrot
+echo -e "Installing nginx..."
+sudo apt-get install -y nginx
+echo -e "Installing ruby..."
+sudo apt-get install -y ruby
+echo -e "Installing scrot..."
+sudo apt-get install -y scrot
+echo -e "Installing mdless..."
 sudo gem install mdless
+echo -e "Installing pylint..."
 sudo pip3 install pylint
 
 # Node
