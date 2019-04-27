@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Pi Image Installation
-# Version 1.0.0
+# Version 1.0.1
 
 url=https://downloads.raspberrypi.org/raspbian_latest
 
@@ -63,9 +63,9 @@ while [ $ok -eq 0 ]; do
             echo "About to copy Raspberry Pi $pitype OS image to SD card $unmountname... "
 
             read -n 1 -s -p "Are you sure? [Y]es, [N]o or [C]ancel " key
+            echo
 
             if [ ${key^^*} != "Y" ]; then
-                echo
                 if [ ${key^^*} = "C" ]; then
                     exit 0
                 else
