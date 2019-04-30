@@ -38,10 +38,6 @@ SD card preparation script for [Raspberry Pi](pi.sh).
 
 Update local config files from the `dotfiles` repo &mdash; [View Script](upconf.sh).
 
-### miconprep.sh ###
+### &lt;m/w&gt;iconprep.sh ###
 
-macOS app icon maker &mdash; [View Script](miconprep.sh).
-
-### wiconprep.sh ###
-
-watchOS app and complication icon maker &mdash; [View Script](wiconprep.sh).
+macOS/watchOS app icon maker &mdash; [View miconprep Script](miconprep.sh) &bull;[View wiconprep Script](wiconprep.sh).
