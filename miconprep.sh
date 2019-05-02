@@ -3,12 +3,12 @@
 
 # Prep Mac App Icons
 #
-# Version 1.0.0
+# Version 1.0.1
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nMac Icon Makrer\n"
-    echo -e "Usage:\n  imagepad [-p path] [-c color] [-d c crop_height crop_width] [-d p pad_height pad_width]\n"
+    echo -e "\nmacOS Icon Maker\n"
+    echo -e "Usage:\n  miconprep [-p path]\n"
     echo    "Options:"
     echo    "  -p / --path   [path]   The path to the images. Default: current working directory"
     echo    "  -h / --help            This help screen"
@@ -20,7 +20,7 @@ path=$"HOME"/dummy.png
 target="$HOME"/Desktop
 argIsAValue=0
 args=(-p)
-sizes=(16 32 64 128 256 512 1024)
+sizes=(16 32 64 96 128 256 512 1024)
 
 # Process the arguments
 argCount=0
