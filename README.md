@@ -6,7 +6,7 @@
 
 Converts `.docx` files downloaded from Google Docs to `.pdf`.
 
-    - [View Script](pdfer.sh)
+- [View Script](pdfer.sh)
 
 ### xcodeautobuild.sh ###
 
