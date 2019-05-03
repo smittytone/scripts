@@ -1,7 +1,7 @@
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
 
-# Prep Mac App Icons
+# Prep macOS App Toolbar Icons
 #
 # Version 1.0.0
 
