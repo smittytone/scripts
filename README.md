@@ -59,10 +59,8 @@ Update local config files from the `dotfiles` repo
 
 - [View Script](upconf.sh)
 
-### &lt;m/t/w&gt;iconprep.sh ###
+### iconprep.sh ###
 
-macOS/watchOS app icon maker scripts.
+macOS/watchOS/iOS app icon maker script
 
-- [View macOS Desktop App Icons Script](miconprep.sh)
-- [View macOS Toolabr Icons Script](ticonprep.sh)
-- [View watchOS App Icons Script](wiconprep.sh).
+- [View Script](iconprep.sh)
