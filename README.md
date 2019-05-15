@@ -31,7 +31,7 @@ Hack a Raspberry Pi to run in read-only mode (no writes to the SD).
 
 Screengrab image processing scrips
 
-- [View Image Padding Script](imagepad.sh)
+- [View Image Cropping/Padding Script](imagepad.sh)
 - [View Image Numbering Script](imagenum.sh)
 
 ### lowerext.sh ###
