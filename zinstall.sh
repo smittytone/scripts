@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Zero Installation Script 1.0.2
+# Pi Zero Installation Script 1.0.3
 
 # Switch to home directory
 cd "$HOME"
@@ -16,9 +16,9 @@ rm -rf MagPi
 
 # Updating System
 echo -e "\nUpdating system..."
-sudo apt-get update -y
-sudo apt-get dist-upgrade -y
-sudo apt-get autoremove
+sudo apt-get -y update
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
 
 # Make directories
 echo -e "\nCreating directories..."
@@ -39,17 +39,17 @@ export PATH=$PATH:/usr/local/bin
 
 # Applications
 echo -e "\nInstalling screen..."
-sudo apt-get install -y screen nginx ruby scrot
-echo -e "Installing nginx..."
-sudo apt-get install -y nginx
-echo -e "Installing ruby..."
-sudo apt-get install -y ruby
-echo -e "Installing scrot..."
-sudo apt-get install -y scrot
-echo -e "Installing mdless..."
-sudo gem install mdless
-echo -e "Installing pylint..."
-sudo pip3 install pylint
+sudo apt-get -q -y install screen
+echo " nginx..."
+sudo apt-get -q -y install nginx
+echo " ruby..."
+sudo apt-get -q -y install ruby
+echo " scrot..."
+sudo apt-get -q -y install scrot
+echo " mdless..."
+sudo gem -q install mdless
+echo -e "pylint\n"
+sudo pip3 -q install pylint
 
 # Node
 version="10.13.0"
