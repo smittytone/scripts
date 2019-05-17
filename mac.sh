@@ -2,11 +2,11 @@
 # NOTE You may need to change the above line to /bin/bash
 
 # Mac install script
-# Version 1.0.0
+# Version 1.0.1
 
 # Do intro
 clear
-echo "macOS Install Script 1.0.0"
+echo "macOS Install Script 1.0.1"
 
 # Get server access
 read -p "Please enter your server username: "
@@ -38,8 +38,6 @@ if mount -v -t smbfs "//$credo@192.168.0.3/homes/macsource" mntpoint; then
     cp -nvR mntpoint/fonts "$HOME/$target/Fonts"
     echo "Copying xroar ROMs from server..."
     cp -nvR mntpoint/xroar "$HOME/$target/xroar"
-    echo "Copying dylibs from server..."
-    cp -nvR mntpoint/dylibs/libdvdcss.2.dylib /usr/local/lib/libdvdcss.2.dylib
 
     # Copy these dylibs then make the required aliases
     cp -va mntpoint/ffmpeg "$HOME/Library/ffmpeg-mac-2.2.2"
@@ -98,6 +96,7 @@ cp -v "$source/vs_settings.json" "$HOME/Library/Application Support/Code/User/se
 cp -vR "$source/Services/Copy File Path.workflow" "$HOME/Library/Services/Copy File Path.workflow"
 cp -vR "$source/LaunchAgents" "$HOME/Library/LaunchAgents"
 cp -vR "$source/Quicklook" "$HOME/Library/Quicklook"
+cp -vR "$source/ffmpeg" "$target/ffmpeg"
 
 echo "Adding ~/.config/git... "
 if ! [ -e "$HOME"/.config/git ]; then
@@ -112,6 +111,9 @@ fi
 cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
 echo "Terminal settings file 'HomebrewMe' copied to desktop. To use it, open Terminal > Preferences > Profiles and import "
 
+cp -nv "$source/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
+echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
+
 echo "Installing Brew... "
 if /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; then
     echo "Brew installed -- installing Brew-sourced Applications..."
@@ -123,6 +125,7 @@ if /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/ins
     brew install readline
     brew install shellcheck
     brew install gitup
+    brew install libdvdcss
 fi
 
 echo "Installing Cocoapods (requires authorizaton)... "
