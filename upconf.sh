@@ -3,9 +3,9 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files
-# Version 1.0.3
+# Version 1.0.4
 
-source=~/documents/github/dotfiles
+source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
 
 if ! [ -e "$source" ]; then
@@ -66,6 +66,11 @@ if [ "$choice" = "F" ]; then
     cp -nvR "$source/Quicklook" "$target/Quicklook"
     cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
     echo "Terminal settings file 'HomebrewMe' copied to desktop. To use it, open Terminal > Preferences > Profiles and import"
+    cp -nvR "$ource/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
+    cp -nv "$source/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
+    echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
+    cp -nvR "$source/ffmpeg" "$target/ffmpeg"
+
 fi
 
 echo Done
