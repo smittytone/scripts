@@ -13,13 +13,12 @@ function showHelp() {
     echo    "  -s / --source       [path]  The path of the source image. The source image should"
     echo    "                              be at least 1024x1024, and a PNG or JPG file"
     echo    "  -d / --destination  [path]  The path to the target folder. Default: desktop"
-    echo    "  -t / --type         [type]  The output type:"
-    echo    "                                1 - macOS app icons (Default)"
-    echo    "                                2 - macOS toolbar icons"
-    echo    "                                3 - watchOS app icons"
-    echo    "                                4 - watchOS complication icons"
-    echo    "                                5 - iOS app icons"
-    echo    "  -h / --help            This help screen"
+    echo    "  -t / --type         [int]   The output type: 1 - macOS app icons (Default)"
+    echo    "                                               2 - macOS toolbar icons"
+    echo    "                                               3 - watchOS app icons"
+    echo    "                                               4 - watchOS complication icons"
+    echo    "                                               5 - iOS app icons"
+    echo    "  -h / --help                 This help screen"
     echo
 }
 
