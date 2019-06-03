@@ -2,7 +2,7 @@
 # NOTE You may need to change the above line to /bin/bash
 
 # Backup to Server Script
-# Version 1.1.3
+# Version 1.2.0
 
 clear
 echo "Backup to Server"
@@ -15,6 +15,10 @@ success2=99
 musicMounted=0
 homeMounted=0
 bookmark=~/.config/sync/bookmarks
+d_sources=("/Documents/Comics" "/OneDrive/eBooks")
+m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
+           "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
+           "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
 
 if ! [ -f $bookmark ]; then
     echo "No bookmarks file found -- backup cannot continue"
@@ -57,28 +61,18 @@ fi
 
 if [[ -d mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books..."
-    rsync -avz ~/Documents/Comics mntpoint/home --exclude ".*"
-    rsync -avz ~/OneDrive/eBooks mntpoint/home --exclude ".*"
+    for source in "${d_sources[@]}"; do
+        rsync -avz "$HOME/$source" mntpoint/home --exclude ".DS_Store"
+    done
 else
     echo "The server’s HOME partition is not mounted -- backup cannot continue"
 fi
 
 if [[ -d mntpoint/music && $musicMounted -eq 1 ]]; then
     echo "Backing-up Music..."
-    rsync -avz ~/Music/Alternative mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Classical mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Comedy mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/'Doctor Who' mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Electronic mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Folk mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Metal mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Pop mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Rock mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/SFX mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/Soundtracks mntpoint/music --exclude ".DS_Store"
-    rsync -avz ~/Music/'Spoken Word' mntpoint/music --exclude ".DS_Store"
-    #rsync -avz ~/Music/Ringtones mntpoint/music --exclude ".DS_Store"
-    #rsync -avz ~/Music/Singles mntpoint/music --exclude ".DS_Store"
+    for source in "${m_sources[@]}"; do
+        rsync -avz "$HOME/$source" mntpoint/music --exclude ".DS_Store"
+    done
 else
     echo "The server's MUSIC directory is not mounted -- backup cannot continue"
 fi
