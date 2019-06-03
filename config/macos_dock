@@ -1,0 +1,4 @@
+defaults write com.apple.dock mineffect -string "scale"
+defaults write com.apple.dock orientation -string "left"
+defaults write com.apple.dock tilesize -int 40
+defaults write com.apple.dock minimize-to-application -int 0

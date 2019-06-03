@@ -1,0 +1,4 @@
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
