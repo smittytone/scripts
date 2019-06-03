@@ -134,6 +134,13 @@ sudo gem install cocoapods
 echo "Installing Pylint... "
 pip3 install pylint
 
+echo "Installing apps... "
+brew cask install handbrake
+brew cask install vlc
+brew cask install skype
+brew cask install firefox
+brew cask install omnidisksweeper
+
 read -n 1 -s -p "Press [ENTER] to open websites for app downloads, or [S] to skip " key
 echo
 key=${key^^*}
@@ -141,14 +148,14 @@ if [ "$key" != "S" ]; then
     open http://www.dropbox.com
     open http://www.barebones.com
     open https://desktop.github.com
-    open http://www.mozilla.org
+    #open http://www.mozilla.org
     open http://www.rogueamoeba.com/piezo
-    open http://www.skype.com
-    open http://handbrake.fr
+    #open http://www.skype.com
+    #open http://handbrake.fr
     open https://www.bresink.com/osx/0TinkerTool/download.php
     open http://www.audacityteam.org/download/mac/
-    open http://www.skype.com
-    open http://www.videolan.org
+    #open http://www.skype.com
+    #open http://www.videolan.org
 fi
 
 read -n 1 -s -p "Press [ENTER] to open the App Store, or [S] to skip " key
@@ -158,11 +165,11 @@ if [ "$key" != "S" ]; then
     open "/Applications/App Store.app"
 fi
 
-read -n 1 -s -p "Connect drive 'MEDIA2' and press [ENTER] to copy music, or [S] to skip " key
+read -n 1 -s -p "Connect drive '2TB-APFS' and press [ENTER] to copy music, or [S] to skip " key
 echo
 key=${key^^*}
 if [ "$key" != "S" ]; then
-    cp -R /Volumes/MEDIA2/Music "$HOME/Music"
+    cp -R /Volumes/2TB-APFS/Music "$HOME/Music"
 fi
 
 read -n 1 -s -p "Press [ENTER] to finish "
