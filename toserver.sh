@@ -62,7 +62,7 @@ fi
 if [[ -d mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books..."
     for source in "${d_sources[@]}"; do
-        rsync -avz "$HOME/$source" mntpoint/home --exclude ".DS_Store"
+        rsync -avz "$HOME/$source" mntpoint/home --exclude ".*"
     done
 else
     echo "The server’s HOME partition is not mounted -- backup cannot continue"
@@ -71,7 +71,7 @@ fi
 if [[ -d mntpoint/music && $musicMounted -eq 1 ]]; then
     echo "Backing-up Music..."
     for source in "${m_sources[@]}"; do
-        rsync -avz "$HOME/$source" mntpoint/music --exclude ".DS_Store"
+        rsync -avz "$HOME/$source" mntpoint/music --exclude ".*"
     done
 else
     echo "The server's MUSIC directory is not mounted -- backup cannot continue"
