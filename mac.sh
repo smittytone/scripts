@@ -54,10 +54,10 @@ cd "$target" || exit 1
 git clone https://github.com/smittytone/scripts.git
 git clone https://github.com/smittytone/dotfiles.git
 
-# Run the udpate app config scripts
-"$target/scripts/upconf.sh"
+# Run the app settings script
+"$target/scripts/upconf.sh --full"
 
-# Run the various mac config scripts
+# Run the various mac config scriptlets
 cd "$target/scripts/config"
 for task in *; do
     . "$task"
@@ -76,7 +76,7 @@ if /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/ins
     done
 
     echo "Installing Applications... "
-    apps=("handbrake" "vlc" "skype" "firefox" "omnidisksweeper" "google-chrome" "zoomus")
+    apps=("handbrake" "vlc" "skype" "firefox" "omnidisksweeper" "google-chrome" "zoomus" "qlmarkdown")
     for app in "${apps[@]}"; do
         brew cask install "$app"
     done
