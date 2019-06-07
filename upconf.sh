@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files
-# Version 1.0.4
+# Version 1.0.5
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -13,13 +13,24 @@ if ! [ -e "$source" ]; then
     exit 1
 fi
 
-read -n 1 -s -p "Full [F] or partial [P] update? " choice
-if [ -z "$choice" ]; then
-    echo -e "\nCancelling..."
-    exit 0
-fi
+# Process any arguments
+choice="N"
+for arg in "$@"; do
+    if [[ $arg = "-f" || $arg = "--full" ]]; then
+        choice="F"
+    elif [[ $arg = "-p" || $arg = "--partial" ]]; then
+        choice="P"
+    fi
+done
 
-choice=${choice^^*}
+if [ "$choice" == "N" ]; then
+    read -n 1 -s -p "Full [F] or partial [P] update? " choice
+    if [ -z "$choice" ]; then
+        echo -e "\nCancelling..."
+        exit 0
+    fi
+    choice=${choice^^*}
+fi
 
 if [[ "$choice" != "F" && "$choice" != "P" ]]; then
     echo -e "\nInvalid option selected: '$choice' -- cancelling... "
@@ -66,7 +77,7 @@ if [ "$choice" = "F" ]; then
     cp -nvR "$source/Quicklook" "$target/Quicklook"
     cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
     echo "Terminal settings file 'HomebrewMe' copied to desktop. To use it, open Terminal > Preferences > Profiles and import"
-    cp -nvR "$ource/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
+    cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
     cp -nv "$source/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
     echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
     cp -nvR "$source/ffmpeg" "$target/ffmpeg"
