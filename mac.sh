@@ -46,7 +46,7 @@ chflags nohidden "$HOME/Library"
 # Set up git and clone key repos
 echo "Preparing Git..."
 target="$HOME/Documents/GitHub"
-if ! [ -d "$target" ]; then
+if ! [ -e "$target" ]; then
     mdkir "$target"
 fi
 
