@@ -3,7 +3,7 @@
 
 # Rename and number a sequence of PNG files, and convert them to JPEG
 #
-# Version 1.0.2
+# Version 1.0.3
 
 
 # Function to show help info - keeps this out of the code
@@ -15,7 +15,7 @@ function showHelp() {
     echo    "  -p / --path      [path]     The path to the source images. Default: current directory"
     echo    "  -n / --name      [name]     The name of the image sequence. Default: Untitled"
     echo    "  -s / --start     [number]   The first number in the sequence. Default: 01"
-    echo    "  -d / --digits    [number]   The number of digits in the sequence number. Default: 2"
+    echo    "  -d / --digits    [number]   The number of digits in the sequence number. Default: 3"
     echo    '  -c / --separator [symbol]   The symbol used to separate name from number. Default: " "'
     echo    "  -h / --help                 This help screen"
     echo
@@ -24,7 +24,7 @@ function showHelp() {
 
 # Set inital state values
 start=1
-digits=2
+digits=3
 name=Untitled
 path=~+
 sep=space
