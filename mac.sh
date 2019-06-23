@@ -8,7 +8,7 @@ clear
 echo "macOS Install Script 1.0.3"
 
 # Update macOS
-softwareupdate --install --all
+sudo softwareupdate --install --all
 
 # Apply preferred Energy Saver settings
 sudo pmset -a lessbright 0
@@ -30,6 +30,15 @@ if [ -n "$hostname" ]; then
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$hostname"
     dscacheutil -flushcache
 fi
+
+# Run the various mac config scriptlets
+cd "$target/scripts/config"
+for task in *; do
+    . "$task"
+done
+
+# Restart Finder and Dock to effect changes
+killall Finder Dock
 
 # Set dark mode
 osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to true'
@@ -56,15 +65,6 @@ git clone https://github.com/smittytone/dotfiles.git
 
 # Run the app settings script
 "$target/scripts/upconf.sh --full"
-
-# Run the various mac config scriptlets
-cd "$target/scripts/config"
-for task in *; do
-    . "$task"
-done
-
-# Restart Finder and Dock to effect changes
-killall Finder Dock
 
 # Install applications... brew first
 echo "Installing Brew... "
@@ -142,6 +142,14 @@ if mount -v -t smbfs "//$credo@192.168.0.3/homes/macsource" mntpoint; then
     cp -nvR mntpoint/fonts "$HOME/$target/Fonts"
     echo "Copying xroar ROMs from server..."
     cp -nvR mntpoint/xroar "$HOME/$target/xroar"
+
+    # Unmount the share
+    if umount mntpoint; then
+        # Remove the share mount points if the unmount was successful
+        rm mntpoint
+    else
+        echo "$(pwd)/mntpoint failed to unmount -- please unmount it manually and remove the mointpoint "
+    fi
 else
     echo "Unable to copy files from server (return code: $?)"
 fi
@@ -158,13 +166,5 @@ echo
 
 echo "Cleaning up... "
 brew cleanup
-
-# Unmount the share
-if umount mntpoint; then
-    # Remove the share mount points if the unmount was successful
-    rm mntpoint
-else
-    echo "$(pwd)/mntpoint failed to unmount -- please unmount it manually and remove the mointpoint "
-fi
 
 echo "Done"
