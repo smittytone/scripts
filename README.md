@@ -49,7 +49,7 @@ Setup scripts for the Raspberry Pi and the Raspberry Pi Zero.
 
 ### pi.sh ###
 
-SD card preparation script for Raspberry Pis. **Note** This runs on the macOS host.
+SD card preparation script for Raspberry Pis. **Note** This runs on a macOS host.
 
 - [View Script](pi.sh)
 

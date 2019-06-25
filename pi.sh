@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Pi Image Installation
-# Version 1.0.2
+# Version 1.0.3
 
 url=https://downloads.raspberrypi.org/raspbian_latest
 
