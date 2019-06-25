@@ -3,24 +3,24 @@
 #      but I use brew-installed bash under macOS
 
 # Pi Image Installation
-# Version 1.0.1
+# Version 1.0.2
 
 url=https://downloads.raspberrypi.org/raspbian_latest
 
 clear
-read -n 1 -s -p "Install Pi 3 [3] or Zero [Z] " choice
+read -n 1 -s -p "Install Standard Pi [P] or Pi Zero [Z] " choice
 echo
 
 choice=${choice^^*}
 
-if [[ "$choice" != "3" && "$choice" != "Z" ]]; then
+if [[ "$choice" != "P" && "$choice" != "Z" ]]; then
     exit 0
 fi
 
 pitype=Zero
 
-if [ "$choice" = "3" ]; then
-    pitype=3
+if [ "$choice" = "P" ]; then
+    pitype=Standard
 fi
 
 if ! [ -e "tmp" ]; then
@@ -31,7 +31,20 @@ cd tmp || exit 1
 
 if ! [ -e "p.img" ]; then
     echo "Downloading Raspberry Pi $pitype OS image... "
-    curl -O -L -# "$url"
+    #curl -O -L -# "$url"
+
+    read -p "Enter SHA 256 or [ENTER] to bypass this check " choice
+    if ! [ -z "$choice" ]; then
+        sha=$(shasum -a 256 raspbian_latest)
+        echo "Download SHA 256: $sha"
+        echo " Entered SHA 256: $choice"
+        if [ "$choice" = "$sha" ]; then
+            echo "MATCH"
+        else
+            echo "SHAs do not match -- do not proceed with this file"
+            exit 1
+        fi
+    fi
 
     echo "Decompressing Raspberry Pi $pitype OS image... "
     mv raspbian_latest r.zip
