@@ -8,7 +8,8 @@
 url=https://downloads.raspberrypi.org/raspbian_latest
 
 clear
-read -n 1 -s -p "Install Standard Pi [P] or Pi Zero [Z] " choice
+echo "macOS Raspberry Pi Image Installer with optional WiFi setup"
+read -n 1 -s -p "Install Standard Pi [P] or Pi Zero [Z] image " choice
 echo
 
 choice=${choice^^*}
@@ -34,7 +35,7 @@ if ! [ -e "p.img" ]; then
     curl -O -L -# "$url"
 
     read -p "Enter SHA 256 or [ENTER] to bypass this check " choice
-    if ! [ -z "$choice" ]; then
+    if [ -n "$choice" ]; then
         sha=$(shasum -a 256 raspbian_latest)
         echo "Download SHA 256: $sha"
         echo " Entered SHA 256: $choice"
