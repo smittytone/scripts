@@ -31,7 +31,7 @@ cd tmp || exit 1
 
 if ! [ -e "p.img" ]; then
     echo "Downloading Raspberry Pi $pitype OS image... "
-    #curl -O -L -# "$url"
+    curl -O -L -# "$url"
 
     read -p "Enter SHA 256 or [ENTER] to bypass this check " choice
     if ! [ -z "$choice" ]; then
