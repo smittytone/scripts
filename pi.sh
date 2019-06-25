@@ -9,7 +9,7 @@ url=https://downloads.raspberrypi.org/raspbian_latest
 
 clear
 echo "macOS Raspberry Pi Image Installer with optional WiFi setup"
-read -n 1 -s -p "Install Standard Pi [P] or Pi Zero [Z] image " choice
+read -n 1 -s -p "Install image on a standard Pi [P] or a Pi Zero [Z] image " choice
 echo
 
 choice=${choice^^*}
