@@ -31,15 +31,6 @@ if [ -n "$hostname" ]; then
     dscacheutil -flushcache
 fi
 
-# Run the various mac config scriptlets
-cd "$target/scripts/config"
-for task in *; do
-    . "$task"
-done
-
-# Restart Finder and Dock to effect changes
-killall Finder Dock
-
 # Set dark mode
 osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to true'
 
@@ -65,6 +56,15 @@ git clone https://github.com/smittytone/dotfiles.git
 
 # Run the app settings script
 "$target/scripts/upconf.sh --full"
+
+# Run the various mac config scriptlets
+cd "$target/dotfiles/config"
+for task in *; do
+    . "$task"
+done
+
+# Restart Finder and Dock to effect changes
+killall Finder Dock
 
 # Install applications... brew first
 echo "Installing Brew... "
