@@ -59,7 +59,7 @@ echo
 ok=0
 while [ $ok -eq 0 ]; do
     echo "Disk list... "
-    diskutil list
+    diskutil list external
 
     read -p "Enter the SD card's disk number (eg. 2 for /dev/disk2) " disknum
 
