@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Pi Image Installation
-# Version 1.0.3
+# Version 1.0.4
 
 url=https://downloads.raspberrypi.org/raspbian_latest
 
@@ -105,6 +105,13 @@ while [ $ok -eq 0 ]; do
             echo "Setting up WiFi... SSID: \"$ssid\", PWD: \"$psk\""
             echo -e "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\ncountry=GB\n\nnetwork={\n  ssid=\"$ssid\"\n  psk=\"$psk\"\n  key_mgmt=WPA-PSK\n}" > "/Volumes/boot/wpa_supplicant.conf"
         fi
+
+        echo "Copying setup script to /boot... "
+        src="$GIT/scripts/pinstall.sh"
+        if [ "$choice" = "Z" ]; then
+            src="$GIT/scripts/zinstall.sh"
+        fi
+        cp "$src" /Volumes/boot
 
         echo "Cleaning up... "
         diskutil unmountdisk /Volumes/boot
