@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Pi Installation Script 1.0.0
+# Pi Installation Script 1.0.1
 
 # Switch to home directory
-cd /home/pi
+cd "$HOME"
 
 # Remove stock folders
 echo "Removing home sub-directories..."
@@ -15,18 +15,18 @@ rm -rf Templates
 rm -rf MagPi
 
 # Update the apt-get database, etc.
-echo -e "\nUpdating system..."
-sudo apt-get update -y
-sudo apt-get dist-pgrade -y
-sudo apt-get autoremove -y
+echo "Updating system..."
+sudo apt-get update
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
 
 # Make directories
-echo -e "\nCreating directories..."
-mkdir Documents/GitHub
-mkdir Python
+echo "Creating directories..."
+mkdir "$HOME/Documents/GitHub"
+mkdir "$HOME/Python"
 
 # Update .bashrc
-echo -e "\nConfiguring command line..."
+echo -e "Configuring command line... "
 echo "export PS1='$PWD > '" >> .bashrc
 echo "alias la='ls -lah --color=auto'" > .bash_aliases
 echo "alias ls='ls -l --color=auto'" >> .bash_aliases
@@ -35,45 +35,54 @@ echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
 echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
 export PATH=$PATH:/usr/local/bin
 
-# Wifi setup
-read -p "Enter your WiFi SSID"
-if [ -z "$REPLY" ]; then
-    echo "Not a vaild SSID -- cancelling..."
-    exit 1
+# Applications
+echo -e "\nInstalling screen..."
+sudo apt-get -q -y install screen
+echo " nginx..."
+sudo apt-get -q -y install nginx
+echo " ruby..."
+sudo apt-get -q -y install ruby
+echo " scrot..."
+sudo apt-get -q -y install scrot
+echo " mdless..."
+sudo gem -q install mdless
+echo -e "pylint\n"
+sudo pip3 -q install pylint
+
+# Node
+version="10.13.0"
+echo -e "\nInstalling Node $version..."
+mkdir tmp
+cd tmp || exit 1
+wget "https://nodejs.org/dist/v$version/node-v$version-linux-armv6l.tar.gz"
+tar -xzf "node-v$version-linux-armv6l.tar.gz"
+cd "node-v$version-linux-armv6l"
+sudo cp -R * /usr/local/
+
+# Git
+echo -e "\nCloning key repos..."
+cd "$HOME/Documents/GitHub" || exit 1
+git clone https://github.com/smittytone/dotfiles.git
+git clone https://github.com/smittytone/scripts.git
+
+# Setup configs
+cp dotfiles/nanorc "$HOME"/.nanorc
+cp dotfiles/pylintrc "$HOME"/.pylintrc
+cp dotfiles/gitignore_global "$HOME"/.gitignore_global
+git config --global core.excludesfile "$HOME"/.gitignore_global
+
+echo -e "\nCleaning up..."
+# Remove the script
+cd "$HOME"
+rm pinstall.sh
+rm -rf tmp
+
+read -n 1 -s -p "Press [S] to shutdown, [R] to reboot or [C] to cancel " key
+key=${key^^*}
+if [ "$key" = "S" ]; then
+    sudo shutdown -h now
+elif [ "$key" = "R" ]; then
+    sudo shutdown -r now
+else
+    echo
 fi
-ssid=$REPLY
-
-read -s -p "Enter your WiFi password (just hit [ENTER] for no password)"
-if [ -z "$REPLY" ]; then
-    read -n 1 -s -p "You have entered no password -- is that correct?"
-    exit 1
-fi
-pwd=$REPLY
-
-sudo echo "network={ ssid=$ssid psk=$psk }" >> /etc/wpa_supplicant/wpa_supplicant.conf
-
-# Set netdrive to autoload
-mkdir /home/pi/netdrive
-sudo mount -t cifs -o guest //192.168.0.3/Public /home/pi/netdrive
-sudo echo "//192.168.0.3/Public /home/pi/netdrive cifs guest,noauto,x-systemd.automount 0 0" >> /etc/fstab
-
-# Scrollphat install
-curl -sSL get.pimoroni.com/scrollphat | bash
-
-# Pyglow script install
-curl get.pimoroni.com/piglow | bash
-
-mkdir /home/pi/Pyglow
-cp /home/pi/netdrive/Pi/Python/stats.py /home/pi/Pyglow/stats.py
-chmod +x /home/pi/Pyglow/stats.py
-sudo echo "python /home/pi/Pyglow/stays.py&" >> /etc/rc.local
-
-# PiFace install
-echo "Installing RTC"
-
-wget https://raw.githubusercontent.com/piface/PiFace-Real-Time-Clock/master/install-piface-real-time-clock.sh
-chmod +x install-piface-real-time-clock.sh
-sudo ./install-piface-real-time-clock.sh
-rm install-piface-real-time-clock.sh
-echo "After restart, enter 'sudo date -s 23 OCT 2015 17:12:00' to set the clock"
-

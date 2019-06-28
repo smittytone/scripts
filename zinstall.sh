@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Zero Installation Script 1.0.3
+# Pi Zero Installation Script 1.0.4
 
 # Switch to home directory
 cd "$HOME"
@@ -16,14 +16,14 @@ rm -rf MagPi
 
 # Updating System
 echo -e "\nUpdating system..."
-sudo apt-get -y update
+sudo apt-get update
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove
 
 # Make directories
 echo -e "\nCreating directories..."
-mkdir Documents/GitHub
-mkdir Python
+mkdir "$HOME/Documents/GitHub"
+mkdir "$HOME/Python"
 
 # Update .bashrc
 echo -e "\nConfiguring command line..."
@@ -63,7 +63,7 @@ sudo cp -R * /usr/local/
 
 # Git
 echo -e "\nCloning key repos..."
-cd ~/Documents/GitHub || exit 1
+cd "$HOME/Documents/GitHub" || exit 1
 git clone https://github.com/smittytone/dotfiles.git
 git clone https://github.com/smittytone/scripts.git
 
