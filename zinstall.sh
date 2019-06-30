@@ -52,7 +52,7 @@ echo -e "pylint\n"
 sudo pip3 -q install pylint
 
 # Node
-version="10.13.0"
+version="12.4.0"
 echo -e "\nInstalling Node..."
 mkdir tmp
 cd tmp || exit 1

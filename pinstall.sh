@@ -50,13 +50,13 @@ echo -e "pylint\n"
 sudo pip3 -q install pylint
 
 # Node
-version="10.13.0"
+version="12.4.0"
 echo -e "\nInstalling Node $version..."
 mkdir tmp
 cd tmp || exit 1
-wget "https://nodejs.org/dist/v$version/node-v$version-linux-armv6l.tar.gz"
-tar -xzf "node-v$version-linux-armv6l.tar.gz"
-cd "node-v$version-linux-armv6l"
+wget "https://nodejs.org/dist/v$version/node-v$version-linux-arm64.tar.gz"
+tar -xzf "node-v$version-linux-arm64.tar.gz"
+cd "node-v$version-linux-arm64"
 sudo cp -R * /usr/local/
 
 # Git
