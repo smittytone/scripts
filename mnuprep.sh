@@ -22,6 +22,9 @@ destFolder="$HOME/Desktop"
 extension="png"
 argIsAValue=0
 args=(-s -d)
+# Set required sizes (@2x will be created too:
+# 20 - Menu icon
+# 64 - Popover icon
 m_a_sizes=(20 64)
 
 
