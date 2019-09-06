@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.0.6
+# Version 1.1.0
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -83,6 +83,15 @@ if [ "$choice" = "F" ]; then
 
     cp -nv "$source/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
     echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
+
+    # FROM 1.1.0
+    # Run the various macOS config scriptlets
+    echo "Configuring macOS... "
+    cd "$source/config"
+    for task in *; do
+        echo $task
+        . "$task"
+    done
 fi
 
 echo "Configuration files updated"
