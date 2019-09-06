@@ -14,6 +14,9 @@ if ! [ -e "$source" ]; then
 fi
 
 # Process any arguments
+# NOTE P == Partial, ie. only update frequently used app configs
+#      F == Full, ie. update frequently used app configs AND apply
+#           macOS configurations AND occasional use app configs
 choice="ASK"
 for arg in "$@"; do
     if [[ $arg = "-f" || $arg = "--full" ]]; then
