@@ -3,7 +3,7 @@
 
 # Crop and/or pad image files
 #
-# Version 3.0.0
+# Version 3.0.1
 
 
 # Function to show help info - keeps this out of the code
@@ -14,8 +14,8 @@ function showHelp() {
     echo    "    NOTE You can selet either crop, pad or both, but pad actions will always be"
     echo -e "         performed before crop actions\n"
     echo    "Options:"
-    echo    "    -s / --source      [path]                  The path to the images. Default: Downloads folder."
-    echo    "    -d / --destination [path]                  The path to the images. Default: current working directory."
+    echo    "    -s / --source      [path]                  The path to the images. Default: current working directory."
+    echo    "    -d / --destination [path]                  The path to the images. Default: Downloads folder."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
     echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is c (crop) or p (pad)."
     echo    "    -r / --resolution  [dpi]                   Set the image dpi. Default: 300."
@@ -27,8 +27,8 @@ function showHelp() {
 
 
 # Set inital state values
-destPath=~+
-sourcePath="$HOME/Downloads"
+destPath="$HOME/Downloads"
+sourcePath=~+
 argType=c
 padColour=FFFFFF
 cropHeight=2182
