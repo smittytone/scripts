@@ -56,7 +56,7 @@ do
         argIsAValue=0
     else
         if [[ $arg = "-n" || $arg = "--name" ]]; then
-        argIsAValue=1
+            argIsAValue=1
         elif [[ $arg = "-s" || $arg = "--start" ]]; then
             argIsAValue=2
         elif [[ $arg = "-d" || $arg = "--digits" ]]; then
