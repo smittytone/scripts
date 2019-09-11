@@ -1,9 +1,9 @@
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
 
-# Crop and/or pad image files
+# Crop, pad and/or scale image files
 #
-# Version 3.0.1
+# Version 4.0.0
 
 
 # Function to show help info - keeps this out of the code
@@ -11,13 +11,13 @@ function showHelp() {
     echo -e "\nImage Size Adjust Utility\n"
     echo -e "Usage:\n    imagepad [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-k] [-h]"
-    echo    "    NOTE You can selet either crop, pad or both, but pad actions will always be"
-    echo -e "         performed before crop actions\n"
+    echo    "    NOTE You can selet either crop, pad or scale or all three, but actions will always"
+    echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
     echo    "    -s / --source      [path]                  The path to the images. Default: current working directory."
     echo    "    -d / --destination [path]                  The path to the images. Default: Downloads folder."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
-    echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is c (crop) or p (pad)."
+    echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
     echo    "    -r / --resolution  [dpi]                   Set the image dpi. Default: 300."
     echo    "    -k / --keep                                Keep the source file. Without this, the source will be deleted."
     echo    "    -q / --quiet                               Silence output messages (errors excepted)."
@@ -35,9 +35,12 @@ cropHeight=2182
 cropWidth=1668
 padHeight=2224
 padWidth=1668
+scaleHeight=$padHeight
+scaleWidth=$padWidth
 dpi=300
 doCrop=0
 doPad=0
+doScale=0
 doRes=0
 noMessages=0
 deleteSource=1
@@ -61,17 +64,23 @@ for arg in "$@"; do
             2)  destPath=$arg ;;
             3)  padColour=$arg ;;
             4)  dpi=$arg ;;
-            5)  argType=$arg ;; # Next argument is the 'type' value ('c' or 'i')
-            6)  if [[ $argType = "c" ]]; then
+            5)  argType=$arg ;; # Next argument is the 'type' value ('c', 'p' or 's')
+            6)  if [ "$argType" = "c" ]; then
                     doCrop=1
                     cropHeight=$arg
+                elif [ "$argType" = "s" ]; then
+                    doScale=1
+                    scaleHeight=$arg
                 else
                     doPad=1
                     padHeight=$arg
                 fi ;;
-            7)  if [[ $argType = "c" ]]; then
+            7)  if [ "$argType" = "c" ]; then
                     doCrop=1
                     cropWidth=$arg
+                elif [ "$argType" = "s" ]; then
+                    doScale=1
+                    scaleWidth=$arg
                 else
                     doPad=1
                     padWidth=$arg
@@ -165,6 +174,11 @@ do
             # Crop the file, as requested
             if [ $doCrop -eq 1 ]; then
                 sips "$destPath/$filename.$extension" -c "$cropHeight" "$cropWidth" --padColor "$padColour" &> /dev/null
+            fi
+
+            # Scale the file, as requested
+            if [ $doScale -eq 1 ]; then
+                sips "$destPath/$filename.$extension" -z "$scaleHeight" "$scaleWidth" --padColor "$padColour" &> /dev/null
             fi
 
             # Increment the file count
