@@ -203,13 +203,13 @@ do
             if [ $reformat -eq 1 ]; then
                 # Set the new extension to match the new format before copying
                 extension=$formatExtension
-                cp "$file" "$destPath/$filename.$extension"
+                cp "$file" "$destPath/$filename.$extension" &> /dev/null
 
                 # Now reformat
                 sips "$destPath/$filename.$extension" -s format "$format" &> /dev/null
             else
                 # Just copy the file
-                cp "$file" "$destPath/$filename.$extension"
+                cp "$file" "$destPath/$filename.$extension" &> /dev/null
             fi
 
             if [ $noMessages -eq 0 ]; then
