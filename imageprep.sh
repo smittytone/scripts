@@ -1,16 +1,16 @@
 #!/usr/local/bin/bash
 # NOTE You may need to change the above line to /bin/bash
 
-# Crop, pad and/or scale image files
+# Crop, pad, scale and/or reformat image files
 #
-# Version 4.0.0
+# Version 5.0.0
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
     echo -e "\nImage Size Adjust Utility\n"
     echo -e "Usage:\n    imagepad [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
-    echo    "             [-a p pad_height pad_width] [-r] [-k] [-h]"
+    echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
     echo    "    NOTE You can selet either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
@@ -18,7 +18,8 @@ function showHelp() {
     echo    "    -d / --destination [path]                  The path to the images. Default: Downloads folder."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
     echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
-    echo    "    -r / --resolution  [dpi]                   Set the image dpi. Default: 300."
+    echo    "    -r / --resolution  [dpi]                   Set the image dpi, eg. 300"
+    echo    "    -f / --format      [format]                Set the image format: JPG/JPEG, PNG or TIF/TIFF"
     echo    "    -k / --keep                                Keep the source file. Without this, the source will be deleted."
     echo    "    -q / --quiet                               Silence output messages (errors excepted)."
     echo    "    -h / --help                                This help screen."
@@ -38,14 +39,18 @@ padWidth=1668
 scaleHeight=$padHeight
 scaleWidth=$padWidth
 dpi=300
+format=UNSET
+formatExtension=PNG
 doCrop=0
 doPad=0
+reformat=0
 doScale=0
 doRes=0
 noMessages=0
 deleteSource=1
 argIsAValue=0
-args=(-s -d -c -r -a -h -q -k)
+args=(-s -d -c -r -f -a -h -q -k)
+supportedFormats=(png jpg jpeg tif tiff)
 
 # Process the arguments
 argCount=0
@@ -64,8 +69,9 @@ for arg in "$@"; do
             2)  destPath=$arg ;;
             3)  padColour=$arg ;;
             4)  dpi=$arg ;;
-            5)  argType=$arg ;; # Next argument is the 'type' value ('c', 'p' or 's')
-            6)  if [ "$argType" = "c" ]; then
+            5)  format=$arg ;;
+            6)  argType=$arg ;; # Next argument is the 'type' value ('c', 'p' or 's')
+            7)  if [ "$argType" = "c" ]; then
                     doCrop=1
                     cropHeight=$arg
                 elif [ "$argType" = "s" ]; then
@@ -75,7 +81,7 @@ for arg in "$@"; do
                     doPad=1
                     padHeight=$arg
                 fi ;;
-            7)  if [ "$argType" = "c" ]; then
+            8)  if [ "$argType" = "c" ]; then
                     doCrop=1
                     cropWidth=$arg
                 elif [ "$argType" = "s" ]; then
@@ -88,8 +94,8 @@ for arg in "$@"; do
             *) echo "Error: Unknown argument"; exit 1 ;;
         esac
 
-        # Reset 'argIsAValue' for values 5 through 7 (crop and pad actionsm, which have extra params)
-        if [[ $argIsAValue -eq 7 || $argIsAValue -lt 5 ]]; then
+        # Reset 'argIsAValue' for values 6 through 8 (ie. actions, which have extra params)
+        if [[ $argIsAValue -eq 8 || $argIsAValue -lt 6 ]]; then
             argIsAValue=0
         else
             ((argIsAValue++))
@@ -104,8 +110,11 @@ for arg in "$@"; do
         elif [[ $arg = "-r" || $arg = "--resolution" ]]; then
             doRes=1
             argIsAValue=4
-        elif [[ $arg = "-a" || $arg = "--action" ]]; then
+        elif [[ $arg = "-f" || $arg = "--format" ]]; then
+            reformat=1
             argIsAValue=5
+        elif [[ $arg = "-a" || $arg = "--action" ]]; then
+            argIsAValue=6
         elif [[ $arg = "-h" || $arg = "--help" ]]; then
             showHelp
             exit 0
@@ -138,6 +147,38 @@ if ! [ -e "$destPath" ]; then
     exit 1
 fi
 
+# FROM 5.0.0
+# Check the reformatting, if present
+if [ $reformat -eq 1 ]; then
+    # Make the format value lowercase
+    format=${format,,}
+
+    # Is the value valid?
+    valid=0
+    formatExtension=$format
+    if [ $format = "jpg" ]; then
+        format=jpeg
+        valid=1
+    elif [ $format = "jpeg" ]; then
+        formatExtension=JPG
+        valid=1
+    elif [ $format = "tif" ]; then
+        format=tiff
+        formatExtension=TIFF
+        valid=1
+    elif [ $format = "tiff" ]; then
+        valid=1
+    elif [ $format = "png" ]; then
+        valid=1
+    fi
+
+    if ! [ $valid -eq 1 ]; then
+        echo "Invalid image format selected: $format -- exiting"
+        exit 1
+    fi
+fi
+
+# Output the source and destination directories
 if [ $noMessages -eq 0 ]; then
     echo "Source: $sourcePath"
     echo "Target: $destPath"
@@ -149,17 +190,32 @@ do
         # Get the extension and make it uppercase
         filename="${file##*/}"
         extension=${file##*.}
-        extension=${extension^^*}
+        extension=${extension,,}
         filename="${filename%.*}"
 
         # Make sure the file's of the right type
-        if [[ $extension = "PNG" || $extension = "JPG" || $extension = "JPEG" ]]; then
+        if [[ $extension = "png" || $extension = "jpg" || $extension = "jpeg" || $extension = "tif" || $extension = "tiff" ]]; then
             if [ $noMessages -eq 0 ]; then
-                echo "Converting $file to $destPath/$filename.$extension..."
+                echo -n "Processing $file as "
             fi
 
-            # Copy the file from source to destination
-            cp "$file" "$destPath/$filename.$extension"
+            # FROM 5.0.0
+            # Set the format
+            if [ $reformat -eq 1 ]; then
+                # Set the new extension to match the new format before copying
+                extension=$formatExtension
+                cp "$file" "$destPath/$filename.$extension"
+
+                # Now reformat
+                sips "$destPath/$filename.$extension" -s format "$format" &> /dev/null
+            else
+                # Just copy the file
+                cp "$file" "$destPath/$filename.$extension"
+            fi
+
+            if [ $noMessages -eq 0 ]; then
+                echo "$destPath/$filename.$extension"
+            fi
 
             # Set the dpi
             if [ $doRes -eq 1 ]; then
@@ -183,7 +239,6 @@ do
 
             # Increment the file count
             ((fileCount++))
-
 
             # Remove the source file if requested
             if [ $deleteSource -gt 0 ]; then
