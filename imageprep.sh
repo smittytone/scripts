@@ -8,10 +8,10 @@
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nImage Size Adjust Utility\n"
+    echo -e "\nImage Adjustment Utility\n"
     echo -e "Usage:\n    imagepad [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
-    echo    "    NOTE You can selet either crop, pad or scale or all three, but actions will always"
+    echo    "    NOTE You can select either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
     echo    "    -s / --source      [path]                  The path to the images. Default: current working directory."
@@ -50,7 +50,6 @@ noMessages=0
 deleteSource=1
 argIsAValue=0
 args=(-s -d -c -r -f -a -h -q -k)
-supportedFormats=(png jpg jpeg tif tiff)
 
 # Process the arguments
 argCount=0
@@ -156,19 +155,19 @@ if [ $reformat -eq 1 ]; then
     # Is the value valid?
     valid=0
     formatExtension=$format
-    if [ $format = "jpg" ]; then
+    if [ "$format" = "jpg" ]; then
         format=jpeg
         valid=1
-    elif [ $format = "jpeg" ]; then
+    elif [ "$format" = "jpeg" ]; then
         formatExtension=JPG
         valid=1
-    elif [ $format = "tif" ]; then
+    elif [ "$format" = "tif" ]; then
         format=tiff
         formatExtension=TIFF
         valid=1
-    elif [ $format = "tiff" ]; then
+    elif [ "$format" = "tiff" ]; then
         valid=1
-    elif [ $format = "png" ]; then
+    elif [ "$format" = "png" ]; then
         valid=1
     fi
 
