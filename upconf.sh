@@ -19,22 +19,23 @@ fi
 #           macOS configurations AND occasional use app configs
 choice="ASK"
 for arg in "$@"; do
-    if [[ $arg = "-f" || $arg = "--full" ]]; then
+    if [[ $arg = "-f" || $arg = "--full" || $arg = "-F" || $arg = "--FULL" ]]; then
         choice="F"
-    elif [[ $arg = "-p" || $arg = "--partial" ]]; then
+    elif [[ $arg = "-p" || $arg = "--partial" || $arg = "-P" || $arg = "--PARTIAL" ]]; then
         choice="P"
     fi
 done
 
+# No valid arguments passed, so ask the user for the type of update
 if [ "$choice" = "ASK" ]; then
     read -n 1 -s -p "Full [F] or partial [P] update? " choice
     if [ -z "$choice" ]; then
         echo "Cancelling..."
         exit 0
     fi
-    choice=${choice^^*}
 fi
 
+choice=${choice^^*}
 if [[ "$choice" != "F" && "$choice" != "P" ]]; then
     echo "Invalid option selected: '$choice' -- cancelling... "
     exit 1
