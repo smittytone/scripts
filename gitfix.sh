@@ -8,6 +8,6 @@ key=${key^^*}
 if [ "$key" = "G" ]; then
     git rm -r --cached .
     git add .
-    git commit -m ".gitignore is now working"
+    git commit -m "[Git Fixed] .gitignore is now working"
     echo "Git Fixed"
 fi
