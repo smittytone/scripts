@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.2.0
+# Version 1.2.1
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -76,12 +76,16 @@ fi
 # to be changed once installed in the first place
 if [ "$choice" = "F" ]; then
     echo "Updating additional config files... "
-    cp -nvR "$source/LaunchAgents" "$target/LaunchAgents"
-    # FROM 1.2.0 -- Don't copy Quicklook files, FFMPEG under Catalina
-    # cp -nvR "$source/Quicklook" "$target/Quicklook"
-    # cp -nvR "$source/ffmpeg" "$target/ffmpeg"
-    # cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
+    # FROM 1.2.1 -- fix duplication of files vs folders
+    cp -nvR "$source/LaunchAgents/" "$target/LaunchAgents"
+    cp -nvR "$source/Quicklook/" "$target/Quicklook"
+
+    # FROM 1.2.0 -- Don't copy FFMPEG, workflow files under Catalina
+    # cp -nvR "$source/ffmpeg/" "$target/ffmpeg"
     # cp -nvR "$source/Services/Copy File Path.workflow" "$target/Services/Copy File Path.workflow"
+
+    # FROM 1.1.0 -- Don't bother with BBEdit for now
+    # cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
 
     cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
     echo "Terminal settings file 'HomebrewMe' copied to desktop. To use it, open Terminal > Preferences > Profiles and import"
