@@ -3,7 +3,7 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.0.0
+# Version 5.0.1
 
 
 # Function to show help info - keeps this out of the code
@@ -181,6 +181,9 @@ fi
 if [ $noMessages -eq 0 ]; then
     echo "Source: $sourcePath"
     echo "Target: $destPath"
+    if [ $doRes -eq 1 ]; then
+        echo "New DPI: $dpi"
+    fi
 fi
 
 for file in "$sourcePath"/*
@@ -209,16 +212,14 @@ do
                 sips "$destPath/$filename.$extension" -s format "$format" &> /dev/null
             else
                 # Just copy the file
-                cp "$file" "$destPath/$filename.$extension" &> /dev/null
+                # FROM 5.0.1 -- but not if source and destination match
+                if [ "$file" != "$destPath/$filename.$extension" ]; then
+                    cp "$file" "$destPath/$filename.$extension" &> /dev/null
+                fi
             fi
 
             if [ $noMessages -eq 0 ]; then
                 echo "$destPath/$filename.$extension"
-            fi
-
-            # Set the dpi
-            if [ $doRes -eq 1 ]; then
-                sips "$destPath/$filename.$extension" --setProperty dpiHeight "$dpi" --setProperty dpiWidth "$dpi" &> /dev/null
             fi
 
             # Pad the file, as requested
@@ -234,6 +235,11 @@ do
             # Scale the file, as requested
             if [ $doScale -eq 1 ]; then
                 sips "$destPath/$filename.$extension" -z "$scaleHeight" "$scaleWidth" --padColor "$padColour" &> /dev/null
+            fi
+
+            # Set the dpi
+            if [ $doRes -eq 1 ]; then
+                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
             fi
 
             # Increment the file count
