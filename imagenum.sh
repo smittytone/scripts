@@ -2,21 +2,24 @@
 # NOTE You may need to change the above line to /bin/bash
 
 # Rename and number a sequence of PNG files, and convert them to JPEG
+# FROM 2.0.0 -- Rename JPGs too, but omit conversion (natch); change commands
 #
-# Version 1.0.3
+# Version 2.0.0
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
     echo -e "\nImage Renumber Utility\n"
     echo -e "Important: Run this script from the destination folder\n"
-    echo -e "Usage:\n  imagenum [-p path] [-n name] [-s start] [-d digits] [-c separator]\n"
+    echo -e "Usage:\n  imagenum [-p path] [-t path] [-n name] [-s start] [-d digits] [-c separator] [-k] [-h]\n"
     echo    "Options:"
     echo    "  -p / --path      [path]     The path to the source images. Default: current directory"
+    echo    "  -t / --target    [path]     Where to place converted images. Default: source directory"
     echo    "  -n / --name      [name]     The name of the image sequence. Default: Untitled"
     echo    "  -s / --start     [number]   The first number in the sequence. Default: 01"
     echo    "  -d / --digits    [number]   The number of digits in the sequence number. Default: 3"
     echo    '  -c / --separator [symbol]   The symbol used to separate name from number. Default: " "'
+    echo    "  -k / --keep                 Keep the source files; don\'t delete them. Default: false"
     echo    "  -h / --help                 This help screen"
     echo
 }
@@ -27,9 +30,11 @@ start=1
 digits=3
 name=Untitled
 path=~+
+dest=""
 sep=space
 argIsAValue=0
-args=(-n -s -d -c -p)
+args=(-p -t -n -s -d -c -k -h)
+doKeep=0
 
 # Process the arguments
 argCount=0
@@ -50,6 +55,7 @@ do
             3) digits=$arg ;;
             4) sep=$arg ;;
             5) path=$arg ;;
+            6) dest=$arg ;;
             *) echo "Error: Unknown argument" exit 1 ;;
         esac
 
@@ -65,6 +71,10 @@ do
             argIsAValue=4
         elif [[ $arg = "-p" || $arg = "--path" ]]; then
             argIsAValue=5
+        elif [[ $arg = "-t" || $arg = "--target" ]]; then
+            argIsAValue=6
+        elif [[ $arg = "-k" || $arg = "--keep" ]]; then
+            doKeep=1
         elif [[ $arg = "-h" || $arg = "--help" ]]; then
             showHelp
             exit 0
@@ -91,7 +101,8 @@ do
         extension=${extension^^*}
 
         # Make sure the file's of the right type
-        if [ "$extension" = "PNG" ]; then
+        # FROM 2.0.0 -- include JPG and JPEG files
+        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" ]]; then
             ((fileCount++))
         fi
     fi
@@ -103,12 +114,26 @@ if [ ${#fileCount} -gt "$digits" ]; then
 fi
 
 if [ $fileCount -eq 0 ]; then
-    echo "There are no PNG files to convert in folder $path"
+    echo "There are no suitable files to convert in folder $path"
     exit 0
 elif [ $fileCount -eq 1 ]; then
-    echo "1 PNG file in folder $path will now be converted..."
+    if [ "$extension" = "PNG" ]; then
+        echo "1 PNG file in folder $path will now be converted and renumbered..."
+    else
+        echo "1 file in folder $path will now be renumbered..."
+    fi
 else
-    echo "$fileCount PNG files in folder $path will now be converted..."
+    if [ "$extension" = "PNG" ]; then
+        echo "$fileCount PNG files in folder $path will now be converted..."
+    else
+        echo "$fileCount files in folder $path will now be renumbered..."
+    fi
+fi
+
+# FROM 2.0.0 -- set the default destination
+if [ -z "$dest" ]; then
+    dest="$path"
+    echo "DEST: $dest"
 fi
 
 count=$start
@@ -120,7 +145,8 @@ do
         extension=${extension^^*}
 
         # Make sure the file's of the right type
-        if [ "$extension" = "PNG" ]; then
+        # FROM 2.0.0 -- include JPG and JPEG files
+        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" ]]; then
 
             # Make the new file name
             value=$count
@@ -135,7 +161,7 @@ do
             # Add in the separator: either one of the set strings
             # (space, underscore, under, hash, minus) or the passed-in string
             if [ "$sep" = "space" ]; then
-                filename=~+/"$name $value.jpg"
+                filename="$name $value.jpg"
             else
                 case $sep in
                     hash) dep="#" ;;
@@ -145,17 +171,25 @@ do
                     *) dep=$sep ;;
                 esac
 
-                filename=~+/"$name$dep$value.jpg"
+                filename="$name$dep$value.jpg"
             fi
 
-            # Move the PNG file to the working directory
-            mv "$file" "$filename"
+            # Copy the PNG file to the destination directory
+            cp "$file" "$dest/$filename"
+
+            # FROM 2.0.0 -- only delete the source file if permitted
+            if [ $doKeep -eq 0 ]; then
+                rm "$file"
+            fi
 
             # Convert the copied PNG to JPEG (compression 60%)
+            # FROM 2.0.0 -- only do this if necessary
             # NOTE We've already renamed the file extension to stop sips
             #      throwing an error
-            echo "Converting $file to $filename..."
-            sips "$filename" -s format jpeg -s formatOptions 60 > /dev/null
+            echo "Converting $file to $dest/$filename..."
+            if [ "$extension" = "PNG" ]; then
+                sips "$dest/$filename" -s format jpeg -s formatOptions 60 > /dev/null
+            fi
 
             # Increment the file count
             ((count++))
