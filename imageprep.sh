@@ -218,7 +218,7 @@ do
 
             # Set the dpi
             if [ $doRes -eq 1 ]; then
-                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                sips "$destPath/$filename.$extension" --setProperty dpiHeight "$dpi" --setProperty dpiWidth "$dpi" &> /dev/null
             fi
 
             # Pad the file, as requested
