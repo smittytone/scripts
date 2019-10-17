@@ -3,7 +3,7 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.0.1
+# Version 5.0.2
 
 
 # Function to show help info - keeps this out of the code
@@ -40,7 +40,7 @@ scaleHeight=$padHeight
 scaleWidth=$padWidth
 dpi=300
 format=UNSET
-formatExtension=PNG
+formatExtension=png
 doCrop=0
 doPad=0
 reformat=0
@@ -159,11 +159,11 @@ if [ $reformat -eq 1 ]; then
         format=jpeg
         valid=1
     elif [ "$format" = "jpeg" ]; then
-        formatExtension=JPG
+        formatExtension=jpg
         valid=1
     elif [ "$format" = "tif" ]; then
         format=tiff
-        formatExtension=TIFF
+        formatExtension=tiff
         valid=1
     elif [ "$format" = "tiff" ]; then
         valid=1
@@ -204,12 +204,15 @@ do
             # FROM 5.0.0
             # Set the format
             if [ $reformat -eq 1 ]; then
+                # FROM 5.0.2 -- if we're converting from PNG or TIFF, perform an dpi change before converting to target format
+                if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
+                    doRes=0
+                    sips "$file" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                fi
+
                 # Set the new extension to match the new format before copying
                 extension=$formatExtension
-                cp "$file" "$destPath/$filename.$extension" &> /dev/null
-
-                # Now reformat
-                sips "$destPath/$filename.$extension" -s format "$format" &> /dev/null
+                sips "$file" -s format "$format" --out "$destPath/$filename.$extension" &> /dev/null
             else
                 # Just copy the file
                 # FROM 5.0.1 -- but not if source and destination match
@@ -239,7 +242,16 @@ do
 
             # Set the dpi
             if [ $doRes -eq 1 ]; then
-                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
+                    # sips does not apply dpi settings to JPEGs, so if the target image is a JPEG, convert it to PNG,
+                    # apply the dpi settings and convert back again.
+                    sips "$destPath/$filename.$extension" -s format png --out "$destPath/$filename-sipstmp.png" &> /dev/null
+                    sips "$destPath/$filename-sipstmp.png" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                    sips "$destPath/$filename-sipstmp.png" -s format jpeg --out "$destPath/$filename.$extension" &> /dev/null
+                    rm "$destPath/$filename-sipstmp.png"
+                else
+                    sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                fi
             fi
 
             # Increment the file count
