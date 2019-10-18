@@ -3,18 +3,18 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.0.2
+# Version 5.1.0
 
 
 # Function to show help info - keeps this out of the code
-function showHelp() {
+function showHelp {
     echo -e "\nImage Adjustment Utility\n"
     echo -e "Usage:\n    imagepad [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
     echo    "    NOTE You can select either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
-    echo    "    -s / --source      [path]                  The path to the images. Default: current working directory."
+    echo    "    -s / --source      [path]                  The path to an image or a directory of images. Default: current working directory."
     echo    "    -d / --destination [path]                  The path to the images. Default: Downloads folder."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
     echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
@@ -24,6 +24,100 @@ function showHelp() {
     echo    "    -q / --quiet                               Silence output messages (errors excepted)."
     echo    "    -h / --help                                This help screen."
     echo
+}
+
+
+# FROM 5.1.0
+# Separarate out the code that processes a given file into a function
+function processFile {
+    file="$1"
+
+    if ! [ -s "$file" ]; then
+        echo "[ERROR] $file has no content -- ignoring "
+        return
+    fi
+
+    # Get the extension and make it uppercase
+    fileSeparate "$file"
+
+    # Make sure the file's of the right type
+    if [[ $extension = "png" || $extension = "jpg" || $extension = "jpeg" || $extension = "tif" || $extension = "tiff" ]]; then
+        if [ $noMessages -eq 0 ]; then
+            echo -n "Processing $file as "
+        fi
+
+        # Copy the file before editing...
+        # FROM 5.0.1 -- ...but not if source and destination match
+        # FROM 5.0.3 -- Move this up so it happens first
+        if [ "$file" != "$destPath/$filename.$extension" ]; then
+            cp "$file" "$destPath/$filename.$extension" &> /dev/null
+        fi
+
+        # FROM 5.0.0
+        # Set the format (and perform the copy)
+        if [ $reformat -eq 1 ]; then
+            # FROM 5.0.2
+            # If we're converting from PNG or TIFF, perform an dpi change before converting to target format
+            if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
+                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                doRes=0
+            fi
+
+            # Output the new format as a new copy, then delete the old copy and set the new extension
+            sips "$destPath/$filename.$extension" -s format "$format" --out "$destPath/$filename.$formatExtension" &> /dev/null
+            rm "$destPath/$filename.$extension"
+            extension=$formatExtension
+        fi
+
+        if [ $noMessages -eq 0 ]; then
+            echo "$destPath/$filename.$extension"
+        fi
+
+        # Pad the file, as requested
+        if [ $doPad -eq 1 ]; then
+            sips "$destPath/$filename.$extension" -p "$padHeight" "$padWidth" --padColor "$padColour" &> /dev/null
+        fi
+
+        # Crop the file, as requested
+        if [ $doCrop -eq 1 ]; then
+            sips "$destPath/$filename.$extension" -c "$cropHeight" "$cropWidth" --padColor "$padColour" &> /dev/null
+        fi
+
+        # Scale the file, as requested
+        if [ $doScale -eq 1 ]; then
+            sips "$destPath/$filename.$extension" -z "$scaleHeight" "$scaleWidth" --padColor "$padColour" &> /dev/null
+        fi
+
+        # Set the dpi
+        if [ $doRes -eq 1 ]; then
+            if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
+                # sips does not apply dpi settings to JPEGs, so if the target image is a JPEG, convert it to PNG,
+                # apply the dpi settings and convert back again.
+                sips "$destPath/$filename.$extension" -s format png --out "$destPath/$filename-sipstmp.png" &> /dev/null
+                sips "$destPath/$filename-sipstmp.png" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                sips "$destPath/$filename-sipstmp.png" -s format jpeg --out "$destPath/$filename.$extension" &> /dev/null
+                rm "$destPath/$filename-sipstmp.png"
+            else
+                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+            fi
+        fi
+
+        # Increment the file count
+        ((fileCount++))
+
+        # Remove the source file if requested
+        if [ $deleteSource -gt 0 ]; then
+            rm "$file"
+        fi
+    fi
+}
+
+
+function fileSeparate {
+    filename="${1##*/}"
+    extension=${1##*.}
+    extension=${extension,,}
+    filename="${filename%.*}"
 }
 
 
@@ -186,86 +280,23 @@ if [ $noMessages -eq 0 ]; then
     fi
 fi
 
-for file in "$sourcePath"/*
-do
-    if [ -f "$file" ]; then
-        # Get the extension and make it uppercase
-        filename="${file##*/}"
-        extension=${file##*.}
-        extension=${extension,,}
-        filename="${filename%.*}"
-
-        # Make sure the file's of the right type
-        if [[ $extension = "png" || $extension = "jpg" || $extension = "jpeg" || $extension = "tif" || $extension = "tiff" ]]; then
-            if [ $noMessages -eq 0 ]; then
-                echo -n "Processing $file as "
-            fi
-
-            # FROM 5.0.0
-            # Set the format
-            if [ $reformat -eq 1 ]; then
-                # FROM 5.0.2 -- if we're converting from PNG or TIFF, perform an dpi change before converting to target format
-                if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
-                    doRes=0
-                    sips "$file" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
-                fi
-
-                # Set the new extension to match the new format before copying
-                extension=$formatExtension
-                sips "$file" -s format "$format" --out "$destPath/$filename.$extension" &> /dev/null
-            else
-                # Just copy the file
-                # FROM 5.0.1 -- but not if source and destination match
-                if [ "$file" != "$destPath/$filename.$extension" ]; then
-                    cp "$file" "$destPath/$filename.$extension" &> /dev/null
-                fi
-            fi
-
-            if [ $noMessages -eq 0 ]; then
-                echo "$destPath/$filename.$extension"
-            fi
-
-            # Pad the file, as requested
-            if [ $doPad -eq 1 ]; then
-                sips "$destPath/$filename.$extension" -p "$padHeight" "$padWidth" --padColor "$padColour" &> /dev/null
-            fi
-
-            # Crop the file, as requested
-            if [ $doCrop -eq 1 ]; then
-                sips "$destPath/$filename.$extension" -c "$cropHeight" "$cropWidth" --padColor "$padColour" &> /dev/null
-            fi
-
-            # Scale the file, as requested
-            if [ $doScale -eq 1 ]; then
-                sips "$destPath/$filename.$extension" -z "$scaleHeight" "$scaleWidth" --padColor "$padColour" &> /dev/null
-            fi
-
-            # Set the dpi
-            if [ $doRes -eq 1 ]; then
-                if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
-                    # sips does not apply dpi settings to JPEGs, so if the target image is a JPEG, convert it to PNG,
-                    # apply the dpi settings and convert back again.
-                    sips "$destPath/$filename.$extension" -s format png --out "$destPath/$filename-sipstmp.png" &> /dev/null
-                    sips "$destPath/$filename-sipstmp.png" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
-                    sips "$destPath/$filename-sipstmp.png" -s format jpeg --out "$destPath/$filename.$extension" &> /dev/null
-                    rm "$destPath/$filename-sipstmp.png"
-                else
-                    sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
-                fi
-            fi
-
-            # Increment the file count
-            ((fileCount++))
-
-            # Remove the source file if requested
-            if [ $deleteSource -gt 0 ]; then
-                rm "$file"
-            fi
+# FROM 5.1.0
+# Check for a single input file
+if [ -f "$sourcePath" ]; then
+    # Process the single input file
+    processFile "$sourcePath"
+elif [ -d "$sourcePath" ]; then
+    # Process the contents of the supplied directory
+    for file in "$sourcePath"/*; do
+        if [ -f "$file" ]; then
+            processFile "$file"
         fi
-    fi
-done
+    done
+else
+    echo "[ERROR] $sourcePath is not a valid directory -- ignoring "
+fi
 
-# Present a task report
+# Present a task report, if requested
 if [ $noMessages -eq 0 ]; then
     if [ $fileCount -eq 1 ]; then
         echo "1 file converted"
