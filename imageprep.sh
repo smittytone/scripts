@@ -3,7 +3,7 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.1.0
+# Version 5.1.1
 
 
 # Function to show help info - keeps this out of the code
@@ -58,9 +58,11 @@ function processFile {
         if [ $reformat -eq 1 ]; then
             # FROM 5.0.2
             # If we're converting from PNG or TIFF, perform an dpi change before converting to target format
-            if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
-                sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
-                doRes=0
+            if [ $doRes -eq 1 ]; then
+                if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
+                    sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
+                    doRes=0
+                fi
             fi
 
             # Output the new format as a new copy, then delete the old copy and set the new extension
