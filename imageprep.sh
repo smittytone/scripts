@@ -3,13 +3,14 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.1.1
+# Version 5.1.2
 
 
 # Function to show help info - keeps this out of the code
 function showHelp {
-    echo -e "\nImage Adjustment Utility\n"
-    echo -e "Usage:\n    imagepad [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
+    echo -e "\nimageprep\n"
+    echo -e "A macOS Image Adjustment Utility\n"
+    echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
     echo    "    NOTE You can select either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
