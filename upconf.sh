@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.3.0
+# Version 1.4.0
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -90,8 +90,10 @@ if [ "$choice" = "F" ]; then
     # FROM 1.1.0 -- Don't bother with BBEdit for now
     # cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
 
+    # FROM 1.4.0 -- Add second terminal file (HomebrewMeDark)
     cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
-    echo "Terminal settings file 'HomebrewMe' copied to desktop. To use it, open Terminal > Preferences > Profiles and import"
+    cp -nv "$source/HomebrewMeDark.terminal" "$HOME/Desktop/HomebrewMeDark.terminal"
+    echo "Terminal settings files 'HomebrewMe' and 'HomebrewMeDark' copied to desktop. To use them, open Terminal > Preferences > Profiles and import"
 
     cp -nv "$source/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
     echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
