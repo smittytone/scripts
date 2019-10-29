@@ -19,19 +19,6 @@ Convert the working directory’s file extensions to lowercase
 
 - [View Script](lowerext.sh)
 
-### upconf.sh ###
-
-Update local config files from the `dotfiles` repo
-
-- [View Script](upconf.sh)
-
-### to&lt;disk/server&gt;.sh ###
-
-Local media back-up scripts, targeting disk and server.
-
-- [View Disk Script](todisk.sh)
-- [View Server Script](toserver.sh)
-
 ### pdfer.sh ###
 
 Converts `.docx` files downloaded from Google Docs to `.pdf`.
@@ -52,7 +39,24 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 - [View Script](xcodeautobuild.sh)
 
-## Raspberry Pi ##
+## Mac Setup and Config ##
+
+### upconf.sh ###
+
+Update local config files from the `dotfiles` repo
+
+- [View Script](upconf.sh)
+
+## Mac Backup ##
+
+### to&lt;disk/server&gt;.sh ###
+
+Local media back-up scripts, targeting disk and server.
+
+- [View Disk Script](todisk.sh)
+- [View Server Script](toserver.sh)
+
+## Raspberry Pi Setup and Config ##
 
 ### pireadonly.sh ###
 
