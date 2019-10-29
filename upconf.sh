@@ -76,9 +76,9 @@ fi
 # to be changed once installed in the first place
 if [ "$choice" = "F" ]; then
     echo "Updating additional config files... "
-    # FROM 1.2.0 -- Don't copy FFMPEG, workflow files under Catalina
+    # FROM 1.2.0 -- Don't copy FFMPEG under Catalina
     # cp -nvR "$source/ffmpeg/" "$target/ffmpeg"
-    # cp -nvR "$source/Services/Copy File Path.workflow" "$target/Services/Copy File Path.workflow"
+    cp -nvR "$source/Services/Copy File Path.workflow" "$target/Services/Copy File Path.workflow"
 
     # FROM 1.2.1 -- fix duplication of files vs folders
     cp -nvR "$source/LaunchAgents/" "$target/LaunchAgents"
