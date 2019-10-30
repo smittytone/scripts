@@ -3,7 +3,7 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.1.2
+# Version 5.1.3
 
 
 # Function to show help info - keeps this out of the code
@@ -60,9 +60,10 @@ function processFile {
             # FROM 5.0.2
             # If we're converting from PNG or TIFF, perform an dpi change before converting to target format
             if [ $doRes -eq 1 ]; then
+                doneRes=0
                 if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
                     sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
-                    doRes=0
+                    doneRes=1
                 fi
             fi
 
@@ -92,7 +93,7 @@ function processFile {
         fi
 
         # Set the dpi
-        if [ $doRes -eq 1 ]; then
+        if [[ $doRes -eq 1 && $doneRes -eq 0 ]]; then
             if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
                 # sips does not apply dpi settings to JPEGs, so if the target image is a JPEG, convert it to PNG,
                 # apply the dpi settings and convert back again.
@@ -143,6 +144,7 @@ doPad=0
 reformat=0
 doScale=0
 doRes=0
+doneRes=0
 noMessages=0
 deleteSource=1
 argIsAValue=0
