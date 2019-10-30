@@ -43,7 +43,7 @@ function processFile {
 
     # Make sure the file's of the right type
     if [[ $extension = "png" || $extension = "jpg" || $extension = "jpeg" || $extension = "tif" || $extension = "tiff" ]]; then
-        if [ $noMessages -eq 0 ]; then
+        if [ "$noMessages" -eq 0 ]; then
             echo -n "Processing $file as "
         fi
 
@@ -56,10 +56,10 @@ function processFile {
 
         # FROM 5.0.0
         # Set the format (and perform the copy)
-        if [ $reformat -eq 1 ]; then
+        if [ "$reformat" -eq 1 ]; then
             # FROM 5.0.2
             # If we're converting from PNG or TIFF, perform an dpi change before converting to target format
-            if [ $doRes -eq 1 ]; then
+            if [ "$doRes" -eq 1 ]; then
                 doneRes=0
                 if [[ $extension = "png" || $extension = "tiff" || $extension = "tif" ]]; then
                     sips "$destPath/$filename.$extension" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
@@ -73,27 +73,27 @@ function processFile {
             extension=$formatExtension
         fi
 
-        if [ $noMessages -eq 0 ]; then
+        if [ "$noMessages" -eq 0 ]; then
             echo "$destPath/$filename.$extension"
         fi
 
         # Pad the file, as requested
-        if [ $doPad -eq 1 ]; then
+        if [ "$doPad" -eq 1 ]; then
             sips "$destPath/$filename.$extension" -p "$padHeight" "$padWidth" --padColor "$padColour" &> /dev/null
         fi
 
         # Crop the file, as requested
-        if [ $doCrop -eq 1 ]; then
+        if [ "$doCrop" -eq 1 ]; then
             sips "$destPath/$filename.$extension" -c "$cropHeight" "$cropWidth" --padColor "$padColour" &> /dev/null
         fi
 
         # Scale the file, as requested
-        if [ $doScale -eq 1 ]; then
+        if [ "$doScale" -eq 1 ]; then
             sips "$destPath/$filename.$extension" -z "$scaleHeight" "$scaleWidth" --padColor "$padColour" &> /dev/null
         fi
 
         # Set the dpi
-        if [[ $doRes -eq 1 && $doneRes -eq 0 ]]; then
+        if [[ "$doRes" -eq 1 && "$doneRes" -eq 0 ]]; then
             if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
                 # sips does not apply dpi settings to JPEGs (why???) so if the target image is a JPEG,
                 # convert it to PNG, apply the dpi settings and then convert it back again.
@@ -110,7 +110,7 @@ function processFile {
         ((fileCount++))
 
         # Remove the source file if requested
-        if [ $deleteSource -gt 0 ]; then
+        if [ "$deleteSource" -gt 0 ]; then
             rm "$file"
         fi
     fi
@@ -153,7 +153,7 @@ args=(-s -d -c -r -f -a -h -q -k)
 # Process the arguments
 argCount=0
 for arg in "$@"; do
-    if [[ $argIsAValue -gt 0 ]]; then
+    if [[ "$argIsAValue" -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
         if [[ ${arg:0:1} = "-" ]]; then
             # Next value is an option: ie. missing value
@@ -193,7 +193,7 @@ for arg in "$@"; do
         esac
 
         # Reset 'argIsAValue' for values 6 through 8 (ie. actions, which have extra params)
-        if [[ $argIsAValue -eq 8 || $argIsAValue -lt 6 ]]; then
+        if [[ "$argIsAValue" -eq 8 || "$argIsAValue" -lt 6 ]]; then
             argIsAValue=0
         else
             ((argIsAValue++))
@@ -225,7 +225,7 @@ for arg in "$@"; do
 
     ((argCount++))
 
-    if [[ $argCount -eq $# && $argIsAValue -ne 0 ]]; then
+    if [[ "$argCount" -eq $# && "$argIsAValue" -ne 0 ]]; then
         echo "Error:  Missing value for $arg"
         exit 1
     fi
@@ -247,7 +247,7 @@ fi
 
 # FROM 5.0.0
 # Check the reformatting, if present
-if [ $reformat -eq 1 ]; then
+if [ "$reformat" -eq 1 ]; then
     # Make the format value lowercase
     format=${format,,}
 
@@ -277,7 +277,7 @@ if [ $reformat -eq 1 ]; then
 fi
 
 # Output the source and destination directories
-if [ $noMessages -eq 0 ]; then
+if [ "$noMessages" -eq 0 ]; then
     echo "Source: $sourcePath"
     echo "Target: $destPath"
     if [ $doRes -eq 1 ]; then
@@ -302,7 +302,7 @@ else
 fi
 
 # Present a task report, if requested
-if [ $noMessages -eq 0 ]; then
+if [ "$noMessages" -eq 0 ]; then
     if [ $fileCount -eq 1 ]; then
         echo "1 file converted"
     elif [ $fileCount -gt 1 ]; then
