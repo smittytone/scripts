@@ -95,8 +95,8 @@ function processFile {
         # Set the dpi
         if [[ $doRes -eq 1 && $doneRes -eq 0 ]]; then
             if [[ "$extension" = "jpg" || "$extension" = "jpeg" ]]; then
-                # sips does not apply dpi settings to JPEGs, so if the target image is a JPEG, convert it to PNG,
-                # apply the dpi settings and convert back again.
+                # sips does not apply dpi settings to JPEGs (why???) so if the target image is a JPEG,
+                # convert it to PNG, apply the dpi settings and then convert it back again.
                 sips "$destPath/$filename.$extension" -s format png --out "$destPath/$filename-sipstmp.png" &> /dev/null
                 sips "$destPath/$filename-sipstmp.png" -s dpiHeight "$dpi" -s dpiWidth "$dpi" &> /dev/null
                 sips "$destPath/$filename-sipstmp.png" -s format jpeg --out "$destPath/$filename.$extension" &> /dev/null
