@@ -3,12 +3,12 @@
 
 # Prep macOS/watchOS/iOS Icons
 #
-# Version 1.0.0
+# Version 1.0.1
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
     echo -e "\nIcon Maker\n"
-    echo -e "Usage:\n  iconprep [-p path] [-d path] [-t type]\n"
+    echo -e "Usage:\n  iconprep [-s path] [-d path] [-t type]\n"
     echo    "Options:"
     echo    "  -s / --source       [path]  The path of the source image. The source image should"
     echo    "                              be at least 1024x1024, and a PNG or JPG file"
