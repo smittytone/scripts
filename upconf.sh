@@ -3,7 +3,7 @@
 #      but I use brew-installed bash under macOS
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.4.0
+# Version 1.5.0
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -19,15 +19,17 @@ fi
 #           macOS configurations AND occasional use app configs
 choice="ASK"
 for arg in "$@"; do
-    if [[ $arg = "-f" || $arg = "--full" || $arg = "-F" || $arg = "--FULL" ]]; then
+    theArg=${arg^^*}
+    if [[ $theArg = "-F" || $theArg = "--FULL" ]]; then
         choice="F"
-    elif [[ $arg = "-p" || $arg = "--partial" || $arg = "-P" || $arg = "--PARTIAL" ]]; then
+    elif [[ $theArg = "-P" || $theArg = "--PARTIAL" ]]; then
         choice="P"
     fi
 done
 
 # No valid arguments passed, so ask the user for the type of update
-if [ "$choice" = "ASK" ]; then
+
+if [ "$choice" = "ASK" ]; do
     read -n 1 -s -p "Full [F] or partial [P] update? " choice
     if [ -z "$choice" ]; then
         echo "Cancelling..."
@@ -89,6 +91,9 @@ if [ "$choice" = "F" ]; then
 
     # FROM 1.1.0 -- Don't bother with BBEdit for now
     # cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
+
+    # FROM 1.5.0 -- Add 64-bit libdvdcss
+    cp -nv "$source/libdvdcss/libdvdcss.2.dylib" "/usr/local/lib/libdvdcss.2.dylib"
 
     # FROM 1.4.0 -- Add second terminal file (HomebrewMeDark)
     cp -nv "$source/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"
