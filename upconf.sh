@@ -29,7 +29,7 @@ done
 
 # No valid arguments passed, so ask the user for the type of update
 
-if [ "$choice" = "ASK" ]; do
+if [ "$choice" = "ASK" ]; then
     read -n 1 -s -p "Full [F] or partial [P] update? " choice
     if [ -z "$choice" ]; then
         echo "Cancelling..."
