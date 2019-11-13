@@ -4,23 +4,23 @@
 # Rename and number a sequence of PNG files, and convert them to JPEG
 # FROM 2.0.0 -- Rename JPGs too, but omit conversion (natch); change commands
 #
-# Version 2.0.0
+# Version 2.1.0
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nImage Renumber Utility\n"
-    echo -e "Important: Run this script from the destination folder\n"
-    echo -e "Usage:\n  imagenum [-p path] [-t path] [-n name] [-s start] [-d digits] [-c separator] [-k] [-h]\n"
+    echo -e "\nImage Renumber Utility 2.1.0\n"
+    echo -e "Usage:\n  imagenum [-p path] [-t path] [-n name] [-s start] [-d digits] [-c separator] [-k] [-q] [-h]\n"
     echo    "Options:"
-    echo    "  -p / --path      [path]     The path to the source images. Default: current directory"
-    echo    "  -t / --target    [path]     Where to place converted images. Default: source directory"
-    echo    "  -n / --name      [name]     The name of the image sequence. Default: Untitled"
-    echo    "  -s / --start     [number]   The first number in the sequence. Default: 01"
-    echo    "  -d / --digits    [number]   The number of digits in the sequence number. Default: 3"
-    echo    '  -c / --separator [symbol]   The symbol used to separate name from number. Default: " "'
-    echo    "  -k / --keep                 Keep the source files; don\'t delete them. Default: false"
-    echo    "  -h / --help                 This help screen"
+    echo    "  -p / --path      [path]    The path to the source images. Default: current directory."
+    echo    "  -t / --target    [path]    Where to place converted images. Default: source directory."
+    echo    "  -n / --name      [name]    The name of the image sequence. Default: Untitled."
+    echo    "  -s / --start     [number]  The first number in the sequence. Default: 01."
+    echo    "  -d / --digits    [number]  The number of digits in the sequence number. Default: 3."
+    echo    '  -c / --separator [symbol]  The symbol used to separate name from number. Default: " ".'
+    echo    "  -k / --keep                Keep the source files; don\'t delete them. Default: false."
+    echo    "  -q / --quiet               Silence output (errors excepted)."
+    echo    "  -h / --help                This help screen."
     echo
 }
 
@@ -35,6 +35,7 @@ sep=space
 argIsAValue=0
 args=(-p -t -n -s -d -c -k -h)
 doKeep=0
+verbose=1
 
 # Process the arguments
 argCount=0
@@ -61,6 +62,9 @@ do
 
         argIsAValue=0
     else
+        # Make argument lowercase
+        arg=${arg,,}
+
         if [[ $arg = "-n" || $arg = "--name" ]]; then
             argIsAValue=1
         elif [[ $arg = "-s" || $arg = "--start" ]]; then
@@ -75,6 +79,8 @@ do
             argIsAValue=6
         elif [[ $arg = "-k" || $arg = "--keep" ]]; then
             doKeep=1
+        elif [[ $arg = "-q" || $arg = "--quiet" ]]; then
+            verbose=0
         elif [[ $arg = "-h" || $arg = "--help" ]]; then
             showHelp
             exit 0
@@ -102,29 +108,28 @@ do
 
         # Make sure the file's of the right type
         # FROM 2.0.0 -- include JPG and JPEG files
-        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" ]]; then
+        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" || "$extension" = "TIFF" ]]; then
             ((fileCount++))
         fi
     fi
 done
 
 if [ ${#fileCount} -gt "$digits" ]; then
-    echo "Error: Specified digits ($digits) is less than the number of digits required (${#fileCount}) - use -d to set the number of output digits"
+    echo "[Error] Specified digits ($digits) is less than the number of digits required (${#fileCount}) - use -d to set the number of output digits"
     exit 1
 fi
 
-if [ $fileCount -eq 0 ]; then
-    echo "There are no suitable files to convert in folder $path"
-    exit 0
-elif [ $fileCount -eq 1 ]; then
-    if [ "$extension" = "PNG" ]; then
-        echo "1 PNG file in folder $path will now be converted and renumbered..."
-    else
-        echo "1 file in folder $path will now be renumbered..."
-    fi
-else
-    if [ "$extension" = "PNG" ]; then
-        echo "$fileCount PNG files in folder $path will now be converted..."
+# FROM 2.1.0 -- implement quiet operation
+if [ $verbose -eq 1 ]; then
+    if [ $fileCount -eq 0 ]; then
+        echo "There are no suitable files to convert in folder $path"
+        exit 0
+    elif [ $fileCount -eq 1 ]; then
+        if [ "$extension" = "PNG" ]; then
+            echo "1 PNG file in folder $path will now be converted and renumbered..."
+        else
+            echo "1 file in folder $path will now be renumbered..."
+        fi
     else
         echo "$fileCount files in folder $path will now be renumbered..."
     fi
@@ -146,7 +151,7 @@ do
 
         # Make sure the file's of the right type
         # FROM 2.0.0 -- include JPG and JPEG files
-        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" ]]; then
+        if [[ "$extension" = "PNG" || "$extension" = "JPG"  || "$extension" = "JPEG" || "$extension" = "TIFF" ]]; then
 
             # Make the new file name
             value=$count
@@ -182,12 +187,15 @@ do
                 rm "$file"
             fi
 
+            if [ $verbose -eq 1 ]; then
+                echo "Converting $file to $dest/$filename..."
+            fi
+
             # Convert the copied PNG to JPEG (compression 60%)
             # FROM 2.0.0 -- only do this if necessary
             # NOTE We've already renamed the file extension to stop sips
             #      throwing an error
-            echo "Converting $file to $dest/$filename..."
-            if [ "$extension" = "PNG" ]; then
+            if [[ "$extension" = "PNG" || "$extension" = "TIFF" ]]; then
                 sips "$dest/$filename" -s format jpeg -s formatOptions 60 > /dev/null
             fi
 
@@ -197,11 +205,13 @@ do
     fi
 done
 
-((count = count - start))
-if [ $count -eq 1 ]; then
-    echo "1 file converted"
-elif [ $count -gt 1 ]; then
-    echo "$count files converted"
-else
-    echo "No files converted"
+if [ $verbose -eq 1 ]; then
+    ((count = count - start))
+    if [ $count -eq 1 ]; then
+        echo "1 file converted"
+    elif [ $count -gt 1 ]; then
+        echo "$count files converted"
+    else
+        echo "No files converted"
+    fi
 fi
