@@ -10,6 +10,8 @@ In the case of scripts which operate as utilities, use the `--help` switch to le
 
 Image processing scripts. See [this blog post](https://smittytone.wordpress.com/2019/10/24/macos-image-manipulation-with-sips/).
 
+**Note** imageprep 5.2.0 reverses the order of crop, scale and pad dimensions *from* <height> <width> *to* <width> <height>.
+
 - [View Image Cropping/Padding/Scaling Script](imageprep.sh)
 - [View Image Numbering Script](imagenum.sh)
 

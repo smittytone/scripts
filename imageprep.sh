@@ -3,12 +3,12 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.1.4
+# Version 5.2.0
 
 
 # Function to show help info - keeps this out of the code
 function showHelp {
-    echo -e "\nimageprep 5.1.4\n"
+    echo -e "\nimageprep 5.2.0\n"
     echo -e "A macOS Image Adjustment Utility\n"
     echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
@@ -17,7 +17,7 @@ function showHelp {
     echo    "Options:"
     echo    "    -s / --source      [path]                  The path to an image or a directory of images. Default: current working directory."
     echo    "    -d / --destination [path]                  The path to the images. Default: current working directory."
-    echo    "    -a / --action      [type] [height] [width] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
+    echo    "    -a / --action      [type] [width] [height] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
     echo    "    -r / --resolution  [dpi]                   Set the image dpi, eg. 300"
     echo    "    -f / --format      [format]                Set the image format: JPG/JPEG, PNG or TIF/TIFF"
@@ -171,16 +171,6 @@ for arg in "$@"; do
             6)  argType=$arg ;; # Next argument is the 'type' value ('c', 'p' or 's')
             7)  if [ "$argType" = "c" ]; then
                     doCrop=1
-                    cropHeight=$arg
-                elif [ "$argType" = "s" ]; then
-                    doScale=1
-                    scaleHeight=$arg
-                else
-                    doPad=1
-                    padHeight=$arg
-                fi ;;
-            8)  if [ "$argType" = "c" ]; then
-                    doCrop=1
                     cropWidth=$arg
                 elif [ "$argType" = "s" ]; then
                     doScale=1
@@ -188,6 +178,16 @@ for arg in "$@"; do
                 else
                     doPad=1
                     padWidth=$arg
+                fi ;;
+            8)  if [ "$argType" = "c" ]; then
+                    doCrop=1
+                    cropHeight=$arg
+                elif [ "$argType" = "s" ]; then
+                    doScale=1
+                    scaleHeight=$arg
+                else
+                    doPad=1
+                    padHeight=$arg
                 fi ;;
             *) echo "Error: Unknown argument"; exit 1 ;;
         esac
