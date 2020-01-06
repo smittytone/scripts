@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # Mac install script
-# Version 1.0.3
+# Version 1.0.4
 
 # Do intro
 clear
-echo "macOS Install Script 1.0.3"
+echo "macOS Install Script 1.0.4"
+
+# Set exit-on-failure
+set -e
 
 # Update macOS
 sudo softwareupdate --install --all
@@ -22,8 +25,8 @@ sudo pmset -c powernap 1
 
 # Ask for and set the machine's machine name
 read -p "Enter your preferred hostname " hostname
-echo -e "\nSetting machine name to $hostname"
 if [ -n "$hostname" ]; then
+    echo -e "\nSetting machine name to $hostname"
     sudo scutil --set HostName "$hostname"
     sudo scutil --set LocalHostName "$hostname"
     sudo scutil --set ComputerName "$hostname"
@@ -45,9 +48,10 @@ chflags nohidden "$HOME/Library"
 
 # Set up git and clone key repos
 echo "Preparing Git..."
+xcode-select --install
 target="$HOME/Documents/GitHub"
 if ! [ -e "$target" ]; then
-    mdkir "$target"
+    mkdir "$target"
 fi
 
 cd "$target" || exit 1
@@ -57,12 +61,6 @@ git clone https://github.com/smittytone/dotfiles.git
 # Run the app settings script
 "$target/scripts/upconf.sh --full"
 
-# Run the various mac config scriptlets
-cd "$target/dotfiles/config"
-for task in *; do
-    . "$task"
-done
-
 # Restart Finder and Dock to effect changes
 killall Finder Dock
 
@@ -70,13 +68,13 @@ killall Finder Dock
 echo "Installing Brew... "
 if /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; then
     echo "Installing Brew-sourced Utilities... "
-    apps=("bash" "nano" "coreutils" "gitup" "jq" "ncurses" "readline" "shellcheck" "gitup" "libdvdcss" "node" "python3")
+    apps=("bash" "nano" "coreutils" "gitup" "jq" "ncurses" "readline" "shellcheck" "libdvdcss" "node" "python3")
     for app in "${apps[@]}"; do
         brew install "$app"
     done
 
     echo "Installing Applications... "
-    apps=("handbrake" "vlc" "skype" "firefox" "omnidisksweeper" "google-chrome" "zoomus" "qlmarkdown")
+    apps=("handbrake" "vlc" "skype" "firefox" "omnidisksweeper")
     for app in "${apps[@]}"; do
         brew cask install "$app"
     done
@@ -90,8 +88,9 @@ pip3 install pylint
 
 read -n 1 -s -p "Press [ENTER] to open websites for other app downloads, or [S] to skip " key
 echo
-key=${key^^*}
-if [ "$key" != "S" ]; then
+# Make argument lowercase
+key=${key,,}
+if [ "$key" != "s" ]; then
     open http://www.dropbox.com
     open http://www.barebones.com
     open https://desktop.github.com
@@ -107,57 +106,16 @@ fi
 
 read -n 1 -s -p "Press [ENTER] to open the App Store, or [S] to skip " key
 echo
-key=${key^^*}
-if [ "$key" != "S" ]; then
+# Make argument lowercase
+key=${key,,}
+if [ "$key" != "s" ]; then
     open "/Applications/App Store.app"
-fi
-
-# Get server access for remaining items
-read -p "Please enter your server username: "
-echo
-if [ -z "$REPLY" ]; then
-    echo "Not a vaild username -- cancelling..."
-    exit 1
-else
-    user=$REPLY
-fi
-
-read -p "Please enter your server password: "
-echo
-if [ -z "$REPLY" ]; then
-    echo "Not a vaild password -- cancelling..."
-    exit 1
-else
-    pass=$REPLY
-fi
-
-credo="$user:$pass"
-if ! [ -e mntpoint ]; then
-    mkdir mntpoint
-fi
-
-if mount -v -t smbfs "//$credo@192.168.0.3/homes/macsource" mntpoint; then
-    # The mount operation worked, so copy over key files
-    echo "Copying fonts from server..."
-    cp -nvR mntpoint/fonts "$HOME/$target/Fonts"
-    echo "Copying xroar ROMs from server..."
-    cp -nvR mntpoint/xroar "$HOME/$target/xroar"
-
-    # Unmount the share
-    if umount mntpoint; then
-        # Remove the share mount points if the unmount was successful
-        rm mntpoint
-    else
-        echo "$(pwd)/mntpoint failed to unmount -- please unmount it manually and remove the mointpoint "
-    fi
-else
-    echo "Unable to copy files from server (return code: $?)"
 fi
 
 read -n 1 -s -p "Connect drive '2TB-APFS' and press [ENTER] to copy music, or [S] to skip " key
 echo
-key=${key^^*}
-if [ "$key" != "S" ]; then
+key=${key,,}
+if [ "$key" != "s" ]; then
     cp -R /Volumes/2TB-APFS/Music "$HOME/Music"
 fi
 
