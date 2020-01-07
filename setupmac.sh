@@ -5,7 +5,7 @@
 
 # Do intro
 clear
-echo "macOS Install Script 1.0.4"
+echo "macOS Install Script 1.0.5"
 
 # Set exit-on-failure
 set -e
@@ -68,7 +68,7 @@ killall Finder Dock
 echo "Installing Brew... "
 if /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; then
     echo "Installing Brew-sourced Utilities... "
-    apps=("bash" "nano" "coreutils" "gitup" "jq" "ncurses" "readline" "shellcheck" "libdvdcss" "node" "python3")
+    apps=("bash" "nano" "coreutils" "gitup" "jq" "ncurses" "readline" "shellcheck" "libdvdcss" "node" "python3" "hugo")
     for app in "${apps[@]}"; do
         brew install "$app"
     done
@@ -95,7 +95,7 @@ if [ "$key" != "s" ]; then
     open http://www.barebones.com
     open https://desktop.github.com
     open http://www.rogueamoeba.com/piezo
-    open https://www.bresink.com/osx/0TinkerTool/download.php
+    open https://www.bresink.com/osx/TinkerTool/download.php
     open http://www.audacityteam.org/download/mac/
     #open http://www.skype.com
     #open http://handbrake.fr
