@@ -1,5 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
+#!/usr/bin/env bash
 
 # Convert .docx files downloaded from Google Docs into PDFs
 # Uses textutil (macOS/BSD) and cupsfilter (CUPS)

@@ -1,5 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
+#!/usr/bin/env bash
 
 echo "GitFix"
 read -n 1 -s -p "You should be in your project directory. Press [G] to continue, or any other key to cancel " key

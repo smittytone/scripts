@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Mac install script
 # Version 1.0.4
@@ -106,7 +106,6 @@ fi
 
 read -n 1 -s -p "Press [ENTER] to open the App Store, or [S] to skip " key
 echo
-# Make argument lowercase
 key=${key,,}
 if [ "$key" != "s" ]; then
     open "/Applications/App Store.app"

@@ -1,6 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
-#      but I use brew-installed bash under macOS
+#!/usr/bin/env bash
 
 # Update local user config files (eg. between multiple machines)
 # Version 1.5.0

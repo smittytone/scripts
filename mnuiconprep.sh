@@ -7,8 +7,8 @@
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nIcon Maker\n"
-    echo -e "Usage:\n  iconprep [-p path] [-d path] [-t type]\n"
+    echo -e "\nIcon Maker for MNU\n"
+    echo -e "Usage:\n  mnuiconprep [-p path] [-d path] [-t type]\n"
     echo    "Options:"
     echo    "  -s / --source       [path]  The path of the source image(s). Default: ~/Downloads"
     echo    "  -d / --destination  [path]  The path to the target folder. Default: ~/Desktop"

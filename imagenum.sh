@@ -1,5 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
+#!/usr/bin/env bash
 
 # Rename and number a sequence of PNG files, and convert them to JPEG
 # FROM 2.0.0 -- Rename JPGs too, but omit conversion (natch); change commands

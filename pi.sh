@@ -1,6 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
-#      but I use brew-installed bash under macOS
+#!/usr/bin/env bash
 
 # Pi Image Installation
 # Version 1.0.5

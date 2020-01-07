@@ -1,5 +1,4 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
+#!/usr/bin/env bash
 
 # Backup to Server Script
 # Version 2.0.0
