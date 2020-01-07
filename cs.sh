@@ -2,11 +2,11 @@
 
 # Check SHAs
 #
-# Version 1.0.0
+# Version 1.0.1
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nCheck SHA 1.0.0\n"
+    echo -e "\nCheck SHA 1.0.1\n"
     echo -e "Usage:\n  cs [-f path] [sha]\n"
 }
 
@@ -66,7 +66,7 @@ if [ -z "$sourceFile" ]; then
 fi
 
 if [ ! -f "$sourceFile" ]; then
-    echo "[Error] Specified file not found"
+    echo "[Error] File not found: $sourceFile"
     exit 1
 fi
 
