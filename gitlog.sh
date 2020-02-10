@@ -6,7 +6,7 @@ echo -e "Year\tAdded\tRemoved\tTotal"
 
 total=0
 
-for year in $(seq 2010 2019); do
+for year in $(seq 2014 2020); do
     yearAdd=0
     yearSub=0
     TMPFILE=$(mktemp)
