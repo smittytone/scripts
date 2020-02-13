@@ -3,7 +3,7 @@
 # Update local user config files (eg. between multiple machines)
 # Version 1.0.0
 
-source="$HOME/documents/github/dotfiles"
+source="$HOME/Documents/GitHub/dotfiles"
 target="$HOME"
 
 if ! [ -e "$source" ]; then
@@ -56,7 +56,7 @@ if ! [ -e "$HOME/.config/gitup" ]; then
     echo "Adding ~/.config/gitup... "
     mkdir -p "$HOME/.config/gitup"
 fi
-cp -v "$source/bookmarks" "$HOME/.config/gitup/bookmarks"
+cp -v "$source/pi_bookmarks" "$HOME/.config/gitup/bookmarks"
 
 if ! [ -e "$HOME/.config/git" ]; then
     echo "Adding ~/.config/git... "
