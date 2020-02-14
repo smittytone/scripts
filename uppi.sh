@@ -14,7 +14,7 @@ fi
 # Process any arguments
 # NOTE P == Partial, ie. only update frequently used app configs
 #      F == Full, ie. update frequently used app configs AND apply
-#           macOS configurations AND occasional use app configs
+#           Pi system and occasional use app configs
 choice="ASK"
 for arg in "$@"; do
     theArg=${arg^^*}
