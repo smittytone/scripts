@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Disk Script
-# Version 2.0.0
+# Version 2.0.1
 
 target_vol=2TB-APFS
 doMusic=1
@@ -14,13 +14,22 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
 # Process the arguments
 argCount=0
 for arg in "$@"; do
-    arg=${arg,,}
-    if [[ $arg = "--books" || $arg = "-b" ]]; then
+    if [[ ${arg,,} = "--books" || ${arg,,} = "-b" ]]; then
         doMusic=0
         ((argCount++))
-    elif [[ $arg = "--music" || $arg = "-m" ]]; then
+    elif [[ ${arg,,} = "--music" || ${arg,,} = "-m" ]]; then
         doBooks=0
         ((argCount++))
+    elif [[ ${arg,,} = "--help" || ${arg,,} = "-h" ]]; then
+        echo -e "todisk.sh\n"
+        echo -e "Usage:\n"
+        echo -e "  todisk.sh [-m] [-b] [<drive_name>]\n"
+        echo -e "sOptions:\n"
+        echo "  -m / --music   Backup music only. Default: backup both"
+        echo "  -b / --books   Backup eBooks only. Default: backup both"
+        echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
+        echo
+        exit 0
     else
         target_vol=$arg
     fi
