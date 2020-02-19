@@ -15,9 +15,15 @@ Image processing scripts. See [this blog post](https://smittytone.wordpress.com/
 - [View Image Cropping/Padding/Scaling Script](imageprep.sh)
 - [View Image Numbering Script](imagenum.sh)
 
+### cs.sh ###
+
+Confirm or reject a downloaded file’s SHA-256.
+
+- [View Script](cs.sh)
+
 ### lowerext.sh ###
 
-Convert the working directory’s file extensions to lowercase
+Convert the working directory’s file extensions to lowercase.
 
 - [View Script](lowerext.sh)
 
@@ -27,17 +33,23 @@ Converts `.docx` files downloaded from Google Docs to `.pdf`.
 
 - [View Script](pdfer.sh)
 
+### cbz_blitzer.sh ###
+
+Scans a folder (and sub-folders) for .cbz files and converts them to .pdf files. Created for a one-off project. Included here to record folder scanning and file manipulation algorithms.
+
+- [View Script](cbz_blitzer.sh)
+
 ## Xcode and Development ##
 
 ### iconprep.sh ###
 
-macOS/watchOS/iOS app icon maker script
+macOS/watchOS/iOS app icon maker script.
 
 - [View Script](iconprep.sh)
 
 ### xcodeautobuild.sh ###
 
-Xcode-oriented build script for auto-incrementing a project's build number at build time
+Xcode-oriented build script for auto-incrementing a project's build number at build time.
 
 - [View Script](xcodeautobuild.sh)
 
@@ -45,7 +57,7 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 ### upconf.sh ###
 
-Update local config files from the `dotfiles` repo
+Update local config files from the `dotfiles` repo.
 
 - [View Script](upconf.sh)
 
@@ -60,11 +72,12 @@ Local media back-up scripts, targeting disk and server.
 
 ## Raspberry Pi Setup and Config ##
 
-### pireadonly.sh ###
+### uppi.sh ###
 
-Hack a Raspberry Pi to run in read-only mode (no writes to the SD).
+Update local config files from the `dotfiles` repo.
 
-- [View Script](pireadonly.sh)
+- [View Script](uppi.sh)
+
 
 ### &lt;p/z&gt;install.sh ###
 
@@ -78,3 +91,9 @@ Setup scripts for the Raspberry Pi and the Raspberry Pi Zero.
 SD card preparation script for Raspberry Pis. **Note** This runs on a macOS host.
 
 - [View Script](pi.sh)
+
+### pireadonly.sh ###
+
+Hack a Raspberry Pi to run in read-only mode (no writes to the SD).
+
+- [View Script](pireadonly.sh)
