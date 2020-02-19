@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# .cbz blitzer 1.0.1
+# .cbz blitzer 1.0.2
 #
 
 
@@ -23,7 +23,8 @@ function processFolder {
     for file in "$currentFolder"/*; do
         if [ -d "$file" ]; then
             # Item is a directory
-            if [ $(basename -- "$file") = "__MACOSX" ]; then
+            foldername=$(basename -- "$file")
+            if [ "$foldername" = "__MACOSX" ]; then
                 # This is an artifact from macOS-created .zips -- kill it
                 rm -rf "$file"
             else
@@ -37,29 +38,31 @@ function processFolder {
 
             if [ "$extension" = "cbz" ]; then
                 # File's extension is .cbz, so...
+                echo "Processing $file..."
 
                 # ...get the file's name...
                 filename=$(basename -- "$file")
                 newfilename=${filename%.*}
 
                 # ...make a folder in the current with the file's name...
-                mkdir "$folder/$newfilename"
+                mkdir "$currentFolder/$newfilename"
 
                 # ...unpack the .cbz to the new folder...
                 unzip -q "$file" -d "$currentFolder/$newfilename"
 
                 # ...and change the .cbz to .zip so it's not processed again
-                mv "$file" "$currentFolder/$newfilename.zip"
-                
+                #mv "$file" "$currentFolder/$newfilename.zip"
+
                 # Code for PDF-ing
                 # Set image DPI for unpacked files
-                # imageprep.sh -r 300 -f jpg -k -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename"
+                imageprep.sh -q -r 300 -k -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename"
                 #
                 # Put prepped images into a PDF stored here
-                # pdfmaker -c 0.5 -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename.pdf"
+                pdfmaker -c 0.5 -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename.pdf"
                 #
                 # Remove the folder of images
-                # rm -rf "$currentFolder/$newfilename"
+                rm -rf "$currentFolder/$newfilename"
+                rm "$file"
             fi
         fi
     done
