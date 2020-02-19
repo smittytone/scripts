@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
 #
-# .cbz blitzer 1.0.0
+# .cbz blitzer 1.0.1
 #
 
 
 function processFolder {
     # Set the supplied argument as a variable
-    folder="$1"
+    currentFolder="$1"
 
     # Make sure the supplied folder exists and IS a folder
-    if ! [[ -e "$folder" || -d "$folder" ]]; then
-        echo "Ignoring $folder"
+    if ! [[ -e "$currentFolder" || -d "$currentFolder" ]]; then
         return
     fi
 
     # How many items in the current folder?
     count=0
-    for file in "$folder"/*; do
+    for file in "$currentFolder"/*; do
         ((count++))
     done
 
     # Iterate through the current folder's items
-    for file in "$folder"/*; do
+    for file in "$currentFolder"/*; do
         if [ -d "$file" ]; then
             # Item is a directory
             if [ $(basename -- "$file") = "__MACOSX" ]; then
@@ -47,27 +46,36 @@ function processFolder {
                 mkdir "$folder/$newfilename"
 
                 # ...unpack the .cbz to the new folder...
-                unzip -q "$file" -d "$folder/$newfilename"
+                unzip -q "$file" -d "$currentFolder/$newfilename"
 
                 # ...and change the .cbz to .zip so it's not processed again
-                mv "$file" "$folder/$newfilename.zip"
-                # rm "$file"
+                mv "$file" "$currentFolder/$newfilename.zip"
+                
+                # Code for PDF-ing
+                # Set image DPI for unpacked files
+                # imageprep.sh -r 300 -f jpg -k -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename"
+                #
+                # Put prepped images into a PDF stored here
+                # pdfmaker -c 0.5 -s "$currentFolder/$newfilename" -d "$currentFolder/$newfilename.pdf"
+                #
+                # Remove the folder of images
+                # rm -rf "$currentFolder/$newfilename"
             fi
         fi
     done
 
     # How many items NOW in the current folder?
     newcount=0
-    for file in "$folder"/*; do
+    for file in "$currentFolder"/*; do
         ((newcount++))
     done
 
     # Has the file count changed? If so, reprocess it
     # NOTE Count will change when we expand the cbz files
     if [ "$newcount" -ne "$count" ]; then
-        processFolder "$1"
+        processFolder "$currentFolder"
     fi
 }
 
-# Start processing the contents of the current folder
+# Just start processing the contents of the current folder
 processFolder "$PWD"
