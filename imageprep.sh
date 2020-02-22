@@ -2,7 +2,7 @@
 
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.2.0
+# Version 5.2.1
 
 
 # Function to show help info - keeps this out of the code
@@ -15,7 +15,7 @@ function showHelp {
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
     echo    "    -s / --source      [path]                  The path to an image or a directory of images. Default: current working directory."
-    echo    "    -d / --destination [path]                  The path to the images. Default: current working directory."
+    echo    "    -d / --destination [path]                  The path to the images. Default: source directory."
     echo    "    -a / --action      [type] [width] [height] The crop/pad dimensions. Type is s (scale), c (crop) or p (pad)."
     echo    "    -c / --colour      [colour]                The padding colour in Hex, eg. A1B2C3. Default: FFFFFF."
     echo    "    -r / --resolution  [dpi]                   Set the image dpi, eg. 300"
@@ -125,8 +125,8 @@ function parseFileName {
 
 
 # Set inital state values
-destPath=~+
 sourcePath=~+
+destPath="DEFAULT"
 argType=c
 padColour=FFFFFF
 cropHeight=2182
@@ -236,6 +236,12 @@ fileCount=0
 if ! [ -e "$sourcePath" ]; then
     echo "Source directory $sourcePath cannot be found -- exiting"
     exit 1
+fi
+
+# FROM 5.2.1
+# If destination not set, use the source
+if [ "$destPath" = "DEFAULT" ]; then
+    destPath="$sourcePath"
 fi
 
 # Check that the destination directory is good; bail otherwise
