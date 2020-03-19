@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Disk Script
-# Version 2.0.1
+# Version 2.0.2
 
 target_vol=2TB-APFS
 doMusic=1
@@ -61,7 +61,7 @@ if [ -d "$target_path" ]; then
         for source in "${d_sources[@]}"; do
             name="${source##*/}"
             echo "Syncing $name"
-            rsync -avz "$HOME/$source" "$target_path" --exclude ".DS_Store"
+            rsync -az "$HOME/$source" "$target_path" --exclude ".DS_Store"
         done
     fi
 
@@ -70,7 +70,7 @@ if [ -d "$target_path" ]; then
         for source in "${m_sources[@]}"; do
             name="${source##*/}"
             echo "Syncing $name music"
-            rsync -avz "$HOME/$source" "$target_path/Music" --exclude ".DS_Store"
+            rsync -az "$HOME/$source" "$target_path/Music" --exclude ".DS_Store"
         done
     fi
 else
