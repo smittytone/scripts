@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Disk Script
-# Version 2.0.2
+# Version 2.1.0
 
 target_vol=2TB-APFS
 doMusic=1
@@ -11,6 +11,39 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
 
+# Functions
+function doSync {
+    # Sync the source to the target
+    # Arg 1 should be the source directory
+    # Arg 2 should be the target directory
+    name="${1##*/}"
+    echo -n "Syncing $name music"
+
+    # Prepare a readout of changed files ONLY (rsync does not do this)
+    list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
+    lines=$(grep '>' < <(echo -e "$list"))
+
+    # Check we have files to report
+    if [ -n "$lines" ]; then
+        # Files were sync'd so count the total number
+        count=0
+        while IFS= read -r line; do
+            ((count++))
+        done <<< "$lines"
+        echo "... $count files changed:"
+        # Output the files changed
+        while IFS= read -r line; do
+            trimline=$(echo "$line" | cut -c 11-)
+            if [ -n "$trimline" ]; then
+                echo "  $trimline"
+            fi
+        done <<< "$lines"
+    else
+        echo "... no files changed"
+    fi
+}
+
+# Runtime start
 # Process the arguments
 argCount=0
 for arg in "$@"; do
@@ -53,24 +86,21 @@ if [ $argCount -eq 0 ]; then
     echo
 fi
 
+# Make sure the target disk is mounted
 if [ -d "$target_path" ]; then
     echo "Disk '$target_vol' mounted."
 
     # Sync document sources
     if [ $doBooks -eq 1 ]; then
         for source in "${d_sources[@]}"; do
-            name="${source##*/}"
-            echo "Syncing $name"
-            rsync -az "$HOME/$source" "$target_path" --exclude ".DS_Store"
+            doSync "$source" "$target_path"
         done
     fi
 
     # Sync music sources
     if [ $doMusic -eq 1 ]; then
         for source in "${m_sources[@]}"; do
-            name="${source##*/}"
-            echo "Syncing $name music"
-            rsync -az "$HOME/$source" "$target_path/Music" --exclude ".DS_Store"
+            doSync "$source" "$target_path/Music"
         done
     fi
 else
