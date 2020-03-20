@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Disk Script
-# Version 2.1.0
+# Version 2.1.1
 
 target_vol=2TB-APFS
 doMusic=1
@@ -17,7 +17,7 @@ function doSync {
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
     name="${1##*/}"
-    echo -n "Syncing $name music"
+    echo -n "Syncing $name"
 
     # Prepare a readout of changed files ONLY (rsync does not do this)
     list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
@@ -35,7 +35,7 @@ function doSync {
         while IFS= read -r line; do
             trimline=$(echo "$line" | cut -c 11-)
             if [ -n "$trimline" ]; then
-                echo "  $trimline"
+                echo "/$trimline"
             fi
         done <<< "$lines"
     else
