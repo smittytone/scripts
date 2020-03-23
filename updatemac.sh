@@ -119,8 +119,23 @@ if [ "$choice" = "F" ]; then
         echo $task
         . "$task"
     done
+    
+    # FROM 2.0.0
+    # Install Xcode CLI if necessary
+    result=$(xcode-select --install 2>&1)
+    error=$(grep 'already installed' < <(echo -e "$result"))
+    if [ -n "$error" ]; then
+        # CLI installed already
+        echo "Xcode Command Line Tools installed"
+        exit -1
+    else
+        # Check for opening of external installer
+        note=$(grep 'install requested' < <(echo -e "$result"))
+        if [ -n "$note" ]; then
+            echo "Installing Xcode Command Line Tools... "
+        fi
+    fi
 fi
 
 echo "Configuration files updated"
-
-
+exit 0
