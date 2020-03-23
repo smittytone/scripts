@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
-# Update local user config files (eg. between multiple machines)
-# Version 1.5.0
+#
+# updatemac.sh
+#
+# Update local Macs user config files
+# (eg. between multiple machines)
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   2.0.0
+# @license   MIT
+#
+
 
 source="$HOME/documents/github/dotfiles"
 target="$HOME/Library"
@@ -112,3 +122,5 @@ if [ "$choice" = "F" ]; then
 fi
 
 echo "Configuration files updated"
+
+
