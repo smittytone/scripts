@@ -55,11 +55,17 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 ## Mac Setup and Config ##
 
-### upconf.sh ###
+### updatemac.sh ###
 
 Update local config files from the `dotfiles` repo.
 
-- [View Script](upconf.sh)
+- [View Script](updatemac.sh)
+
+### setupmac.sh ###
+
+Set up a new Mac.
+
+- [View Script](setupmac.sh)
 
 ## Mac Backup ##
 
@@ -77,7 +83,6 @@ Local media back-up scripts, targeting disk and server.
 Update local config files from the `dotfiles` repo.
 
 - [View Script](uppi.sh)
-
 
 ### &lt;p/z&gt;install.sh ###
 
