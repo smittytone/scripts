@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Installation Script 1.0.2
+# Pi Installation Script 1.1.0
 
 # Switch to home directory
 cd "$HOME"
@@ -71,6 +71,11 @@ cp dotfiles/nanorc "$HOME"/.nanorc
 cp dotfiles/pylintrc "$HOME"/.pylintrc
 cp dotfiles/gitignore_global "$HOME"/.gitignore_global
 git config --global core.excludesfile "$HOME"/.gitignore_global
+
+# From 1.1.0
+# Setup and enable VNC service
+sudo cp dotfiles/pi_virtual_desktop.service /etc/systemd/system/vnc_vd.service
+sudo systemctl enable vnc_vd.service
 
 echo -e "\nCleaning up..."
 # Remove the script
