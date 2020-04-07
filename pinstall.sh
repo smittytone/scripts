@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Installation Script 1.0.1
+# Pi Installation Script 1.0.2
 
 # Switch to home directory
 cd "$HOME"
@@ -16,9 +16,9 @@ rm -rf MagPi
 
 # Update the apt-get database, etc.
 echo "Updating system..."
-sudo apt-get update
-sudo apt-get -y dist-upgrade
-sudo apt-get -y autoremove
+sudo apt update
+sudo apt -y dist-upgrade
+sudo apt -y autoremove
 
 # Make directories
 echo "Creating directories..."
