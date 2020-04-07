@@ -16,9 +16,9 @@ rm -rf MagPi
 
 # Update the apt-get database, etc.
 echo "Updating system..."
-sudo apt update
-sudo apt -y dist-upgrade
-sudo apt -y autoremove
+sudo apt-get update
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
 
 # Make directories
 echo "Creating directories..."
@@ -27,12 +27,12 @@ mkdir "$HOME/Python"
 
 # Update .bashrc
 echo -e "Configuring command line... "
-echo "export PS1='$PWD > '" >> .bashrc
-echo "alias la='ls -lah --color=auto'" > .bash_aliases
-echo "alias ls='ls -l --color=auto'" >> .bash_aliases
-echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
-echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
-echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
+echo $'export PS1=\'$PWD > \'' >> .bashrc
+#echo "alias la='ls -lah --color=auto'" > .bash_aliases
+#echo "alias ls='ls -l --color=auto'" >> .bash_aliases
+#echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
+#echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
+#echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
 export PATH=$PATH:/usr/local/bin
 
 # Applications
@@ -45,7 +45,7 @@ sudo apt-get -q -y install ruby
 echo " scrot..."
 sudo apt-get -q -y install scrot
 echo " mdless..."
-sudo gem -q install mdless
+sudo gem install -q --silent mdless
 echo -e "pylint\n"
 sudo pip3 -q install pylint
 
@@ -66,6 +66,7 @@ git clone https://github.com/smittytone/dotfiles.git
 git clone https://github.com/smittytone/scripts.git
 
 # Setup configs
+cp dotfiles/pi_bash_aliases "$HOME"/.bash_aliases
 cp dotfiles/nanorc "$HOME"/.nanorc
 cp dotfiles/pylintrc "$HOME"/.pylintrc
 cp dotfiles/gitignore_global "$HOME"/.gitignore_global
