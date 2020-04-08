@@ -1,9 +1,8 @@
 #!/bin/bash
-
-# Pi Installation Script 1.1.0
+# Pi Installation Script 1.1.1
 
 # Switch to home directory
-cd "$HOME"
+cd "$HOME" || exit 1
 
 # Remove stock folders
 echo "Removing home sub-directories..."
@@ -26,27 +25,27 @@ mkdir "$HOME/Documents/GitHub"
 mkdir "$HOME/Python"
 
 # Update .bashrc
-echo -e "Configuring command line... "
+echo "Configuring command line... "
 echo $'export PS1=\'$PWD > \'' >> .bashrc
+export PATH=$PATH:/usr/local/bin
 #echo "alias la='ls -lah --color=auto'" > .bash_aliases
 #echo "alias ls='ls -l --color=auto'" >> .bash_aliases
 #echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
 #echo "alias sd='sudo shutdown -h now'" >> .bash_aliases
 #echo "alias update='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y'" >> .bash_aliases
-export PATH=$PATH:/usr/local/bin
 
 # Applications
-echo -e "\nInstalling screen..."
+echo -n "Installing utilities: screen..."
 sudo apt-get -q -y install screen
-echo " nginx..."
+echo -n " nginx..."
 sudo apt-get -q -y install nginx
-echo " ruby..."
+echo -n " ruby..."
 sudo apt-get -q -y install ruby
-echo " scrot..."
+echo -n " scrot..."
 sudo apt-get -q -y install scrot
-echo " mdless..."
+echo -n " mdless..."
 sudo gem install -q --silent mdless
-echo -e "pylint\n"
+echo -n " pylint"
 sudo pip3 -q install pylint
 
 # Node
@@ -60,30 +59,32 @@ sudo pip3 -q install pylint
 # sudo cp -R * /usr/local/
 
 # Git
-echo -e "\nCloning key repos..."
-cd "$HOME/Documents/GitHub" || exit 1
-git clone https://github.com/smittytone/dotfiles.git
-git clone https://github.com/smittytone/scripts.git
+if cd "$HOME/Documents/GitHub"; then
+    echo "Cloning key repos..."
+    git clone https://github.com/smittytone/dotfiles.git
+    git clone https://github.com/smittytone/scripts.git
 
-# Setup configs
-cp dotfiles/pi_bash_aliases "$HOME"/.bash_aliases
-cp dotfiles/nanorc "$HOME"/.nanorc
-cp dotfiles/pylintrc "$HOME"/.pylintrc
-cp dotfiles/gitignore_global "$HOME"/.gitignore_global
-git config --global core.excludesfile "$HOME"/.gitignore_global
+    # Setup configs
+    cp dotfiles/pi_bash_aliases "$HOME"/.bash_aliases
+    cp dotfiles/nanorc "$HOME"/.nanorc
+    cp dotfiles/pylintrc "$HOME"/.pylintrc
+    cp dotfiles/gitignore_global "$HOME"/.gitignore_global
+    git config --global core.excludesfile "$HOME"/.gitignore_global
 
-# From 1.1.0
-# Setup and enable VNC service
-sudo cp dotfiles/pi_virtual_desktop.service /etc/systemd/system/vnc_vd.service
-sudo systemctl enable vnc_vd.service
+    # From 1.1.0
+    # Setup and enable VNC service
+    sudo cp dotfiles/pi_virtual_desktop.service /etc/systemd/system/vnc_vd.service
+    sudo systemctl enable vnc_vd.service
+fi
 
-echo -e "\nCleaning up..."
 # Remove the script
-cd "$HOME"
-rm pinstall.sh
-rm -rf tmp
+if cd "$HOME"; then
+    echo "Cleaning up..."
+    rm pinstall.sh
+    rm -rf tmp
+fi
 
-read -n 1 -s -p "Press [S] to shutdown, [R] to reboot or [C] to cancel " key
+read -n 1 -s -p "Press [S] to shutdown, [R] to reboot or any other key to cancel " key
 key=${key^^*}
 if [ "$key" = "S" ]; then
     sudo shutdown -h now
