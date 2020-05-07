@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Server Script
-# Version 2.0.0
+# Version 3.0.0
 
 count=0
 success1=99
@@ -10,6 +10,7 @@ musicMounted=0
 homeMounted=0
 doBooks=1
 doMusic=1
+server="NONE"
 serverAuth=~/.config/sync/bookmarks
 d_sources=("/Documents/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
@@ -19,19 +20,30 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
 # Check for either of the two possible switches:
 #     --books - Backup the 'books' job only
 #     --music - Backup the 'music' job only
+#     --server - Address of the target server, eg. '192.168.0.1' or 'server.local'
 # NOTE 'argCount' is a flag that stays 0 if no switches were included
 argCount=0
+argIsValue=0
 for arg in "$@"
 do
-    if [ $arg = "--books" ]; then
-        doMusic=0
-        argCount=1
-    elif [ $arg = "--music" ]; then
-        doBooks=0
-        argCount=1
+    if [ $argIsValue -eq 1 ]; then
+        if [ $argCount -eq 1 ]; then
+            server="$arg"
+        fi
     else
-        echo "Error: Unknown argument ($arg)"
-        exit 1
+        if [ $arg = "--books" ]; then
+            doMusic=0
+            ((argCount++))
+        elif [ $arg = "--music" ]; then
+            doBooks=0
+            ((argCount++))
+        elif [ $arg = "--server" ]; then
+            argCount=1
+            ((argCount++))
+        else
+            echo "Error: Unknown argument ($arg)"
+            exit 1
+        fi
     fi
 done
 
@@ -44,6 +56,13 @@ fi
 # Check the 'bookmarks' file is present
 if ! [ -f $serverAuth ]; then
     echo "No server auth file found -- backup cannot continue"
+    exit 1
+fi
+
+# From 3.0.0
+# Check for a valid server
+if [ $server == "NONE" ]; then
+    echo "No server addrss supplied -- backup cannot continue"
     exit 1
 fi
 
@@ -71,7 +90,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/music..."
             mkdir mntpoint/music
             echo "Mounting mntpoint/music..."
-            if mount -t smbfs "//$line@192.168.0.3/music" mntpoint/music; then
+            if mount -t smbfs "//$line@$server/music" mntpoint/music; then
                 musicMounted=1
             fi
         fi
@@ -84,7 +103,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/home..."
             mkdir mntpoint/home
             echo "Mounting mntpoint/home..."
-            if mount -t smbfs "//$line@192.168.0.3/home"  mntpoint/home; then
+            if mount -t smbfs "//$line@$server/home"  mntpoint/home; then
                 homeMounted=1
             fi
         fi
