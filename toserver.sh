@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Server Script
-# Version 3.0.0
+# Version 3.0.1
 
 count=0
 success1=99
@@ -38,7 +38,7 @@ do
             doBooks=0
             ((argCount++))
         elif [ $arg = "--server" ]; then
-            argCount=1
+            argIsValue=1
             ((argCount++))
         else
             echo "Error: Unknown argument ($arg)"
