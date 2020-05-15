@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Backup to Server Script
-# Version 3.0.1
+# Version 4.0.0
 
 count=0
 success1=99
@@ -16,6 +16,37 @@ d_sources=("/Documents/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
+
+# From 4.0.0
+# Functions
+function doSync {
+    # Sync the source to the target
+    # Arg 1 should be the source directory
+    # Arg 2 should be the target directory
+    
+    # Prepare a readout of changed files ONLY (rsync does not do this)
+    list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".*")
+    lines=$(grep '>' < <(echo -e "$list"))
+
+    # Check we have files to report
+    if [ -n "$lines" ]; then
+        # Files were sync'd so count the total number
+        count=0
+        while IFS= read -r line; do
+            ((count++))
+        done <<< "$lines"
+        echo "... $count files changed:"
+        # Output the files changed
+        while IFS= read -r line; do
+            trimline=$(echo "$line" | cut -c 11-)
+            if [ -n "$trimline" ]; then
+                echo "/$trimline"
+            fi
+        done <<< "$lines"
+    else
+        echo "... no files changed"
+    fi
+}
 
 # Check for either of the two possible switches:
 #     --books - Backup the 'books' job only
@@ -122,7 +153,8 @@ fi
 if [[ -d mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books..."
     for source in "${d_sources[@]}"; do
-        rsync -avz "$HOME/$source" mntpoint/home --exclude ".*"
+        doSync $source mntpoint/home
+        #rsync -avz "$HOME/$source" mntpoint/home --exclude ".*"
     done
 fi
 
@@ -130,7 +162,8 @@ fi
 if [[ -d mntpoint/music && $musicMounted -eq 1 ]]; then
     echo "Backing-up Music..."
     for source in "${m_sources[@]}"; do
-        rsync -avz "$HOME/$source" mntpoint/music --exclude ".*"
+        doSync $source mntpoint/music
+        #rsync -avz "$HOME/$source" mntpoint/music --exclude ".*"
     done
 fi
 
