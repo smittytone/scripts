@@ -23,7 +23,9 @@ function doSync {
     # Sync the source to the target
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
-    
+    name="${source##*/}"
+    echo -n "$name"
+
     # Prepare a readout of changed files ONLY (rsync does not do this)
     list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".*")
     lines=$(grep '>' < <(echo -e "$list"))
@@ -153,7 +155,7 @@ fi
 if [[ -d mntpoint/home && $homeMounted -eq 1 ]]; then
     echo "Backing-up Comics and Books..."
     for source in "${d_sources[@]}"; do
-        doSync $source mntpoint/home
+        doSync "$source" mntpoint/home
         #rsync -avz "$HOME/$source" mntpoint/home --exclude ".*"
     done
 fi
@@ -162,7 +164,7 @@ fi
 if [[ -d mntpoint/music && $musicMounted -eq 1 ]]; then
     echo "Backing-up Music..."
     for source in "${m_sources[@]}"; do
-        doSync $source mntpoint/music
+        doSync "$source" mntpoint/music
         #rsync -avz "$HOME/$source" mntpoint/music --exclude ".*"
     done
 fi
