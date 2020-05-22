@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   2.0.0
+# @version   2.0.1
 # @license   MIT
 #
 
@@ -54,11 +54,16 @@ fi
 # The following are items that are likely to change often
 echo "Updating primary config files... "
 
+# bash profile
+# FROM 2.0.1 rename saved file
+cp -v "$source/mac_bash_profile" "$HOME/.bash_profile"
+
+# FROM 2.0.1
+# ZSH rc file
+cp -v "$source/mac_zshrc" "$HOME/.zshrc"
+
 # nano rc file
 cp -v "$source/nanorc" "$HOME/.nanorc"
-
-# bash profile
-cp -v "$source/bash_profile" "$HOME/.bash_profile"
 
 # vscode settings
 cp -v "$source/vs_settings.json" "$target/Application Support/Code/User/settings.json"

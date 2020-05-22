@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Mac install script
-# Version 1.0.4
+# Version 1.0.5
 
 # Do intro
 clear
@@ -59,7 +59,8 @@ git clone https://github.com/smittytone/scripts.git
 git clone https://github.com/smittytone/dotfiles.git
 
 # Run the app settings script
-"$target/scripts/upconf.sh --full"
+# FROM 1.0.5 correct called script's name
+"$target/scripts/updatemac.sh --full"
 
 # Restart Finder and Dock to effect changes
 killall Finder Dock
