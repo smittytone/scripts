@@ -13,7 +13,7 @@
 #
 
 
-# Set up directories
+# Set up key directories
 source="$HOME/Documents/GitHub/dotfiles"
 target="$HOME/Library"
 
