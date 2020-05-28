@@ -1,42 +1,12 @@
 #!/usr/bin/env bash
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.0.1
+# Version 1.0.2
 
 source="$HOME/Documents/GitHub/dotfiles"
 
 if ! [ -e "$source" ]; then
     echo "Please clone the repo \'dotfiles\' before proceeding -- exiting "
-    exit 1
-fi
-
-# Process any arguments
-# NOTE P == Partial, ie. only update frequently used app configs
-#      F == Full, ie. update frequently used app configs AND apply
-#           Pi system and occasional use app configs
-choice="ASK"
-for arg in "$@"; do
-    theArg=${arg^^*}
-    if [[ $theArg = "-F" || $theArg = "--FULL" ]]; then
-        choice="F"
-    elif [[ $theArg = "-P" || $theArg = "--PARTIAL" ]]; then
-        choice="P"
-    fi
-done
-
-# No valid arguments passed, so ask the user for the type of update
-
-if [ "$choice" = "ASK" ]; then
-    read -r -n 1 -s -p "Full [F] or partial [P] update? " choice
-    if [ -z "$choice" ]; then
-        echo "Cancelling..."
-        exit 0
-    fi
-fi
-
-choice=${choice^^*}
-if [[ "$choice" != "F" && "$choice" != "P" ]]; then
-    echo "Invalid option selected: '$choice' -- cancelling... "
     exit 1
 fi
 
@@ -48,6 +18,10 @@ cp -v "$source/nanorc" "$HOME/.nanorc"
 
 # bash profile
 cp -v "$source/pi_bash_aliases" "$HOME/.bash_aliases"
+
+# FROM 1.0.2
+# zsh profile
+cp -v "$source/pi_zshrc" "$HOME/.zshrc"
 
 # gitup config
 if ! [ -e "$HOME/.config/gitup" ]; then
