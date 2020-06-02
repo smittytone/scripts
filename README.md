@@ -1,6 +1,6 @@
 # Smittytone’s Script Archive #
 
-*Useful bash scripts*
+*Useful zsh and bash scripts*
 
 In the case of scripts which operate as utilities, use the `--help` switch to learn how to make use of the tool. Scripts which are intended to be run once &mdash; for example, the Raspberry Pi setup scripts &mdash; are documented in comments. Scripts run in other contexts, eg. in Xcode, are not yet documented.
 
@@ -55,11 +55,12 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 ## Mac Setup and Config ##
 
-### updatemac.sh ###
+### updatemac.zsh / updatemac.sh ###
 
 Update local config files from the `dotfiles` repo.
 
-- [View Script](updatemac.sh)
+- [View bash Script](updatemac.sh)
+- [View zsh Script](updatemac.zsh)
 
 ### setupmac.sh ###
 
@@ -78,11 +79,12 @@ Local media back-up scripts, targeting disk and server.
 
 ## Raspberry Pi Setup and Config ##
 
-### uppi.sh ###
+### updatepi.zsh / updatepi.sh ###
 
 Update local config files from the `dotfiles` repo.
 
-- [View Script](uppi.sh)
+- [View bash Script](updatepi.sh)
+- [View zsh Script](updatepi.zsh)
 
 ### &lt;p/z&gt;install.sh ###
 
