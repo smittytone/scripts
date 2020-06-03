@@ -6,6 +6,12 @@ In the case of scripts which operate as utilities, use the `--help` switch to le
 
 ## Tools and Utilities ##
 
+### outman.zsh ###
+
+Output man pages to text files. Specify the page and its output text file as pairs of arguments.
+
+- [View Script](outman.zssh)
+
 ### image&lt;num/prep&gt;.sh ###
 
 Image processing scripts. See [this blog post](https://smittytone.wordpress.com/2019/10/24/macos-image-manipulation-with-sips/).
