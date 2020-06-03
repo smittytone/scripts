@@ -39,6 +39,7 @@ done
 # No valid arguments passed, so ask the user for the type of update
 
 if [ "$choice" = "ASK" ]; then
+    # Get input, zsh style
     read -k -s "choice?Full [F] or partial [P] update? "
     echo
     if [ $choice = $'\n' ]; then

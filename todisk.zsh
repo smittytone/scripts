@@ -1,18 +1,18 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 # Backup to Disk Script
-# Version 2.1.1
+# Version 3.0.0
 
 target_vol=2TB-APFS
-doMusic=1
-doBooks=1
+do_music=1
+do_books=1
 d_sources=("/Documents/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
 
 # Functions
-function doSync {
+function do_sync {
     # Sync the source to the target
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
@@ -43,28 +43,34 @@ function doSync {
     fi
 }
 
+function show_help {
+    echo -e "todisk.zsh 3.0.0\n"
+    echo -e "Usage:\n"
+    echo -e "  todisk.zsh [-m] [-b] [<drive_name>]\n"
+    echo -e "sOptions:\n"
+    echo "  -m / --music   Backup music only. Default: backup both"
+    echo "  -b / --books   Backup eBooks only. Default: backup both"
+    echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
+    echo
+    exit 0
+}
+
 # Runtime start
 # Process the arguments
-argCount=0
+arg_count=0
 for arg in "$@"; do
-    if [[ ${arg,,} = "--books" || ${arg,,} = "-b" ]]; then
-        doMusic=0
-        ((argCount++))
-    elif [[ ${arg,,} = "--music" || ${arg,,} = "-m" ]]; then
-        doBooks=0
-        ((argCount++))
-    elif [[ ${arg,,} = "--help" || ${arg,,} = "-h" ]]; then
-        echo -e "todisk.sh\n"
-        echo -e "Usage:\n"
-        echo -e "  todisk.sh [-m] [-b] [<drive_name>]\n"
-        echo -e "sOptions:\n"
-        echo "  -m / --music   Backup music only. Default: backup both"
-        echo "  -b / --books   Backup eBooks only. Default: backup both"
-        echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
-        echo
-        exit 0
+    # Temporarily convert argument to lowercase, zsh-style
+    check_arg=${arg:l}
+    if [[ $check_arg = "--books" || $check_arg = "-b" ]]; then
+        do_music=0
+        ((arg_count++))
+    elif [[ $check_arg = "--music" || $check_arg = "-m" ]]; then
+        do_books=0
+        ((arg_count++))
+    elif [[ $check_arg = "--help" || $check_arg = "-h" ]]; then
+        show_help
     else
-        target_vol=$arg
+        target_vol="$arg"
     fi
 done
 
@@ -72,17 +78,18 @@ done
 target_path="/Volumes/$target_vol"
 
 # Check that the user is not exluding both jobs
-if [[ $doBooks -eq 0 && $doMusic -eq 0 ]]; then
+if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
     echo "Mutually exclusive switches set -- backup cannot continue"
     exit 1
 fi
 
 # If no switches were specified, assume we're running interactively
 # and invite the user to continue at their own pace
-if [ $argCount -eq 0 ]; then
+if [ $arg_count -eq 0 ]; then
     clear
     echo "Backup to Disk"
-    read -n 1 -s -p "Connect '$target_vol' then press [ENTER] when it has mounted"
+    # Get input, zsh style
+    read -k -s "choice?Connect '$target_vol' then press [ENTER] when it has mounted "
     echo
 fi
 
@@ -91,16 +98,16 @@ if [ -d "$target_path" ]; then
     echo "Disk '$target_vol' mounted."
 
     # Sync document sources
-    if [ $doBooks -eq 1 ]; then
+    if [ $do_books -eq 1 ]; then
         for source in "${d_sources[@]}"; do
-            doSync "$source" "$target_path"
+            do_sync "$source" "$target_path"
         done
     fi
 
     # Sync music sources
-    if [ $doMusic -eq 1 ]; then
+    if [ $do_music -eq 1 ]; then
         for source in "${m_sources[@]}"; do
-            doSync "$source" "$target_path/Music"
+            do_sync "$source" "$target_path/Music"
         done
     fi
 else
