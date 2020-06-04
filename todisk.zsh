@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Backup to Disk Script
-# Version 3.0.1
+# Version 3.1.0
 
 typeset -i do_music
 typeset -i do_books
@@ -9,7 +9,7 @@ typeset -i do_books
 target_vol=2TB-APFS
 do_music=1
 do_books=1
-d_sources=("/Documents/Comics" "/OneDrive/eBooks")
+d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")

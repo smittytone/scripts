@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # Backup to Disk Script
-# Version 2.1.1
+# Version 2.2.0
 
 target_vol=2TB-APFS
 doMusic=1
 doBooks=1
-d_sources=("/Documents/Comics" "/OneDrive/eBooks")
+d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
