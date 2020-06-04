@@ -103,14 +103,14 @@ if [[ "$choice" = "F" ]]; then
     echo "Updating additional config files... "
     # FROM 1.2.0 -- Don't copy FFMPEG under Catalina
     # cp -nvR "$source/ffmpeg/" "$target/ffmpeg"
-    cp -nvR "$source/Services/Copy File Path.workflow" "$target/Services/Copy File Path.workflow"
+    cp -nvR "$source/Services/" "$target/Services"
 
     # FROM 1.2.1 -- fix duplication of files vs folders
     #cp -nvR $source/LaunchAgents/ $target/LaunchAgents
     cp -nvR "$source/Quicklook/" "$target/Quicklook"
 
     # FROM 1.3.0 -- add ~/Library/Filters folder (custom Quartz filters)
-    cp -nvR "$source/Filters/" "$target/Filters"
+    #cp -nvR "$source/Filters/" "$target/Filters"
 
     # FROM 1.1.0 -- Don't bother with BBEdit for now
     # cp -nvR "$source/bbedit_squirrel.plist" "$target/Application Support/BBEdit/Language Modules/Squirrel.plist"
