@@ -8,13 +8,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   2.0.1
+# @version   2.0.2
 # @license   MIT
 #
 
 source="$HOME/Documents/GitHub/dotfiles"
 
-if ! [ -e "$source" ]; then
+if [[ ! -e "$source" ]]; then
     echo "Please clone the repo \'dotfiles\' before proceeding -- exiting "
     exit 1
 fi
@@ -32,14 +32,14 @@ cp -v "$source/pi_bash_aliases" "$HOME/.bash_aliases"
 cp -v "$source/pi_zshrc" "$HOME/.zshrc"
 
 # gitup config
-if ! [ -e "$HOME/.config/gitup" ]; then
+if [[ ! -e "$HOME/.config/gitup" ]]; then
     echo "Adding ~/.config/gitup... "
     mkdir -p "$HOME/.config/gitup"
 fi
 
 cp -v "$source/pi_bookmarks" "$HOME/.config/gitup/bookmarks"
 
-if ! [ -e "$HOME/.config/git" ]; then
+if [[ ! -e "$HOME/.config/git" ]]; then
     echo "Adding ~/.config/git... "
     mkdir -p "$HOME/.config/git"
 fi

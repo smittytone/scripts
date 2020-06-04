@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.0.1
+# @version   3.0.2
 # @license   MIT
 #
 
@@ -17,7 +17,7 @@
 source="$HOME/Documents/GitHub/dotfiles"
 target="$HOME/Library"
 
-if ! [ -e "$source" ]; then
+if [[ ! -e "$source" ]]; then
     echo "Please clone the repo \'dotfiles\' before proceeding -- exiting "
     exit 1
 fi
@@ -29,20 +29,20 @@ fi
 choice="ASK"
 for arg in $@; do
     theArg=${arg:u}
-    if [[ $theArg = "-F" || $theArg = "--FULL" ]]; then
+    if [[ "$theArg" = "-F" || "$theArg" = "--FULL" ]]; then
         choice="F"
-    elif [[ $theArg = "-P" || $theArg = "--PARTIAL" ]]; then
+    elif [[ "$theArg" = "-P" || "$theArg" = "--PARTIAL" ]]; then
         choice="P"
     fi
 done
 
 # No valid arguments passed, so ask the user for the type of update
 
-if [ "$choice" = "ASK" ]; then
+if [[ "$choice" = "ASK" ]]; then
     # Get input, zsh style
     read -k -s "choice?Full [F] or partial [P] update? "
     echo
-    if [ $choice = $'\n' ]; then
+    if [[ $choice = $'\n' ]]; then
         echo "Cancelling..."
         exit 0
     fi
@@ -74,18 +74,18 @@ cp -v "$source/vs_settings.json" "$target/Application Support/Code/User/settings
 
 # gitup config
 # FROM 3.0.1 only copy on a full install or if file doesn't exist
-if ! [ -e "$HOME/.config/gitup" ]; then
+if [[ ! -e "$HOME/.config/gitup" ]]; then
     echo "Adding ~/.config/gitup... "
     mkdir -p "$HOME/.config/gitup"
     cp -v "$source/bookmarks" "$HOME/.config/gitup/bookmarks"
 else
-    if [ "$choice" = "F" ] || ! [ -e "$HOME/.config/gitup/bookmarks" ]; then
+    if [[ "$choice" = "F" || ! -e "$HOME/.config/gitup/bookmarks" ]]; then
         cp -v "$source/bookmarks" "$HOME/.config/gitup/bookmarks"
     fi
 fi
 
 # git config
-if ! [ -e "$HOME/.config/git" ]; then
+if [[ ! -e "$HOME/.config/git" ]]; then
     echo "Adding ~/.config/git... "
     mkdir -p "$HOME/.config/git"
 fi
@@ -99,7 +99,7 @@ fi
 
 # The following are items that won't be overwritten. They are very, very unlikely
 # to be changed once installed in the first place
-if [ "$choice" = "F" ]; then
+if [[ "$choice" = "F" ]]; then
     echo "Updating additional config files... "
     # FROM 1.2.0 -- Don't copy FFMPEG under Catalina
     # cp -nvR "$source/ffmpeg/" "$target/ffmpeg"
@@ -130,13 +130,13 @@ if [ "$choice" = "F" ]; then
     # Install Xcode CLI if necessary
     result=$(xcode-select --install 2>&1)
     error=$(grep 'already installed' < <(echo -e "$result"))
-    if [ -n "$error" ]; then
+    if [[ -n "$error" ]]; then
         # CLI installed already
         echo "Xcode Command Line Tools installed"
     else
         # Check for opening of external installer
         note=$(grep 'install requested' < <(echo -e "$result"))
-        if [ -n "$note" ]; then
+        if [[ -n "$note" ]]; then
             echo "Installing Xcode Command Line Tools... "
         fi
     fi

@@ -1,7 +1,10 @@
 #!/usr/bin/env zsh
 
 # Backup to Disk Script
-# Version 3.0.0
+# Version 3.0.1
+
+typeset -i do_music
+typeset -i do_books
 
 target_vol=2TB-APFS
 do_music=1
@@ -12,20 +15,22 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
 
 # Functions
-function do_sync {
+do_sync() {
     # Sync the source to the target
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
-    name="${1##*/}"
+    local name="${1##*/}"
     echo -n "Syncing $name"
 
     # Prepare a readout of changed files ONLY (rsync does not do this)
-    list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
-    lines=$(grep '>' < <(echo -e "$list"))
+    local list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
+    local lines=$(grep '>' < <(echo -e "$list"))
 
     # Check we have files to report
-    if [ -n "$lines" ]; then
+    if [[ -n "$lines" ]]; then
         # Files were sync'd so count the total number
+        local count
+        typeset -i count
         count=0
         while IFS= read -r line; do
             ((count++))
@@ -33,8 +38,8 @@ function do_sync {
         echo "... $count files changed:"
         # Output the files changed
         while IFS= read -r line; do
-            trimline=$(echo "$line" | cut -c 11-)
-            if [ -n "$trimline" ]; then
+            local trimline=$(echo "$line" | cut -c 11-)
+            if [[ -n "$trimline" ]]; then
                 echo "  /$trimline"
             fi
         done <<< "$lines"
@@ -43,7 +48,7 @@ function do_sync {
     fi
 }
 
-function show_help {
+show_help() {
     echo -e "todisk.zsh 3.0.0\n"
     echo -e "Usage:\n"
     echo -e "  todisk.zsh [-m] [-b] [<drive_name>]\n"
@@ -52,23 +57,24 @@ function show_help {
     echo "  -b / --books   Backup eBooks only. Default: backup both"
     echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
     echo
-    exit 0
 }
 
 # Runtime start
 # Process the arguments
+typeset -i arg_count
 arg_count=0
 for arg in "$@"; do
     # Temporarily convert argument to lowercase, zsh-style
     check_arg=${arg:l}
-    if [[ $check_arg = "--books" || $check_arg = "-b" ]]; then
+    if [[ "$check_arg" = "--books" || "$check_arg" = "-b" ]]; then
         do_music=0
         ((arg_count++))
-    elif [[ $check_arg = "--music" || $check_arg = "-m" ]]; then
+    elif [[ "$check_arg" = "--music" || "$check_arg" = "-m" ]]; then
         do_books=0
         ((arg_count++))
-    elif [[ $check_arg = "--help" || $check_arg = "-h" ]]; then
+    elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
+        exit 0
     else
         target_vol="$arg"
     fi
@@ -78,14 +84,14 @@ done
 target_path="/Volumes/$target_vol"
 
 # Check that the user is not exluding both jobs
-if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
+if [[ "$do_books" -eq 0 && "$do_music" -eq 0 ]]; then
     echo "Mutually exclusive switches set -- backup cannot continue"
     exit 1
 fi
 
 # If no switches were specified, assume we're running interactively
 # and invite the user to continue at their own pace
-if [ $arg_count -eq 0 ]; then
+if [[ $arg_count -eq 0 ]]; then
     clear
     echo "Backup to Disk"
     # Get input, zsh style
@@ -94,18 +100,18 @@ if [ $arg_count -eq 0 ]; then
 fi
 
 # Make sure the target disk is mounted
-if [ -d "$target_path" ]; then
+if [[ -d "$target_path" ]]; then
     echo "Disk '$target_vol' mounted."
 
     # Sync document sources
-    if [ $do_books -eq 1 ]; then
+    if [[ $do_books -eq 1 ]]; then
         for source in "${d_sources[@]}"; do
             do_sync "$source" "$target_path"
         done
     fi
 
     # Sync music sources
-    if [ $do_music -eq 1 ]; then
+    if [[ $do_music -eq 1 ]]; then
         for source in "${m_sources[@]}"; do
             do_sync "$source" "$target_path/Music"
         done

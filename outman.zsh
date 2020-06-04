@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Output a man page to a text file
-# Version 1.0.0
+# Version 1.0.1
 
 # Functions
 function show_help {
@@ -20,6 +20,7 @@ function show_help {
 
 # Runtime start
 # Process the arguments
+typeset -i is_source
 is_source=1
 sources=()
 targets=()
@@ -31,7 +32,7 @@ for arg in "$@"; do
     fi
 
     # Add the source and target arguments to the arrays
-    if [ $is_source -eq 1 ]; then
+    if [[ $is_source -eq 1 ]]; then
         is_source=0
         sources+=($arg)
     else
@@ -57,13 +58,13 @@ for a_source in $sources; do
     man_page=$(man "$a_source")
 
     # Check that there IS a man page for the entry
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         # Get the target that matches the current source
         a_target=${targets[$target_count]}
 
         # Check the path exists
         file_path=$a_target:h
-        if ! [ -e "$file_path" ]; then
+        if [[ ! -e "$file_path" ]]; then
             if mkdir -p "$file_path"; then
                 echo "[INFO] Path '$file_path' created"
             else
@@ -75,7 +76,7 @@ for a_source in $sources; do
         # Get the file name, zsh style, and check it's not null
         # If it is, append '.txt' to the target
         file_extension=$a_target:t:e
-        if [ -z "$file_extension" ]; then
+        if [[ -z "$file_extension" ]]; then
             a_target="$a_target.txt"
         fi
 
