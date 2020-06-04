@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Mac install script
-# Version 1.0.5
+# Version 1.1.0
 
 # Do intro
 clear
-echo "macOS Install Script 1.0.5"
+echo "macOS Install Script 1.1.0"
 
 # Set exit-on-failure
 set -e
@@ -49,7 +49,7 @@ chflags nohidden "$HOME/Library"
 # Set up git and clone key repos
 echo "Preparing Git..."
 xcode-select --install
-target="$HOME/Documents/GitHub"
+target="$HOME/GitHub"
 if ! [ -e "$target" ]; then
     mkdir "$target"
 fi

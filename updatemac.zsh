@@ -8,13 +8,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.0.2
+# @version   3.1.0
 # @license   MIT
 #
 
 
 # Set up key directories
-source="$HOME/Documents/GitHub/dotfiles"
+source="$HOME/GitHub/dotfiles"
 target="$HOME/Library"
 
 if [[ ! -e "$source" ]]; then

@@ -8,11 +8,11 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   2.0.2
+# @version   2.1.0
 # @license   MIT
 #
 
-source="$HOME/Documents/GitHub/dotfiles"
+source="$HOME/GitHub/dotfiles"
 
 if [[ ! -e "$source" ]]; then
     echo "Please clone the repo \'dotfiles\' before proceeding -- exiting "

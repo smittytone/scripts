@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # Update local user config files (eg. between multiple machines)
-# Version 1.0.2
+# Version 1.1.0
 
-source="$HOME/Documents/GitHub/dotfiles"
+source="$HOME/GitHub/dotfiles"
 
 if ! [ -e "$source" ]; then
     echo "Please clone the repo \'dotfiles\' before proceeding -- exiting "

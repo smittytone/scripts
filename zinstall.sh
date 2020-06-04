@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pi Zero Installation Script 1.0.4
+# Pi Zero Installation Script 1.1.0
 
 # Switch to home directory
 cd "$HOME"
@@ -22,13 +22,13 @@ sudo apt-get -y autoremove
 
 # Make directories
 echo -e "\nCreating directories..."
-mkdir "$HOME/Documents/GitHub"
+mkdir "$HOME/GitHub"
 mkdir "$HOME/Python"
 
 # Update .bashrc
 echo -e "\nConfiguring command line..."
 echo "export PS1='\$(pwd) > '" >> .bashrc
-echo "GIT=~/Documents/GitHub" >> .bashrc
+echo "GIT=$HOME/GitHub" >> .bashrc
 echo "alias la='ls -lahF --color=auto'" > .bash_aliases
 echo "alias ls='ls -lhF --color=auto'" >> .bash_aliases
 echo "alias rs='sudo shutdown -r now'" >> .bash_aliases
@@ -63,7 +63,7 @@ sudo cp -R * /usr/local/
 
 # Git
 echo -e "\nCloning key repos..."
-cd "$HOME/Documents/GitHub" || exit 1
+cd "$HOME/GitHub" || exit 1
 git clone https://github.com/smittytone/dotfiles.git
 git clone https://github.com/smittytone/scripts.git
 

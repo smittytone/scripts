@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pi Installation Script 1.1.1
+# Pi Installation Script 1.2.0
 
 # Switch to home directory
 cd "$HOME" || exit 1
@@ -21,7 +21,7 @@ sudo apt-get -y autoremove
 
 # Make directories
 echo "Creating directories..."
-mkdir "$HOME/Documents/GitHub"
+mkdir "$HOME/GitHub"
 mkdir "$HOME/Python"
 
 # Update .bashrc
@@ -59,7 +59,7 @@ sudo pip3 -q install pylint
 # sudo cp -R * /usr/local/
 
 # Git
-if cd "$HOME/Documents/GitHub"; then
+if cd "$HOME/GitHub"; then
     echo "Cloning key repos..."
     git clone https://github.com/smittytone/dotfiles.git
     git clone https://github.com/smittytone/scripts.git
