@@ -29,8 +29,7 @@ do_sync() {
     # Check we have files to report
     if [[ -n "$lines" ]]; then
         # Files were sync'd so count the total number
-        local count
-        typeset -i count
+        local typeset -i count
         count=0
         local cols=$(tput cols)
         while IFS= read -r line; do
@@ -40,10 +39,8 @@ do_sync() {
         # Output the files changed
         while IFS= read -r line; do
             local trimline=$(echo "$line" | cut -c 11-)
-            local tab=0
             if [[ -n "$trimline" ]]; then
-                ((tab = cols - ${#trimline} - 2))
-                printf "%${tab}s\n" "/$trimline"
+                printf "%${cols}s\n" "/$trimline"
             fi
         done <<< "$lines"
     else
