@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Backup to Disk Script
-# Version 3.1.0
+# Version 3.1.1
 
 typeset -i do_music
 typeset -i do_books
@@ -19,8 +19,8 @@ do_sync() {
     # Sync the source to the target
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
-    local name="${1##*/}"
-    echo -n "Syncing $name"
+    local name="${1:t}"
+    echo -n "Syncing ${name}... "
 
     # Prepare a readout of changed files ONLY (rsync does not do this)
     local list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
@@ -32,19 +32,22 @@ do_sync() {
         local count
         typeset -i count
         count=0
+        local cols=$(tput cols)
         while IFS= read -r line; do
             ((count++))
         done <<< "$lines"
-        echo "... $count files changed:"
+        echo "$count files changed:"
         # Output the files changed
         while IFS= read -r line; do
             local trimline=$(echo "$line" | cut -c 11-)
+            local tab=0
             if [[ -n "$trimline" ]]; then
-                echo "  /$trimline"
+                ((tab = cols - ${#trimline} - 2))
+                printf "%${tab}s\n" "/$trimline"
             fi
         done <<< "$lines"
     else
-        echo "... no files changed"
+        echo "no files changed"
     fi
 }
 
