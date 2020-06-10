@@ -1,14 +1,11 @@
 #!/usr/bin/env zsh
 
 # Backup to Disk Script
-# Version 3.1.1
+# Version 3.1.2
 
-typeset -i do_music
-typeset -i do_books
-
+typeset -i do_music=1
+typeset -i do_books=1
 target_vol=2TB-APFS
-do_music=1
-do_books=1
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
@@ -29,8 +26,7 @@ do_sync() {
     # Check we have files to report
     if [[ -n "$lines" ]]; then
         # Files were sync'd so count the total number
-        local typeset -i count
-        count=0
+        typeset -i count=0
         local cols=$(tput cols)
         while IFS= read -r line; do
             ((count++))
