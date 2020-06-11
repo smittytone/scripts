@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Backup to Server Script
-# Version 5.0.0
+# Version 5.0.1
 
 count=0
 success_1=99
@@ -31,7 +31,7 @@ function do_sync {
     lines=$(grep '>' < <(echo -e "$list"))
 
     # Check we have files to report
-    if [ -n "$lines" ]; then
+    if [[ -n "$lines" ]]; then
         # Files were sync'd so count the total number
         count=0
         while IFS= read -r line; do
@@ -59,18 +59,18 @@ typeset -i arg_count=0
 typeset -i arg_is_value=0
 for arg in "$@"
 do
-    if [ $arg_is_value -eq 1 ]; then
-        if [ $arg_count -eq 1 ]; then
+    if [[ $arg_is_value -eq 1 ]]; then
+        if [[ $arg_count -eq 1 ]]; then
             server="$arg"
         fi
     else
-        if [ $arg = "--books" ]; then
+        if [[ $arg = "--books" ]]; then
             do_music=0
             ((arg_count += 1))
-        elif [ $arg = "--music" ]; then
+        elif [[ $arg = "--music" ]]; then
             do_books=0
             ((arg_count += 1))
-        elif [ $arg = "--server" ]; then
+        elif [[ $arg = "--server" ]]; then
             arg_is_value=1
             ((arg_count += 1))
         else
@@ -94,14 +94,14 @@ fi
 
 # From 3.0.0
 # Check for a valid server
-if [ $server = "NONE" ]; then
+if [[ $server = "NONE" ]]; then
     echo "No server addrss supplied -- backup cannot continue"
     exit 1
 fi
 
 # If no switches were specified, assume we're running interactively
 # and invite the user to continue at their own pace
-if [ $arg_count -eq 0 ]; then
+if [[ $arg_count -eq 0 ]]; then
     clear
     read -k -s "choice?Press [ENTER] to start "
     echo
@@ -119,7 +119,7 @@ while IFS= read -r line; do
 
     # If we're doing the 'music' backup job, mount the relevant server store
     # and flag that it is mounted
-    if [ $do_music -eq 1 ]; then
+    if [[ $do_music -eq 1 ]]; then
         if [[ ! -d mntpoint/music ]]; then
             echo "Making mntpoint/music..."
             if mkdir mntpoint/music; then
@@ -133,7 +133,7 @@ while IFS= read -r line; do
 
     # If we're doing the 'books' backup job, mount the relevant server store
     # and flag that it is mounted
-    if [ $do_books -eq 1 ]; then
+    if [[ $do_books -eq 1 ]]; then
         if [[ ! -d mntpoint/home ]]; then
             echo "Making mntpoint/home..."
             if mkdir mntpoint/home; then
@@ -172,39 +172,35 @@ fi
 
 # If no switches were specified, assume we're running interactively
 # and invite the user to continue at their own pace
-if [ $arg_count -eq 0 ]; then
+if [[ $arg_count -eq 0 ]]; then
     read -k -s "choice?Press [ENTER] to finish "
     echo
 fi
 
 # If we mounted the music store, unmount it now
 # Exit with an error if we can't
-if [ $music_mounted -eq 1 ]; then
+success_1=1
+if [[ $music_mounted -eq 1 ]]; then
     echo "Dismounting mntpoint/music..."
-    umount mntpoint/music
-    success_1=$?
-
-    if [ $success_1 -ne 0 ]; then
+    if umount mntpoint/music; then
+        success_1=0
+    else
         echo ~+"/mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
-else
-    success_1=0
 fi
 
 # If we mounted the books store, unmount it now
 # Exit with an error if we can't
-if [ $home_mounted -eq 1 ]; then
+success_2=1
+if [[ $home_mounted -eq 1 ]]; then
     echo "Dismounting mntpoint/home..."
-    umount mntpoint/home
-    success_2=$?
-
-    if [ $success_2 -ne 0 ]; then
+    if umount mntpoint/home; then
+        success_2=0
+    else
         echo ~+"/mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
-else
-    success_2=0
 fi
 
 # Make sure the unmount operations succeeded, warning if not
