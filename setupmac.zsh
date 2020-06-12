@@ -5,7 +5,7 @@
 
 # Do intro
 clear
-echo "macOS Install Script 1.1.0"
+echo "macOS Install Script 2.0.0"
 
 # Set exit-on-failure
 # set -e
