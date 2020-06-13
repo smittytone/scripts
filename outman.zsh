@@ -1,11 +1,15 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 
 # Output a man page to a text file
-# Version 1.0.1
+# Version 1.0.2
+
+APP_NAME=$(basename $0)
+APP_NAME=${APP_NAME:t}
+APP_VERSION="1.0.2"
 
 # Functions
 function show_help {
-    echo -e "outman.zsh 1.0.0\n"
+    echo -e "outman.zsh $APP_VERSION\n"
     echo -e "Usage:\n"
     echo -e "  outman.zsh <man_page> <text_file> ... <man_page> <text_file>\n"
     echo -e "Options:\n"
@@ -18,10 +22,14 @@ function show_help {
     exit 0
 }
 
+# FROM 1.0.2
+function show_error {
+    echo "${APP_NAME} error: $1" 1>&2
+}
+
 # Runtime start
 # Process the arguments
-typeset -i is_source
-is_source=1
+typeset -i is_source=1
 sources=()
 targets=()
 for arg in "$@"; do
@@ -55,7 +63,7 @@ for a_source in $sources; do
     ((target_count++))
 
     # Get the man page name from the source
-    man_page=$(man "$a_source")
+    man_page=$(man "$a_source" 2>&1)
 
     # Check that there IS a man page for the entry
     if [[ $? -eq 0 ]]; then
@@ -68,7 +76,7 @@ for a_source in $sources; do
             if mkdir -p "$file_path"; then
                 echo "[INFO] Path '$file_path' created"
             else
-                echo "[ERROR] Could not create path '$file_paths'"
+                show_error "Could not create path '$file_paths'"
                 continue
             fi
         fi
@@ -83,6 +91,6 @@ for a_source in $sources; do
         # Output the man page to the text file
         echo "$man_page" | col -b  > "$a_target"
     else
-        echo "[ERROR] '$man_page' is not a valid man page"
+        show_error "'$a_source' is not a valid man page"
     fi
 done
