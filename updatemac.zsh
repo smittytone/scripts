@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.1.0
+# @version   3.1.1
 # @license   MIT
 # remote
 
@@ -67,7 +67,7 @@ cp -v "$source/mac_bash_profile" "$HOME/.bash_profile"
 cp -v "$source/mac_zshrc" "$HOME/.zshrc"
 
 # nano rc file
-cp -v "$source/nanorc" "$HOME/.nanorc"
+cp -v "$source/mac_nanorc" "$HOME/.nanorc"
 
 # vscode settings
 cp -v "$source/vs_settings.json" "$target/Application Support/Code/User/settings.json"
