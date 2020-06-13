@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   2.1.0
+# @version   2.1.1
 # @license   MIT
 #
 
@@ -22,7 +22,7 @@ fi
 echo "Updating primary config files... "
 
 # nano rc file
-cp -v "$source/nanorc" "$HOME/.nanorc"
+cp -v "$source/pi_nanorc" "$HOME/.nanorc"
 
 # bash profile
 cp -v "$source/pi_bash_aliases" "$HOME/.bash_aliases"
