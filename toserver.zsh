@@ -1,7 +1,11 @@
 #!/bin/zsh
 
 # Backup to Server Script
-# Version 5.0.1
+# Version 5.0.2
+
+APP_NAME=$(basename $0)
+APP_NAME=${APP_NAME:t}
+APP_VERSION="5.0.2"
 
 count=0
 success_1=99
@@ -50,6 +54,11 @@ function do_sync {
     fi
 }
 
+# FROM 5.0.2
+function show_error {
+    echo "${APP_NAME} error: $1" 1>&2
+}
+
 # Check for either of the two possible switches:
 #     --books - Backup the 'books' job only
 #     --music - Backup the 'music' job only
@@ -74,7 +83,7 @@ do
             arg_is_value=1
             ((arg_count += 1))
         else
-            echo "Error: Unknown argument ($arg)"
+            show_error "Unknown argument ($arg)"
             exit 1
         fi
     fi
@@ -82,20 +91,20 @@ done
 
 # Check that the user is not exluding both jobs
 if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
-    echo "No sources set -- backup cannot continue"
+    show_error "No sources set -- backup cannot continue"
     exit 1
 fi
 
 # Check the 'bookmarks' file is present
 if [[ ! -f $server_auth ]]; then
-    echo "No server auth file found -- backup cannot continue"
+    show_error "No server auth file found -- backup cannot continue"
     exit 1
 fi
 
 # From 3.0.0
 # Check for a valid server
 if [[ $server = "NONE" ]]; then
-    echo "No server addrss supplied -- backup cannot continue"
+    show_error "No server address supplied -- backup cannot continue"
     exit 1
 fi
 
@@ -149,8 +158,8 @@ while IFS= read -r line; do
 done < $server_auth
 
 # No server auth lines read? Then bail
-if [ $count -eq 0 ]; then
-    echo "No bookmarks present -- backup cannot continue"
+if [[ $count -eq 0 ]]; then
+    show_error "No bookmarks present -- backup cannot continue"
     exit 1
 fi
 
@@ -185,7 +194,7 @@ if [[ $music_mounted -eq 1 ]]; then
     if umount mntpoint/music; then
         success_1=0
     else
-        echo ~+"/mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
+        show_error "/mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
 fi
@@ -198,7 +207,7 @@ if [[ $home_mounted -eq 1 ]]; then
     if umount mntpoint/home; then
         success_2=0
     else
-        echo ~+"/mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
+        show_error "/mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
 fi
@@ -209,7 +218,7 @@ if [[ $success_1 -eq 0 && $success_2 -eq 0 ]]; then
     echo "Removing mntpoint..."
     rm -r mntpoint
 else
-    echo "Could not remove mntpoint -- exiting"
+    show_error "Could not remove mntpoint -- exiting"
     exit 1
 fi
 

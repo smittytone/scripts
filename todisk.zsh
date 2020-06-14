@@ -1,7 +1,11 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 
 # Backup to Disk Script
-# Version 3.1.2
+# Version 3.1.3
+
+APP_NAME=$(basename $0)
+APP_NAME=${APP_NAME:t}
+APP_VERSION="3.1.3"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -36,7 +40,7 @@ do_sync() {
         while IFS= read -r line; do
             local trimline=$(echo "$line" | cut -c 11-)
             if [[ -n "$trimline" ]]; then
-                printf "%${cols}s\n" "/$trimline"
+                echo "    /$trimline"
             fi
         done <<< "$lines"
     else
@@ -45,7 +49,7 @@ do_sync() {
 }
 
 show_help() {
-    echo -e "todisk.zsh 3.0.0\n"
+    echo -e "todisk.zsh $APP_VERSION\n"
     echo -e "Usage:\n"
     echo -e "  todisk.zsh [-m] [-b] [<drive_name>]\n"
     echo -e "sOptions:\n"
@@ -53,6 +57,10 @@ show_help() {
     echo "  -b / --books   Backup eBooks only. Default: backup both"
     echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
     echo
+}
+
+function show_error {
+    echo "${APP_NAME} error: $1" 1>&2
 }
 
 # Runtime start
@@ -81,7 +89,7 @@ target_path="/Volumes/$target_vol"
 
 # Check that the user is not exluding both jobs
 if [[ "$do_books" -eq 0 && "$do_music" -eq 0 ]]; then
-    echo "Mutually exclusive switches set -- backup cannot continue"
+    show_error "Mutually exclusive switches set -- backup cannot continue"
     exit 1
 fi
 
