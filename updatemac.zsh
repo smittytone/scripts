@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 
 #
 # updatemac.zsh
@@ -10,7 +10,7 @@
 # @copyright 2019-20, Tony Smith
 # @version   3.1.2
 # @license   MIT
-# remote
+#
 
 
 # Set up key directories
@@ -152,4 +152,3 @@ if [[ "$choice" = "F" ]]; then
 fi
 
 echo "Mac configuration files updated"
-exit 0

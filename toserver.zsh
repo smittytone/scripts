@@ -1,21 +1,31 @@
 #!/bin/zsh
 
+#
+# toserver.zsh
+#
 # Backup to Server Script
-# Version 5.0.2
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   5.1.0
+# @license   MIT
+#
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.0.2"
+APP_VERSION="5.1.0"
 
-count=0
-success_1=99
-success_2=99
-music_mounted=0
-home_mounted=0
-do_books=1
-do_music=1
-server="NONE"
+typeset -i do_music=1
+typeset -i do_books=1
+typeset -i count=0
+typeset -i success_1=99
+typeset -i success_2=99
+typeset -i music_mounted=0
+typeset -i home_mounted=0
+typeset -i do_books=1
+typeset -i do_music=1
 server_auth=~/.config/sync/bookmarks
+target_vol="NONE"
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
@@ -23,7 +33,7 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
 
 # From 4.0.0
 # Functions
-function do_sync {
+do_sync() {
     # Sync the source to the target
     # Arg 1 should be the source directory
     # Arg 2 should be the target directory
@@ -55,43 +65,45 @@ function do_sync {
 }
 
 # FROM 5.0.2
-function show_error {
+show_error() {
     echo "${APP_NAME} error: $1" 1>&2
 }
 
-# Check for either of the two possible switches:
-#     --books - Backup the 'books' job only
-#     --music - Backup the 'music' job only
-#     --server - Address of the target server, eg. '192.168.0.1' or 'server.local'
-# NOTE 'argCount' is a flag that stays 0 if no switches were included
+# FROM 5.1.0
+show_help() {
+    echo -e "toserver.zsh $APP_VERSION\n"
+    echo -e "Usage:\n"
+    echo -e "  toserver.zsh [-m] [-b] [<server_addr>]\n"
+    echo -e "sOptions:\n"
+    echo "  -m / --music   Backup music only. Default: backup both"
+    echo "  -b / --books   Backup eBooks only. Default: backup both"
+    echo "  <server_addr>  Server server name, eg. '192.168.0.1' or 'server.local'"
+    echo
+}
+
+# Runtime start
+# Process the arguments
 typeset -i arg_count=0
-typeset -i arg_is_value=0
-for arg in "$@"
-do
-    if [[ $arg_is_value -eq 1 ]]; then
-        if [[ $arg_count -eq 1 ]]; then
-            server="$arg"
-        fi
+for arg in "$@"; do
+    # Temporarily convert argument to lowercase, zsh-style
+    check_arg=${arg:l}
+    if [[ "$check_arg" = "--books" || "$check_arg" = "-b" ]]; then
+        do_music=0
+        ((arg_count += 1))
+    elif [[ "$check_arg" = "--music" || "$check_arg" = "-m" ]]; then
+        do_books=0
+        ((arg_count += 1))
+    elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
+        show_help
+        exit 0
     else
-        if [[ $arg = "--books" ]]; then
-            do_music=0
-            ((arg_count += 1))
-        elif [[ $arg = "--music" ]]; then
-            do_books=0
-            ((arg_count += 1))
-        elif [[ $arg = "--server" ]]; then
-            arg_is_value=1
-            ((arg_count += 1))
-        else
-            show_error "Unknown argument ($arg)"
-            exit 1
-        fi
+        target_vol="$arg"
     fi
 done
 
 # Check that the user is not exluding both jobs
 if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
-    show_error "No sources set -- backup cannot continue"
+    show_error "Mutually exclusive options set -- backup cannot continue"
     exit 1
 fi
 
@@ -103,12 +115,12 @@ fi
 
 # From 3.0.0
 # Check for a valid server
-if [[ $server = "NONE" ]]; then
+if [[ $target_vol = "NONE" ]]; then
     show_error "No server address supplied -- backup cannot continue"
     exit 1
 fi
 
-# If no switches were specified, assume we're running interactively
+# If no options were specified, assume we're running interactively
 # and invite the user to continue at their own pace
 if [[ $arg_count -eq 0 ]]; then
     clear
@@ -133,7 +145,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/music..."
             if mkdir mntpoint/music; then
                 echo "Mounting mntpoint/music..."
-                if mount -t smbfs "//$line@$server/music" mntpoint/music; then
+                if mount -t smbfs "//$line@$target_vol/music" mntpoint/music; then
                     music_mounted=1
                 fi
             fi
@@ -147,7 +159,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/home..."
             if mkdir mntpoint/home; then
                 echo "Mounting mntpoint/home..."
-                if mount -t smbfs "//$line@$server/home"  mntpoint/home; then
+                if mount -t smbfs "//$line@$target_vol/home"  mntpoint/home; then
                     home_mounted=1
                 fi
             fi

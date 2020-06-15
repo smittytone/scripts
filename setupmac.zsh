@@ -1,11 +1,24 @@
 #!/bin/zsh
 
+#
+# setupmac.zsh
+#
 # Mac install script
-# Version 2.0.0
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   2.0.0
+# @license   MIT
+#
+
+
+APP_NAME=$(basename $0)
+APP_NAME=${APP_NAME:t}
+APP_VERSION="2.0.0"
 
 # Do intro
 clear
-echo "macOS Install Script 2.0.0"
+echo "macOS Install Script $APP_VERSION"
 
 # Set exit-on-failure
 # set -e

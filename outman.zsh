@@ -1,14 +1,22 @@
 #!/bin/zsh
 
+#
+# outman.zsh
+#
 # Output a man page to a text file
-# Version 1.0.2
+#
+# @author    Tony Smith
+# @copyright 2020, Tony Smith
+# @version   1.0.3
+# @license   MIT
+#
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="1.0.2"
+APP_VERSION="1.0.3"
 
 # Functions
-function show_help {
+show_help() {
     echo -e "outman.zsh $APP_VERSION\n"
     echo -e "Usage:\n"
     echo -e "  outman.zsh <man_page> <text_file> ... <man_page> <text_file>\n"
@@ -23,7 +31,7 @@ function show_help {
 }
 
 # FROM 1.0.2
-function show_error {
+show_error() {
     echo "${APP_NAME} error: $1" 1>&2
 }
 
@@ -51,13 +59,12 @@ done
 
 # Check that source and target counts match
 if [[ ${#sources} -ne ${#targets} ]]; then
-    echo "At least one specified man page has no text file target -- cannot continue "
+    show_error "At least one specified man page has no text file target -- cannot continue "
     exit 1
 fi
 
 # Specify 'target_count' as an integer
-typeset -i target_count
-target_count=0
+typeset -i target_count=0
 for a_source in $sources; do
     # Increase the target array index counter
     ((target_count++))
@@ -71,7 +78,7 @@ for a_source in $sources; do
         a_target=${targets[$target_count]}
 
         # Check the path exists
-        file_path=$a_target:h
+        file_path=${a_target:h}
         if [[ ! -e "$file_path" ]]; then
             if mkdir -p "$file_path"; then
                 echo "[INFO] Path '$file_path' created"
@@ -83,7 +90,7 @@ for a_source in $sources; do
 
         # Get the file name, zsh style, and check it's not null
         # If it is, append '.txt' to the target
-        file_extension=$a_target:t:e
+        file_extension=${a_target:t:e}
         if [[ -z "$file_extension" ]]; then
             a_target="$a_target.txt"
         fi

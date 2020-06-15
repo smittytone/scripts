@@ -1,7 +1,15 @@
 #!/bin/zsh
 
+#
+# todisk.zsh
+#
 # Backup to Disk Script
-# Version 3.1.3
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   3.1.3
+# @license   MIT
+#
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
@@ -59,23 +67,23 @@ show_help() {
     echo
 }
 
-function show_error {
+show_error() {
     echo "${APP_NAME} error: $1" 1>&2
 }
 
+
 # Runtime start
 # Process the arguments
-typeset -i arg_count
-arg_count=0
+typeset -i arg_count=0
 for arg in "$@"; do
     # Temporarily convert argument to lowercase, zsh-style
     check_arg=${arg:l}
     if [[ "$check_arg" = "--books" || "$check_arg" = "-b" ]]; then
         do_music=0
-        ((arg_count++))
+        ((arg_count += 1))
     elif [[ "$check_arg" = "--music" || "$check_arg" = "-m" ]]; then
         do_books=0
-        ((arg_count++))
+        ((arg_count += 1))
     elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
         exit 0
@@ -88,12 +96,12 @@ done
 target_path="/Volumes/$target_vol"
 
 # Check that the user is not exluding both jobs
-if [[ "$do_books" -eq 0 && "$do_music" -eq 0 ]]; then
-    show_error "Mutually exclusive switches set -- backup cannot continue"
+if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
+    show_error "Mutually exclusive options set -- backup cannot continue"
     exit 1
 fi
 
-# If no switches were specified, assume we're running interactively
+# If no options were specified, assume we're running interactively
 # and invite the user to continue at their own pace
 if [[ $arg_count -eq 0 ]]; then
     clear
