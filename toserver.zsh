@@ -98,6 +98,7 @@ for arg in "$@"; do
         exit 0
     else
         target_vol="$arg"
+        ((arg_count += 1))
     fi
 done
 
