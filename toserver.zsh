@@ -7,19 +7,17 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.1.0
+# @version   5.1.1
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.1.0"
+APP_VERSION="5.2.0"
 
 typeset -i do_music=1
 typeset -i do_books=1
 typeset -i count=0
-typeset -i success_1=99
-typeset -i success_2=99
 typeset -i music_mounted=0
 typeset -i home_mounted=0
 typeset -i do_books=1
@@ -66,7 +64,7 @@ do_sync() {
 
 # FROM 5.0.2
 show_error() {
-    echo "${APP_NAME} error: $1" 1>&2
+    echo "${APP_NAME} error: $1"
 }
 
 # FROM 5.1.0
@@ -201,12 +199,9 @@ fi
 
 # If we mounted the music store, unmount it now
 # Exit with an error if we can't
-success_1=1
 if [[ $music_mounted -eq 1 ]]; then
     echo "Dismounting mntpoint/music..."
-    if umount mntpoint/music; then
-        success_1=0
-    else
+    if ! umount mntpoint/music; then
         show_error "/mntpoint/music failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
@@ -214,25 +209,19 @@ fi
 
 # If we mounted the books store, unmount it now
 # Exit with an error if we can't
-success_2=1
 if [[ $home_mounted -eq 1 ]]; then
     echo "Dismounting mntpoint/home..."
-    if umount mntpoint/home; then
-        success_2=0
-    else
+    if ! umount mntpoint/home; then
         show_error "/mntpoint/home failed to unmount -- please unmount it manually and remove the mointpoint"
         exit 1
     fi
 fi
 
 # Make sure the unmount operations succeeded, warning if not
-if [[ $success_1 -eq 0 && $success_2 -eq 0 ]]; then
-    # Remove the share mount points if both unmounts were successful
-    echo "Removing mntpoint..."
-    rm -r mntpoint
+echo "Removing mntpoint..."
+if rm -r mntpoint; then
+    echo "Done"
 else
     show_error "Could not remove mntpoint -- exiting"
     exit 1
 fi
-
-echo Done
