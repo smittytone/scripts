@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   4.1.0
+# @version   4.1.1
 # @license   MIT
 #
 
@@ -102,7 +102,7 @@ if [[ ! -e $bin_dir ]]; then
 fi
 if [[ -e $scripts_dir/binstall.zsh ]]; then
     cp $scripts_dir/binstall.zsh $bin_dir/binstall
-    chmod +v $bin_dir/binstall
+    chmod +x $bin_dir/binstall
     $bin_dir/binstall
 fi
 
