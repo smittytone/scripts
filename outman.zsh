@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   1.0.3
+# @version   1.0.4
 # @license   MIT
 #
 
@@ -23,7 +23,7 @@ show_help() {
     echo -e "Options:\n"
     echo -e "  -h / --help   Show this help page\n"
     echo -e "Description:\n"
-    echo "  Each man page must ba accompanied by a target text file, or the script"
+    echo "  Each man page must be accompanied by a target text file, or the script"
     echo "  will not continue and no files will be generated. If the path to the "
     echo "  target file does not exist, it will be created if permissions allow."
     echo "  If no file extension is provided for the target, '.txt' will be added."
