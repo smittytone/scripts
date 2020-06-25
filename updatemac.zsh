@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   4.0.0
+# @version   4.1.0
 # @license   MIT
 #
 
@@ -91,6 +91,19 @@ fi
 if [[ ! -e "$HOME/.config/git" ]]; then
     echo "Adding ~/.config/git... "
     mkdir -p "$HOME/.config/git" || echo 'Could not add ~/.config/git'
+fi
+
+#FROM 4.§.0
+# binstall
+bin_dir=$HOME/bin
+scripts_dir=$GIT/scripts
+if [[ ! -e $bin_dir ]]; then
+    mkdir -p $bin_dir || echo 'Could not create ~/bin'
+fi
+if [[ -e $scripts_dir/binstall.zsh ]]; then
+    cp $scripts_dir/binstall.zsh $bin_dir/binstall
+    chmod +v $bin_dir/binstall
+    $bin_dir/binstall
 fi
 
 # git global exclude file
