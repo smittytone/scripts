@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.1.1
+# @version   5.1.2
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.2.0"
+APP_VERSION="5.1.2"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -69,9 +69,9 @@ show_error() {
 
 # FROM 5.1.0
 show_help() {
-    echo -e "toserver.zsh $APP_VERSION\n"
+    echo -e "toserver $APP_VERSION\n"
     echo -e "Usage:\n"
-    echo -e "  toserver.zsh [-m] [-b] [<server_addr>]\n"
+    echo -e "  toserver [-m] [-b] [<server_addr>]\n"
     echo -e "sOptions:\n"
     echo "  -m / --music   Backup music only. Default: backup both"
     echo "  -b / --books   Backup eBooks only. Default: backup both"

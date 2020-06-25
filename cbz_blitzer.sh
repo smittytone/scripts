@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
+
 #
-# .cbz blitzer 1.0.2
+# cbz_bitzer.sh
+#
+# CBZ Blitzer — converts .cbz files to .pdfs
+# Requires pdfmaker
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.3
+# @license   MIT
 #
 
 

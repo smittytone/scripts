@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 
+#
+# imagenum.sh
+#
 # Rename and number a sequence of PNG files, and convert them to JPEG
 # FROM 2.0.0 -- Rename JPGs too, but omit conversion (natch); change commands
 #
-# Version 2.1.0
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   2.1.1
+# @license   MIT
+#
 
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nImage Renumber Utility 2.1.0\n"
+    echo -e "\nImage Renumber Utility\n"
     echo -e "Usage:\n  imagenum [-p path] [-t path] [-n name] [-s start] [-d digits] [-c separator] [-k] [-q] [-h]\n"
     echo    "Options:"
     echo    "  -p / --path      [path]    The path to the source images. Default: current directory."

@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.1.3
+# @version   3.1.4
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="3.1.3"
+APP_VERSION="3.1.4"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -57,9 +57,9 @@ do_sync() {
 }
 
 show_help() {
-    echo -e "todisk.zsh $APP_VERSION\n"
+    echo -e "todisk $APP_VERSION\n"
     echo -e "Usage:\n"
-    echo -e "  todisk.zsh [-m] [-b] [<drive_name>]\n"
+    echo -e "  todisk [-m] [-b] [<drive_name>]\n"
     echo -e "sOptions:\n"
     echo "  -m / --music   Backup music only. Default: backup both"
     echo "  -b / --books   Backup eBooks only. Default: backup both"

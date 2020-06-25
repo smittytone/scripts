@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
-# Make all file extensions in the working directory lower cas
 #
-# Version 1.0.0
+# lowerext.sh
+#
+# Make all file extensions in the working directory lower case
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.1
+# @license   MIT
+#
+
 
 # Get all the entries in the working directory
 for file in ~+/*; do

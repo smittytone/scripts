@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
+#
+# pdfer.sh
+#
 # Convert .docx files downloaded from Google Docs into PDFs
 # Uses textutil (macOS/BSD) and cupsfilter (CUPS)
 #
-# Version 1.0.1
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.2
+# @license   MIT
+#
+
 
 for file in ~+/*
 do

@@ -1,9 +1,16 @@
-#!/usr/local/bin/bash
-# NOTE You may need to change the above line to /bin/bash
+#!/usr/bin/env bash
 
+#
+# mnuiconprep.sh
+#
 # Prep MNU images
 #
-# Version 1.0.0
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.1
+# @license   MIT
+#
+
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
@@ -15,6 +22,7 @@ function showHelp() {
     echo    "  -h / --help                 This help screen"
     echo
 }
+
 
 # Set inital state values
 sourceFolder="$HOME/Downloads"

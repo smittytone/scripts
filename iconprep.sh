@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+#
+# iconprep.sh
+#
 # Prep macOS/watchOS/iOS Icons
 #
-# Version 1.0.1
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.2
+# @license   MIT
+#
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nIcon Maker\n"
+    echo -e "\nIcon Prepare\n"
     echo -e "Usage:\n  iconprep [-s path] [-d path] [-t type]\n"
     echo    "Options:"
     echo    "  -s / --source       [path]  The path of the source image. The source image should"

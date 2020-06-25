@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 
+#
+# imageprep.sh
+#
 # Crop, pad, scale and/or reformat image files
 #
-# Version 5.2.1
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   5.2.2
+# @license   MIT
+#
 
 
 # Function to show help info - keeps this out of the code
 function showHelp {
-    echo -e "\nimageprep 5.2.0\n"
+    echo -e "\nimageprep 5.2.2\n"
     echo -e "A macOS Image Adjustment Utility\n"
     echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
     echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"

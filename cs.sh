@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
+#
+# cs.sh
+#
 # Check SHAs
 #
-# Version 1.0.1
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version   1.0.2
+# @license   MIT
+#
+
 
 # Function to show help info - keeps this out of the code
 function showHelp() {
-    echo -e "\nCheck SHA 1.0.1\n"
+    echo -e "\nCheck SHA 1.0.2\n"
     echo -e "Usage:\n  cs [-f path] [sha]\n"
 }
 

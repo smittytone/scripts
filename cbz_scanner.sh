@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
+
 #
-# .cbz scanner 1.0.0
+# cbz_scanner.sh
+#
+# CBZ file finder. Looks in $PWD and sub-directories
+#
+# @author    Tony Smith
+# @copyright 2019-20, Tony Smith
+# @version  1.0.1
+# @license   MIT
 #
 
 

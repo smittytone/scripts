@@ -13,13 +13,13 @@
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="1.0.3"
+APP_VERSION="1.0.4"
 
 # Functions
 show_help() {
-    echo -e "outman.zsh $APP_VERSION\n"
+    echo -e "outman $APP_VERSION\n"
     echo -e "Usage:\n"
-    echo -e "  outman.zsh <man_page> <text_file> ... <man_page> <text_file>\n"
+    echo -e "  outman <man_page> <text_file> ... <man_page> <text_file>\n"
     echo -e "Options:\n"
     echo -e "  -h / --help   Show this help page\n"
     echo -e "Description:\n"
