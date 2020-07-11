@@ -59,6 +59,13 @@ Xcode-oriented build script for auto-incrementing a project's build number at bu
 
 - [View Script](xcodeautobuild.sh)
 
+### packcli.zsh and packapp.zsh ###
+
+Shell scripts to automate the creation of macOS app installer packages, and their signing and notarization. For use with apps distributed outside the Mac App Store.
+
+- [View packapp Script](packapp.zsh)
+- [View packcli Script](packcli.zsh)
+
 ## Mac Setup and Config ##
 
 ### updatemac.zsh / updatemac.sh ###
