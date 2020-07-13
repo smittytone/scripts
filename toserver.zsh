@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.1.2
+# @version   5.2.0
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.1.2"
+APP_VERSION="5.2.0"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -22,12 +22,15 @@ typeset -i music_mounted=0
 typeset -i home_mounted=0
 typeset -i do_books=1
 typeset -i do_music=1
-server_auth=~/.config/sync/bookmarks
+server_auth="$HOME/.config/sync/bookmarks"
 target_vol="NONE"
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
+# FROM 5.2.0
+# Add user fonts
+f_sources=("/Library/Fonts")
 
 # From 4.0.0
 # Functions
@@ -178,6 +181,13 @@ fi
 if [[ -d mntpoint/home && $home_mounted -eq 1 ]]; then
     echo "Backing-up Comics and Books..."
     for source in "${d_sources[@]}"; do
+        do_sync "$source" mntpoint/home
+    done
+
+    # FROM 5.2.0
+    # Add user fonts
+    echo "Backing-up Fonts..."
+    for source in "${f_sources[@]}"; do
         do_sync "$source" mntpoint/home
     done
 fi
