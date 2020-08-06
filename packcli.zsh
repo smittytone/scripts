@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020 Tony Smith
-# @version   3.1.0
+# @version   3.1.1
 # @license   MIT
 #
 
@@ -17,17 +17,17 @@ show_help() {
     echo -e "\npackcli -- create a signed and notarized app package\n"
     echo -e "Usage: packcli.zsh [OPTIONS]\n"
     echo "Options:"
-    echo    "  -s / --source       - The location of the target project. Default: current directory"
-    echo    "  -n / --name         - The target tool's name. If no name is supplied, packcli"
-    echo    "                        uses the name of the source project."
+    echo    "  -s / --source       - The location of the target project. Default: current directory."
+    echo    "  -n / --name         - The target tool's name. If no name is supplied, packcli uses"
+    echo    "                        the name of the source project."
     echo    "  -b / --bundleid     - The target tool's bundle ID. This is not optional."
-    echo    "  -v / --version      - The target tool's version. Default: 1.0.0"
+    echo    "  -v / --version      - The target tool's version. Default: 1.0.0."
     echo    "  -a / --add          - Add scripts from the project's pkgscripts directory."
     echo    "  -u / --user         - Your Apple Developer username."
     echo    "  -c / --cert         - Your Apple Developer Installer certificate name, eg."
-    echo    "                        'Developer ID Installer: Fred Bloggs (ABCDEF1234)'"
-    echo    "  -d / --debug        - Enable extra debugging"
-    echo -e "  -h / --help         - This help page\n"
+    echo    "                        'Developer ID Installer: Fred Bloggs (ABCDEF1234)'."
+    echo    "  -d / --debug        - Enable extra debugging."
+    echo -e "  -h / --help         - This help page.\n"
 }
 
 
