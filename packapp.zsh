@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   4.0.2
+# @version   4.0.3
 # @license   TBD
 #
 
@@ -232,6 +232,7 @@ bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$app_source/$
 setopt
 success=$(pkgbuild ${=extra} --identifier "$bundle_id.pkg" --install-location "/Applications" --sign "$cert" --component "$app_source/$app_filename" "$app_source/$app_name.pkg")
 if [[ -z "$success" ]]; then
+    show_error "Package build error"
     exit 1
 fi
 
