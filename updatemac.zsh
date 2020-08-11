@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   4.1.1
+# @version   4.2.0
 # @license   MIT
 #
 
@@ -75,17 +75,8 @@ cp -v "$file_source/Mac/vs_settings.json" "$file_target/Application Support/Code
 # pylint rc file
 cp -v "$file_source/Universal/pylintrc" "$HOME/.pylintrc"
 
-# gitup config
-# FROM 3.0.1 only copy on a full install or if file doesn't exist
-if [[ ! -e "$HOME/.config/gitup" ]]; then
-    echo "Adding ~/.config/gitup... "
-    mkdir -p "$HOME/.config/gitup" || echo 'Could not add ~/.config/gitup'
-    cp -v "$file_source/Mac/bookmarks" "$HOME/.config/gitup/bookmarks"
-else
-    if [[ "$choice" = "F" || ! -e "$HOME/.config/gitup/bookmarks" ]]; then
-        cp -v "$file_source/Mac/bookmarks" "$HOME/.config/gitup/bookmarks"
-    fi
-fi
+# FROM 4.2.0
+# NOTE Script no longer updates Gitup bookmarks (deprecated)
 
 # git config
 if [[ ! -e "$HOME/.config/git" ]]; then
@@ -93,7 +84,7 @@ if [[ ! -e "$HOME/.config/git" ]]; then
     mkdir -p "$HOME/.config/git" || echo 'Could not add ~/.config/git'
 fi
 
-#FROM 4.§.0
+#FROM 4.1.0
 # binstall
 bin_dir=$HOME/bin
 scripts_dir=$GIT/scripts
