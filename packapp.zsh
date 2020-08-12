@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   4.0.3
-# @license   TBD
+# @version   4.0.4
+# @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="4.0.2"
+APP_VERSION="4.0.4"
 
 typeset -i is_arg=0
 typeset -i add_scripts=0
@@ -54,7 +54,7 @@ show_error() {
 
 
 # Exit script on fail
-set -e
+#set -e
 setopt nomatch
 
 # Process the command line arguments
@@ -202,20 +202,21 @@ if [[ ! -e "$app_source/$app_filename" ]]; then
 fi
 
 # Check for script additions
-extra=""
 if [[ $add_scripts -eq 1 ]]; then
     if [[ ! -e "$script_source" ]]; then
         show_error "'$script_source' scripts directory missing "
         exit 1
     fi
-
-    extra="--scripts $script_source"
 fi
+
+# Get the bundle ID
+bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$app_source/$app_filename/Contents/Info.plist")
 
 # Finally, output the data we have parsed
 if [[ $debug -eq 1 ]]; then
     echo "App Path: $app_source"
     echo "App Name: $app_filename"
+        echo "Bundle ID: $bundle_id"
     echo "Dev. ID Cert: $cert"
 
     if [ -n "$extra" ]; then
@@ -228,9 +229,12 @@ fi
 
 # Build the package
 echo "Making and signing package... "
-bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$app_source/$app_filename/Contents/Info.plist")
-setopt
-success=$(pkgbuild ${=extra} --identifier "$bundle_id.pkg" --install-location "/Applications" --sign "$cert" --component "$app_source/$app_filename" "$app_source/$app_name.pkg")
+if [[ $add_scripts -eq 1 ]]; then
+    success=$(pkgbuild --scripts "$script_source" --identifier "$bundle_id.pkg" --install-location '/Applications' --sign "$cert" --component "$app_source/$app_filename" "$app_source/$app_name.pkg")
+else
+    success=$(pkgbuild --identifier "$bundle_id.pkg" --install-location '/Applications' --sign "$cert" --component "$app_source/$app_filename" "$app_source/$app_name.pkg")
+fi
+
 if [[ -z "$success" ]]; then
     show_error "Package build error"
     exit 1
@@ -243,7 +247,8 @@ n_time=$(date +%s)
 response=$(xcrun altool --notarize-app --file "$app_source/$app_name.pkg" --primary-bundle-id "$bundle_id" --username "$uname" --password "@keychain:AC_PASSWORD")
 
 # Check the altool response for errors, and bail if there are any
-if [[ "$response" == *"Error:"* ]]; then
+err_line=$(grep 'product-errors' < <(echo -e "$response"))
+if [[ -n "$err_line" ]]; then
     show_error "$response"
     exit 1
 fi
