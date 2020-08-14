@@ -12,7 +12,6 @@
 # @license   MIT
 #
 
-
 # Set up key directories
 file_source="$HOME/GitHub/dotfiles"
 file_target="$HOME/Library"

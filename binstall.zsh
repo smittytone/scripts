@@ -7,7 +7,8 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version 1.0.0
+# @version 1.0.1
+
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
@@ -22,7 +23,23 @@ if [[ -e $source_file ]]; then
         # is the name of a script to copy, eg. 'update.zsh'
         while IFS= read -r line; do
             target_file=$HOME/bin/${line:t:r}
-            cp $scripts_dir/$line $target_file
+
+            # FROM 1.0.1
+            # Check of the source and target are different
+            diff_result=""
+            if [[ -e $target_file ]]; then
+                diff_result=$(diff $target_file $scripts_dir/$line)
+            fi
+
+            # FROM 1.0.1
+            # Only copy if the file is different
+            if [[ -n $diff_result ]]; then
+                cp $scripts_dir/$line $target_file
+                #echo "DEBUG $scripts_dir/$line copied"
+            else
+                #echo "DEBUG $scripts_dir/$line unchanged"
+            fi
+
             # Make the file executable
             chmod +x $target_file
         done < $source_file
