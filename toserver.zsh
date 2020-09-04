@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.2.0
+# @version   5.3.0
 # @license   MIT
 #
 
@@ -30,7 +30,7 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
 # FROM 5.2.0
 # Add user fonts
-f_sources=("/Library/Fonts")
+f_sources=("/Library/Fonts" "/Pictures" "/Documents" "/Downloads")
 
 # From 4.0.0
 # Functions
@@ -186,7 +186,7 @@ if [[ -d mntpoint/home && $home_mounted -eq 1 ]]; then
 
     # FROM 5.2.0
     # Add user fonts
-    echo "Backing-up Fonts..."
+    echo "Backing-up Other Items..."
     for source in "${f_sources[@]}"; do
         do_sync "$source" mntpoint/home
     done

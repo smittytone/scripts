@@ -6,8 +6,8 @@
 # Mac install script
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
-# @version   2.0.0
+# @copyright 2020, Tony Smith
+# @version   2.1.0
 # @license   MIT
 #
 
@@ -100,6 +100,15 @@ sudo gem install cocoapods
 
 echo "Installing Pylint... "
 pip3 install pylint
+
+# FROM 2.1.0
+# Install node packages
+which npm >> /dev/null
+if [[ $? -eq  0 ]]; then
+    echo "Installing Node packages... "
+    npm install -g uglify-js
+    npm install -g uglifycss
+fi
 
 read -k -s "key?Press [ENTER] to open the App Store, or [S] to skip"
 echo
