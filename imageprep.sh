@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.2.2
+# @version   5.2.3
 # @license   MIT
 #
 
@@ -290,8 +290,8 @@ fi
 
 # Output the source and destination directories
 if [ "$noMessages" -eq 0 ]; then
-    echo "Source: $sourcePath"
-    echo "Target: $destPath"
+    echo "Source: $(realpath $sourcePath)"
+    echo "Target: $(realpath $destPath)"
     if [ $doRes -eq 1 ]; then
         echo "New DPI: $dpi"
     fi
