@@ -7,16 +7,17 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.3.0
+# @version   5.4.0
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.2.0"
+APP_VERSION="5.4.0"
 
 typeset -i do_music=1
 typeset -i do_books=1
+typeset -i do_docus=1
 typeset -i count=0
 typeset -i music_mounted=0
 typeset -i home_mounted=0
@@ -28,9 +29,10 @@ d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
+
 # FROM 5.2.0
 # Add user fonts
-f_sources=("/Library/Fonts" "/Pictures" "/Documents" "/Downloads")
+b_sources=("/Library/Fonts" "/Pictures" "/Documents" "/Downloads")
 
 # From 4.0.0
 # Functions
@@ -71,13 +73,15 @@ show_error() {
 }
 
 # FROM 5.1.0
+# FROM 5.4.0 - add general docs backup
 show_help() {
     echo -e "toserver $APP_VERSION\n"
     echo -e "Usage:\n"
-    echo -e "  toserver [-m] [-b] [<server_addr>]\n"
-    echo -e "sOptions:\n"
-    echo "  -m / --music   Backup music only. Default: backup both"
-    echo "  -b / --books   Backup eBooks only. Default: backup both"
+    echo -e "  toserver [-m] [-b] [-d] [<server_addr>]\n"
+    echo -e "Options:\n"
+    echo "  -m / --music   Backup music only. Default: backup all"
+    echo "  -b / --books   Backup eBooks only. Default: backup all"
+    echo "  -d / --docs    Backup docs only. Default: backup all"
     echo "  <server_addr>  Server server name, eg. '192.168.0.1' or 'server.local'"
     echo
 }
@@ -90,9 +94,15 @@ for arg in "$@"; do
     check_arg=${arg:l}
     if [[ "$check_arg" = "--books" || "$check_arg" = "-b" ]]; then
         do_music=0
+        do_docus=0
         ((arg_count += 1))
     elif [[ "$check_arg" = "--music" || "$check_arg" = "-m" ]]; then
         do_books=0
+        do_docus=0
+        ((arg_count += 1))
+    elif [[ "$check_arg" = "--docs" || "$check_arg" = "-d" ]]; then
+        do_books=0
+        do_music=0
         ((arg_count += 1))
     elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
@@ -104,7 +114,7 @@ for arg in "$@"; do
 done
 
 # Check that the user is not exluding both jobs
-if [[ $do_books -eq 0 && $do_music -eq 0 ]]; then
+if [[ $do_books -eq 0 && $do_music -eq 0 && $do_docus -eq 0 ]]; then
     show_error "Mutually exclusive options set -- backup cannot continue"
     exit 1
 fi
@@ -156,7 +166,7 @@ while IFS= read -r line; do
 
     # If we're doing the 'books' backup job, mount the relevant server store
     # and flag that it is mounted
-    if [[ $do_books -eq 1 ]]; then
+    if [[ $do_books -eq 1 || $do_docus -eq 1 ]]; then
         if [[ ! -d mntpoint/home ]]; then
             echo "Making mntpoint/home..."
             if mkdir mntpoint/home; then
@@ -179,17 +189,21 @@ fi
 
 # Run the 'books' backup job
 if [[ -d mntpoint/home && $home_mounted -eq 1 ]]; then
-    echo "Backing-up Comics and Books..."
-    for source in "${d_sources[@]}"; do
-        do_sync "$source" mntpoint/home
-    done
+    if [[ $do_books -eq 1 ]]; then
+        echo "Backing-up Comics and Books..."
+        for source in "${d_sources[@]}"; do
+            do_sync "$source" mntpoint/home
+        done
+    fi
 
-    # FROM 5.2.0
-    # Add user fonts
-    echo "Backing-up Other Items..."
-    for source in "${f_sources[@]}"; do
-        do_sync "$source" mntpoint/home
-    done
+    # FROM 5.4.0
+    # Run the 'docs' backup job
+    if [[ $do_docus -eq 1 ]]; then
+        echo "Backing-up Documents..."
+        for source in "${b_sources[@]}"; do
+            do_sync "$source" mntpoint/home/docs
+        done
+    fi
 fi
 
 # Run the 'music' backup job

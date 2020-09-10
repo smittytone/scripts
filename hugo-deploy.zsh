@@ -10,8 +10,8 @@
 do_deploy=1
 arg_count=0
 arg_is_a_value=0
-source="$GIT/websource"
-destination="$GIT/smittytone.github.io"
+source="<YOUR_WEB_SOURCE_DIR>"
+destination="<YOUR_GIT_PAGES_REPO>"
 msg="Latest upload @ $(date)"
 
 # Process the arguments
