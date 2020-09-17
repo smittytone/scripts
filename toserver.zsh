@@ -201,7 +201,7 @@ if [[ -d mntpoint/home && $home_mounted -eq 1 ]]; then
     if [[ $do_docus -eq 1 ]]; then
         echo "Backing-up Documents..."
         for source in "${b_sources[@]}"; do
-            do_sync "$source" mntpoint/home/docs
+            do_sync "$source" mntpoint/home
         done
     fi
 fi
