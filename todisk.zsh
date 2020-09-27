@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.2.0s
+# @version   3.3.0
 # @license   MIT
 #
 
@@ -21,7 +21,8 @@ target_vol=2TB-APFS
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
-           "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
+           "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word"
+           "/Music/Instrumental")
 # FROM 3.2.0
 # Add user fonts
 f_sources=("/Library/Fonts")
@@ -86,6 +87,9 @@ for arg in "$@"; do
         ((arg_count += 1))
     elif [[ "$check_arg" = "--music" || "$check_arg" = "-m" ]]; then
         do_books=0
+        ((arg_count += 1))
+    elif [[ "$check_arg" = "--all" || "$check_arg" = "-a" ]]; then
+        # Dummy arg to avoid presenting request to add disk
         ((arg_count += 1))
     elif [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help

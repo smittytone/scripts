@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   5.4.0
+# @version   5.5.0
 # @license   MIT
 #
 
@@ -28,7 +28,8 @@ target_vol="NONE"
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
-           "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word")
+           "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word"
+           "/Music/Instrumental")
 
 # FROM 5.2.0
 # Add user fonts
