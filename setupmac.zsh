@@ -7,14 +7,15 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   2.1.0
+# @version   2.2.0
 # @license   MIT
 #
 
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="2.0.0"
+APP_VERSION="2.2.0"
+errors=()
 
 # Do intro
 clear
@@ -25,6 +26,14 @@ echo "macOS Install Script $APP_VERSION"
 
 # Update macOS
 sudo softwareupdate --install --all
+
+# Install Xcode CLI
+if xcode-select --install; then
+    echo "Xcode CLI installed"
+else
+    echo "Xcode CLI already installed or could not be installed"
+    errors+="Xcode CLI installation"
+fi
 
 # Apply preferred Energy Saver settings
 sudo pmset -a lessbright 0
@@ -61,8 +70,6 @@ chflags nohidden "$HOME/Library"
 
 # Set up git and clone key repos
 echo "Preparing Git..."
-if xcode-select --install
-
 target="$HOME/GitHub"
 [[ ! -e "$target" ]] && mkdir "$target"
 
@@ -91,8 +98,17 @@ if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install
     for app in "${apps[@]}"; do
         brew cask install "$app"
     done
+
+    # FROM 2.2.0
+    echo "Installing My Applications... "
+    brew tap smittytone/homebrew-smittytone
+    apps=("mnu" "pdfmaker" "ascii" "the-valley")
+    for app in "${apps[@]}"; do
+        brew cask install "$app"
+    done
 else
     echo "Could not install Brew"
+    errors+="Brew installation"
 fi
 
 echo "Installing Cocoapods (requires authorizaton)... "
@@ -138,11 +154,21 @@ echo
 key=${key:l}
 [[ "$key" != "s" ]] && cp -R /Volumes/500GB/Music "$HOME/Music"
 
-
 read -k -s "Press [ENTER] to finish "
 echo
 
 echo "Cleaning up... "
 brew cleanup
+
+# FROM 2.2.0
+# Report issues
+if [[ ${#errors[@]} -eq 0 ]]; then
+    echo "Errors during setup:"
+    count=1
+    for error in "${errors[@]}"; do
+        echo "  ${count}. ${error}"
+        (( count+=1 ))
+    done
+fi
 
 echo "Done"
