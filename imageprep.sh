@@ -16,8 +16,8 @@
 function showHelp {
     echo -e "\nimageprep 5.2.4\n"
     echo -e "A macOS Image Adjustment Utility\n"
-    echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
-    echo -e "              [-a p pad_height pad_width] [-r] [-f] [-k] [-h]\n"
+    echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a s scale_height scale_width] "
+    echo -e "              [-a p pad_height pad_width] [-a c crop_height crop_width] [-r] [-f] [-k] [-h]\n"
     echo    "    NOTE You can select either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
