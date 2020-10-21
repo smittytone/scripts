@@ -6,7 +6,7 @@
 # Crop, pad, scale and/or reformat image files
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
+# @copyright 2020, Tony Smith
 # @version   5.2.3
 # @license   MIT
 #
@@ -14,10 +14,10 @@
 
 # Function to show help info - keeps this out of the code
 function showHelp {
-    echo -e "\nimageprep 5.2.2\n"
+    echo -e "\nimageprep 5.2.4\n"
     echo -e "A macOS Image Adjustment Utility\n"
     echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a c crop_height crop_width] "
-    echo    "             [-a p pad_height pad_width] [-r] [-f] [-k] [-h]"
+    echo -e "              [-a p pad_height pad_width] [-r] [-f] [-k] [-h]\n"
     echo    "    NOTE You can select either crop, pad or scale or all three, but actions will always"
     echo -e "         be performed in this order: pad, then crop, then scale.\n"
     echo    "Options:"
@@ -302,6 +302,9 @@ fi
 if [ "$sourcePath" = "$destPath" ]; then
     deleteSource=0
 fi
+
+# From 5.2.4
+destPath=$(realpath $destPath)
 
 # FROM 5.1.0
 # Check for a single input file
