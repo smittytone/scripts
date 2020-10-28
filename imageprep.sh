@@ -7,14 +7,14 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   5.2.3
+# @version   5.2.5
 # @license   MIT
 #
 
 
 # Function to show help info - keeps this out of the code
 function showHelp {
-    echo -e "\nimageprep 5.2.4\n"
+    echo -e "\nimageprep 5.2.5\n"
     echo -e "A macOS Image Adjustment Utility\n"
     echo -e "Usage:\n    imageprep [-s path] [-d path] [-c padColour] [-a s scale_height scale_width] "
     echo -e "              [-a p pad_height pad_width] [-a c crop_height crop_width] [-r] [-f] [-k] [-h]\n"
@@ -226,13 +226,16 @@ for arg in "$@"; do
             noMessages=1
         elif [[ $arg = "-k" || $arg = "--keep" ]]; then
             deleteSource=0
+        else
+            echo "Error: Unknown option $arg"
+            exit 1
         fi
     fi
 
     ((argCount++))
 
     if [[ "$argCount" -eq $# && "$argIsAValue" -ne 0 ]]; then
-        echo "Error:  Missing value for $arg"
+        echo "Error: Missing value for $arg"
         exit 1
     fi
 done
