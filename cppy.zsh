@@ -1,9 +1,9 @@
 #!/bin/zsh
 
 #
-# circp.zsh
+# cppy.zsh
 #
-# Copy a code file to a CircuitPython device with USP bootloader
+# Copy a code file to a CircuitPython device with UF2 bootloader
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
@@ -14,11 +14,12 @@
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
 APP_VERSION="1.0.0"
+
 # Functions
 show_help() {
-    echo -e "circp $APP_VERSION\n"
+    echo -e "cppy $APP_VERSION\n"
     echo -e "Usage:\n"
-    echo -e "  circp <file 1> <file 2> ... <file n>\n"
+    echo -e "  cppy <file 1> <file 2> ... <file n>\n"
     echo -e "Options:\n"
     echo -e "  -h / --help   Show this help page\n"
     echo -e "Description:\n"
@@ -74,7 +75,7 @@ done
 
 # Bail of no files were provided
 if [[ arg_count -eq 0 ]]; then
-    echo "No Python files to copy"
+    echo "No Python files to copy -- cannot continue"
     exit 1
 fi
 
