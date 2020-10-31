@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   1.0.0
+# @version   1.0.1
 # @license   MIT
 #
 
@@ -36,12 +36,6 @@ show_error() {
 
 # Runtime start
 target="/volumes/CIRCUITPY"
-
-# Check that the drive is mounted
-if ! [[ -e "$target" ]]; then
-    echo "$target not mounted -- cannot continue"
-    exit 1
-fi
 
 # Process the arguments
 code_file=""
@@ -72,6 +66,12 @@ for arg in "$@"; do
         fi
     fi
 done
+
+# Check that the drive is mounted
+if ! [[ -e "$target" ]]; then
+    echo "$target not mounted -- cannot continue"
+    exit 1
+fi
 
 # Bail of no files were provided
 if [[ arg_count -eq 0 ]]; then
