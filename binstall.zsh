@@ -7,7 +7,7 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version 1.0.1
+# @version 1.0.2
 
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
@@ -24,9 +24,9 @@ if [[ -e $source_file ]]; then
         while IFS= read -r line; do
             target_file=$HOME/bin/${line:t:r}
 
-            # FROM 1.0.1
-            # Check of the source and target are different
-            diff_result=""
+            # FROM 1.0.1 -- check of the source and target are different
+            # FROM 1.0.2 -- don't block install of uninstalled scripts
+            diff_result="DO"
             if [[ -e $target_file ]]; then
                 diff_result=$(diff $target_file $scripts_dir/$line)
             fi
