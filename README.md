@@ -117,3 +117,11 @@ SD card preparation script for Raspberry Pis. **Note** This runs on a macOS host
 Hack a Raspberry Pi to run in read-only mode (no writes to the SD).
 
 - [View Script](pireadonly.sh)
+
+## Miscellaneous ##
+
+### circp.zsh ###
+
+Copy a bunch of Python files to a CircuitPython device. The first file on the list is renamed `code.py`.
+
+- [View Script](circp.sh)
