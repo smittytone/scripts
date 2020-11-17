@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   4.2.0
+# @version   4.2.1
 # @license   MIT
 #
 
@@ -111,7 +111,8 @@ if [[ "$choice" = "F" ]]; then
     cp -nvR "$file_source/Mac/Quicklook/" "$file_target/Quicklook"
 
     # FROM 1.5.0 -- Add 64-bit libdvdcss
-    cp -nv "$file_source/Mac/libdvdcss/libdvdcss.2.dylib" /usr/local/lib/libdvdcss.2.dylib
+    # FROM 4.2.1 -- Remove: this should be installed via homebrew
+    #cp -nv "$file_source/Mac/libdvdcss/libdvdcss.2.dylib" /usr/local/lib/libdvdcss.2.dylib
 
     # FROM 1.4.0 -- Add second terminal file (HomebrewMeDark)
     cp -nv "$file_source/Mac/HomebrewMe.terminal" "$HOME/Desktop/HomebrewMe.terminal"

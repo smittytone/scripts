@@ -7,25 +7,22 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   2.2.0
+# @version   2.3.0
 # @license   MIT
 #
 
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="2.2.0"
+APP_VERSION="2.3.0"
 errors=()
 
 # Do intro
 clear
 echo "macOS Install Script $APP_VERSION"
 
-# Set exit-on-failure
-# set -e
-
-# Update macOS
-sudo softwareupdate --install --all
+# REMOVED FROM 2.3.0 -- Update macOS
+# sudo softwareupdate --install --all
 
 # Install Xcode CLI
 if xcode-select --install; then
@@ -96,7 +93,7 @@ if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install
     echo "Installing Applications... "
     apps=("handbrake" "vlc" "skype" "firefox" "omnidisksweeper")
     for app in "${apps[@]}"; do
-        brew cask install "$app"
+        brew install --cask "$app"
     done
 
     # FROM 2.2.0
@@ -104,7 +101,7 @@ if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install
     brew tap smittytone/homebrew-smittytone
     apps=("mnu" "pdfmaker" "ascii" "the-valley")
     for app in "${apps[@]}"; do
-        brew cask install "$app"
+        brew install --cask "$app"
     done
 else
     echo "Could not install Brew"
@@ -128,9 +125,10 @@ fi
 
 read -k -s "key?Press [ENTER] to open the App Store, or [S] to skip"
 echo
+
 # Make argument lowercase
 key=${key:l}
-[[ "$key" != "s" ]] && open "/Applications/App Store.app "
+[[ "$key" != "s" ]] && open '/Applications/App Store.app'
 
 read -k -s "key?Press [ENTER] to open websites for other app downloads, or [S] to skip "
 echo
@@ -141,7 +139,7 @@ if [[ "$key" != "s" ]]; then
     open http://www.rogueamoeba.com/piezo
     open https://www.bresink.com/osx/TinkerTool/download.php
     open http://www.audacityteam.org/download/mac/
-    #open http://www.barebones.com
+    open https://www.sketch.com
     #open http://www.skype.com
     #open http://handbrake.fr
     #open http://www.mozilla.org
@@ -152,7 +150,7 @@ fi
 read -k -s "key?Connect drive '500GB' and press [ENTER] to copy music, or [S] to skip "
 echo
 key=${key:l}
-[[ "$key" != "s" ]] && cp -R /Volumes/500GB/Music "$HOME/Music"
+[[ "$key" != "s" ]] && cp -R /Volumes/500GB/Music/ "$HOME/Music"
 
 read -k -s "Press [ENTER] to finish "
 echo
