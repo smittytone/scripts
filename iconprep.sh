@@ -6,8 +6,8 @@
 # Prep macOS/watchOS/iOS Icons
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
-# @version   1.0.2
+# @copyright 2020, Tony Smith
+# @version   1.1.0
 # @license   MIT
 #
 
@@ -24,6 +24,7 @@ function showHelp() {
     echo    "                                               3 - watchOS app icons"
     echo    "                                               4 - watchOS complication icons"
     echo    "                                               5 - iOS app icons"
+    echo    "                                               6 - Web app icons"
     echo    "  -h / --help                 This help screen"
     echo
 }
@@ -39,6 +40,7 @@ m_t_sizes=(32 64 96)
 w_a_sizes=(216 196 172 100 88 87 80 58 55 48)
 w_c_sizes=(224 203 182 64 58 52 50 44 40 36 32)
 i_a_sizes=(40 60 58 87 80 120 180 20 29 76 152 167 1024)
+s_w_sizes=(64 128)
 
 # Process the arguments
 argCount=0
@@ -127,6 +129,13 @@ i_a_make() {
     done
 }
 
+s_w_make() {
+    # Make smittytone web site app icons
+    for size in ${s_w_sizes[@]}; do
+        make "$destFolder/web_app_icon_$size.$extension"
+    done
+}
+
 make() {
     # Generic function to copy source to new file and then resize the copy
     cp "$sourceImage" "$1"
@@ -150,6 +159,7 @@ if [ "$sourceImage" != "UNSET" ]; then
                     3)  w_a_make ;;
                     4)  w_c_make ;;
                     5)  i_a_make ;;
+                    6)  s_w_make ;;
                     *) echo "Error: Unknown icon type specified ($iType)" ; exit 1 ;;
                 esac
             else
