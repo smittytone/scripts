@@ -5,9 +5,10 @@
 #
 # Prep macOS/watchOS/iOS Icons
 #
+# @shell     bash -- requires 5.0.0+
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   1.1.0
+# @version   1.1.1
 # @license   MIT
 #
 
@@ -30,10 +31,10 @@ function showHelp() {
 }
 
 # Set inital state values
-sourceImage="UNSET"
-destFolder="$HOME/Desktop"
-iType=1
-argIsAValue=0
+source_image="UNSET"
+dest_folder="$HOME/Desktop"
+icon_type=1
+arg_value=0
 args=(-s -t -d)
 m_a_sizes=(16 32 64 96 128 256 512 1024)
 m_t_sizes=(32 64 96)
@@ -42,60 +43,20 @@ w_c_sizes=(224 203 182 64 58 52 50 44 40 36 32)
 i_a_sizes=(40 60 58 87 80 120 180 20 29 76 152 167 1024)
 s_w_sizes=(64 128)
 
-# Process the arguments
-argCount=0
-for arg in "$@"
-do
-    if [[ $argIsAValue -gt 0 ]]; then
-        # The argument should be a value (previous argument was an option)
-        if [[ ${arg:0:1} = "-" ]]; then
-            # Next value is an option: ie. missing value
-            echo "Error: Missing value for ${args[((argIsAValue - 1))]}"
-            exit 1
-        fi
-
-        # Set the appropriate internal value
-        case "$argIsAValue" in
-            1)  sourceImage=$arg ;;
-            2)  iType=$arg ;;
-            3)  destFolder=$arg ;;
-            *) echo "Error: Unknown argument" exit 1 ;;
-        esac
-
-        argIsAValue=0
-    else
-        if [[ $arg = "-s" || $arg = "--source" ]]; then
-            argIsAValue=1
-        elif [[ $arg = "-t" || $arg = "--type" ]]; then
-            argIsAValue=2
-        elif [[ $arg = "-d" || $arg = "--destination" ]]; then
-            argIsAValue=3
-        elif [[ $arg = "-h" || $arg = "--help" ]]; then
-            showHelp
-            exit 0
-        fi
-    fi
-
-    ((argCount++))
-    if [[ $argCount -eq $# && $argIsAValue -ne 0 ]]; then
-        echo "Error: Missing value for $arg"
-        exit 1
-    fi
-done
-
+# Funcions
 m_a_make() {
     # Make macOS app icons
-    for size in ${m_a_sizes[@]}; do
-        make "$destFolder/macos_appicon_$size.$extension"
+    for size in "${m_a_sizes[@]}"; do
+        make "$dest_folder/macos_appicon_$size.$extension"
     done
 }
 
 m_t_make() {
     # Make macOS toolbar icons
     count=0
-    filename="${sourceImage##*/}"
+    filename="${source_image##*/}"
     filename="${filename%.*}"
-    for size in ${m_t_sizes[@]}; do
+    for size in "${m_t_sizes[@]}"; do
         sizemark=""
         if [ $count -eq 1 ]; then
             sizemark='@2x'
@@ -103,78 +64,121 @@ m_t_make() {
         if [ $count -eq 2 ]; then
             sizemark='@3x'
         fi
-        make "$destFolder/macos_toolbar_$filename$sizemark.$extension"
+        make "$dest_folder/macos_toolbar_$filename$sizemark.$extension"
         ((count++))
     done
 }
 
 w_a_make() {
     # Make watcOS complication icons
-    for size in ${w_a_sizes[@]}; do
-        make "$destFolder/watchos_app_icon_$size.$extension"
+    for size in "${w_a_sizes[@]}"; do
+        make "$dest_folder/watchos_app_icon_$size.$extension"
     done
 }
 
 w_c_make() {
     # Make watcOS complication icons
-    for size in ${w_c_sizes[@]}; do
-        make "$destFolder/watchos_comp_icon_$size.$extension"
+    for size in "${w_c_sizes[@]}"; do
+        make "$dest_folder/watchos_comp_icon_$size.$extension"
     done
 }
 
 i_a_make() {
     # Make watcOS complication icons
-    for size in ${i_a_sizes[@]}; do
-        make "$destFolder/ios_app_icon_$size.$extension"
+    for size in "${i_a_sizes[@]}"; do
+        make "$dest_folder/ios_app_icon_$size.$extension"
     done
 }
 
 s_w_make() {
     # Make smittytone web site app icons
-    for size in ${s_w_sizes[@]}; do
-        make "$destFolder/web_app_icon_$size.$extension"
+    for size in "${s_w_sizes[@]}"; do
+        make "$dest_folder/web_app_icon_$size.$extension"
     done
 }
 
 make() {
     # Generic function to copy source to new file and then resize the copy
-    cp "$sourceImage" "$1"
+    cp "$source_image" "$1"
     sips "$1" -Z "$size" -i > /dev/null
 }
 
+
+# Runtime start
+# Process the arguments
+arg_count=0
+for arg in "$@"
+do
+    if [[ $arg_value -gt 0 ]]; then
+        # The argument should be a value (previous argument was an option)
+        if [[ ${arg:0:1} = "-" ]]; then
+            # Next value is an option: ie. missing value
+            echo "Error -- Missing value for ${args[((arg_value - 1))]}"
+            exit 1
+        fi
+
+        # Set the appropriate internal value
+        case "$arg_value" in
+            1)  source_image=$arg ;;
+            2)  icon_type=$arg ;;
+            3)  dest_folder=$arg ;;
+            *) echo "Error -- Unknown argument" exit 1 ;;
+        esac
+
+        arg_value=0
+    else
+        if [[ $arg = "-s" || $arg = "--source" ]]; then
+            arg_value=1
+        elif [[ $arg = "-t" || $arg = "--type" ]]; then
+            arg_value=2
+        elif [[ $arg = "-d" || $arg = "--destination" ]]; then
+            arg_value=3
+        elif [[ $arg = "-h" || $arg = "--help" ]]; then
+            showHelp
+            exit 0
+        fi
+    fi
+
+    ((arg_count++))
+    if [[ $arg_count -eq $# && $arg_value -ne 0 ]]; then
+        echo "Error -- Missing value for $arg"
+        exit 1
+    fi
+done
+
 # Make sure we have a source image
-if [ "$sourceImage" != "UNSET" ]; then
-    if [ -f "$sourceImage" ]; then
-        if [ -d "$destFolder" ] ; then
+if [ "$source_image" != "UNSET" ]; then
+    if [ -f "$source_image" ]; then
+        if [ -d "$dest_folder" ] ; then
             # Get the extension and make it uppercase
-            extension=${sourceImage##*.}
+            extension=${source_image##*.}
             ext_test=${extension^^*}
 
             # Make sure the file's of the right type
             if [[ $ext_test = "PNG" || $ext_test = "JPG" || $ext_test = "JPEG" ]]; then
                 # Make the icons by type
-                case "$iType" in
+                case "$icon_type" in
                     1)  m_a_make ;;
                     2)  m_t_make ;;
                     3)  w_a_make ;;
                     4)  w_c_make ;;
                     5)  i_a_make ;;
                     6)  s_w_make ;;
-                    *) echo "Error: Unknown icon type specified ($iType)" ; exit 1 ;;
+                    *) echo "Error -- Unknown icon type specified ($icon_type)" ; exit 1 ;;
                 esac
             else
                 echo "Source image must be a PNG or JPG. It is a $extension"
                 exit 1
             fi
         else
-            echo "Destination folder $destFolder can't be found"
+            echo "Destination folder $dest_folder can't be found"
             exit 1
         fi
     else
-        echo "Source image $sourceImage can't be found"
+        echo "Source image $source_image can't be found"
         exit 1
     fi
 else
-    echo "Error: No source image set"
+    echo "Error -- No source image set"
     exit 1
 fi
