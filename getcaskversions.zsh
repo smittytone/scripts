@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   1.0.0
+# @version   1.0.1
 # @license   MIT
 #
 
@@ -17,7 +17,7 @@ if cd "$casks"; then
         while IFS= read -r line; do
             version_line=$(echo $line | grep 'version')
             if [[ -n "$version_line" ]]; then
-                version=$(echo "$version_line" | grep -o '[0-9].[0-9].[0-9]')
+                version=$(echo "$version_line" | egrep -o '[0-9]+.[0-9]+.[0-9]+')
                 cask_name=$(echo "$cask" | cut -d "." -s -f 1)
                 echo "$cask_name is at version $version"
             fi
