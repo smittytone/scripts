@@ -11,31 +11,39 @@
 # @license   MIT
 #
 
-target="$GIT"
-list=$(/bin/ls ${target})
-count=0
+list=$(/bin/ls "$GIT")
+max=0
 
-if cd "$target"; then
+if cd "$GIT"; then
+    # Get the longest file name
+    for file in *; do
+        if [[ ${#file} -gt $max ]]; then
+            max=${#file}
+        fi
+    done
+
+    # Process the files
     for file in *; do
         if [[ -d "$file" ]]; then
             if cd "$file"; then
-                state=""
+                local state=""
+
                 unmerged=$(git status)
                 unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
                 if [[ -n "$unmerged" ]]; then
-                    state="UNMERGED"
+                    state="unmerged"
                 fi
 
-                if test -n "$(git status --porcelain --ignore-submodules)"; then
-                    state="UNCOMMITTED"
+                uncommitted=$(git status --porcelain --ignore-submodules)
+                if [[ -n "$uncommitted" ]]; then
+                    state="uncommitted"
                 fi
 
                 if [[ -n "$state" ]]; then
-                    echo $file $state
+                    awk '{ printf "%-*s %-50s\n", $1, $2, $3}' <((echo -e "$max $file $state"))
                 fi
+
                 cd ..
-            else
-                echo ooops
             fi
         fi
     done
