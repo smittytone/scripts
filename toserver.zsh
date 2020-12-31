@@ -158,7 +158,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/music..."
             if mkdir mntpoint/music; then
                 echo "Mounting mntpoint/music..."
-                if mount -t smbfs "//$line@$target_vol/music" mntpoint/music; then
+                if mount -t smbfs -o nobrowse "//$line@$target_vol/music" mntpoint/music; then
                     music_mounted=1
                 fi
             fi
@@ -172,7 +172,7 @@ while IFS= read -r line; do
             echo "Making mntpoint/home..."
             if mkdir mntpoint/home; then
                 echo "Mounting mntpoint/home..."
-                if mount -t smbfs "//$line@$target_vol/home"  mntpoint/home; then
+                if mount -t smbfs -o nobrowse "//$line@$target_vol/home"  mntpoint/home; then
                     home_mounted=1
                 fi
             fi
