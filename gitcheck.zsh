@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2020, Tony Smith
-# @version   1.0.1
+# @version   1.0.2
 # @license   MIT
 #
 
@@ -26,26 +26,28 @@ if cd "$GIT"; then
     # Process the files
     for file in *; do
         if [[ -d "$file" ]]; then
-            if cd "$file"; then
-                local state=""
+            if [[ -d "$file/.git" ]]; then
+                if cd "$file"; then
+                    local state=""
 
-                unmerged=$(git status)
-                unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
-                if [[ -n "$unmerged" ]]; then
-                    state="unmerged changes"
+                    unmerged=$(git status)
+                    unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
+                    if [[ -n "$unmerged" ]]; then
+                        state="unmerged changes"
+                    fi
+
+                    uncommitted=$(git status --porcelain --ignore-submodules)
+                    if [[ -n "$uncommitted" ]]; then
+                        state="uncommitted changes"
+                    fi
+
+                    if [[ -n "$state" ]]; then
+                        awk '{ printf "%-*s %-50s\n", $1, $2, $3}' <((echo -e "$max $file $state"))
+                        ((output+=1))
+                    fi
+
+                    cd ..
                 fi
-
-                uncommitted=$(git status --porcelain --ignore-submodules)
-                if [[ -n "$uncommitted" ]]; then
-                    state="uncommitted changes"
-                fi
-
-                if [[ -n "$state" ]]; then
-                    awk '{ printf "%-*s %-50s\n", $1, $2, $3}' <((echo -e "$max $file $state"))
-                    ((output+=1))
-                fi
-
-                cd ..
             fi
         fi
     done
