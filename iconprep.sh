@@ -7,8 +7,8 @@
 #
 # @shell     bash -- requires 5.0.0+
 # @author    Tony Smith
-# @copyright 2020, Tony Smith
-# @version   1.1.1
+# @copyright 2021, Tony Smith
+# @version   1.2.0
 # @license   MIT
 #
 
@@ -19,6 +19,7 @@ function showHelp() {
     echo    "Options:"
     echo    "  -s / --source       [path]  The path of the source image. The source image should"
     echo    "                              be at least 1024x1024, and a PNG or JPG file"
+    echo    "  -n / --name         [name]  The base name of output icons. Default: set by type"
     echo    "  -d / --destination  [path]  The path to the target folder. Default: desktop"
     echo    "  -t / --type         [int]   The output type: 1 - macOS app icons (Default)"
     echo    "                                               2 - macOS toolbar icons"
@@ -42,12 +43,15 @@ w_a_sizes=(216 196 172 100 88 87 80 58 55 48)
 w_c_sizes=(224 203 182 64 58 52 50 44 40 36 32)
 i_a_sizes=(40 60 58 87 80 120 180 20 29 76 152 167 1024)
 s_w_sizes=(64 128)
+# FROM 1.2.0
+names=(macos_appicon macos_toolbar watchos_app_icon watchos_comp_icon ios_app_icon web_app_icon)
+name="NONE"
 
 # Funcions
 m_a_make() {
     # Make macOS app icons
     for size in "${m_a_sizes[@]}"; do
-        make "$dest_folder/macos_appicon_$size.$extension"
+        make "${dest_folder}/${name}_${size}.${extension}"
     done
 }
 
@@ -64,7 +68,7 @@ m_t_make() {
         if [ $count -eq 2 ]; then
             sizemark='@3x'
         fi
-        make "$dest_folder/macos_toolbar_$filename$sizemark.$extension"
+        make "${dest_folder}/${name}_${filename}${sizemark}.${extension}"
         ((count++))
     done
 }
@@ -72,28 +76,28 @@ m_t_make() {
 w_a_make() {
     # Make watcOS complication icons
     for size in "${w_a_sizes[@]}"; do
-        make "$dest_folder/watchos_app_icon_$size.$extension"
+        make "${dest_folder}/${name}_${size}.${extension}"
     done
 }
 
 w_c_make() {
     # Make watcOS complication icons
     for size in "${w_c_sizes[@]}"; do
-        make "$dest_folder/watchos_comp_icon_$size.$extension"
+        make "${dest_folder}/${name}_${size}.${extension}"
     done
 }
 
 i_a_make() {
     # Make watcOS complication icons
     for size in "${i_a_sizes[@]}"; do
-        make "$dest_folder/ios_app_icon_$size.$extension"
+        make "${dest_folder}/${name}_${size}.${extension}"
     done
 }
 
 s_w_make() {
     # Make smittytone web site app icons
     for size in "${s_w_sizes[@]}"; do
-        make "$dest_folder/web_app_icon_$size.$extension"
+        make "${dest_folder}/${name}_${size}.${extension}"
     done
 }
 
@@ -122,6 +126,7 @@ do
             1)  source_image=$arg ;;
             2)  icon_type=$arg ;;
             3)  dest_folder=$arg ;;
+            4)  name=$arg ;;
             *) echo "Error -- Unknown argument" exit 1 ;;
         esac
 
@@ -133,6 +138,8 @@ do
             arg_value=2
         elif [[ $arg = "-d" || $arg = "--destination" ]]; then
             arg_value=3
+        elif [[ $arg = "-n" || $arg = "--name" ]]; then
+            arg_value=4
         elif [[ $arg = "-h" || $arg = "--help" ]]; then
             showHelp
             exit 0
@@ -145,6 +152,12 @@ do
         exit 1
     fi
 done
+
+# FROM 1.2.0
+# Fix the name
+if [ "$name" = "NONE" ]; then
+    name=${names[(($icon_type - 1))]}
+fi
 
 # Make sure we have a source image
 if [ "$source_image" != "UNSET" ]; then
