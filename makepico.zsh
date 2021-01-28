@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2021, Tony Smith
-# @version   1.0.0
+# @version   1.0.1
 # @license   MIT
 #
 
@@ -25,8 +25,8 @@ make_project() {
     project_name=${1:t:l}
     project_path=${1}
 
-    # Create initial C file
-    make_source_file "${1}"
+    # Create initial C files
+    make_source_files "${1}"
 
     # Copy over the .make file from the SDK
     file="pico_sdk_import.cmake"
@@ -45,19 +45,25 @@ make_project() {
     echo "Project ${project_name} created at ${project_path}"
 }
 
-make_source_file() {
+make_source_files() {
     # Output lines to the file
     # Args: 1 -- project path
 
     echo "Creating project files..."
     project_name=${1:t}
     source_file=${1:t:l}
+
     {
-        echo -e "/*\n *    Project ${project_name} created by makepico\n */\n\n"
+        echo -e "/*\n *    ${project_name}/${source_file}.h created by makepico\n */\n\n"
         echo '#include <stdio.h>'
         echo '#include "pico/stdlib.h"'
         echo '#include "pico/binary_info.h"'
         echo '#include "hardware/gpio.h"'
+    } >> "${1}/${source_file}.h"
+
+    {
+        echo -e "/*\n *    ${project_name}/${source_file}.c created by makepico\n */\n\n"
+        echo "#include \"${source_file}.h\""
         echo -e "\n\nint main() {\n    return 0;\n}\n"
     } >> "${1}/${source_file}.c"
 }
