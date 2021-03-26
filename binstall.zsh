@@ -7,13 +7,13 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version   1.1.0
+# @version   1.2.0
 
-app_version="1.1.0"
+app_version="1.2.0"
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
-do_show=0
+do_show=1
 
 
 # FROM 1.1.0
@@ -36,8 +36,8 @@ get_version() {
 # Check args to silence version display
 for arg in "$@"; do
     arg=${arg:l}
-    if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
-        do_show=1
+    if [[ "$arg" == "-q" || "$arg" == "--quiet" ]]; then
+        do_show=0
     fi
 
     if [[ "$arg" == "--version" ]]; then
