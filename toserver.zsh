@@ -6,8 +6,8 @@
 # Backup to Server Script
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
-# @version   5.5.0
+# @copyright 2019-21, Tony Smith
+# @version   5.6.0
 # @license   MIT
 #
 
@@ -33,7 +33,7 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
 
 # FROM 5.2.0
 # Add user fonts
-b_sources=("/Library/Fonts" "/Pictures" "/Documents" "/Downloads")
+b_sources=("/Library/Fonts" "/Pictures" "/Documents")
 
 # From 4.0.0
 # Functions
