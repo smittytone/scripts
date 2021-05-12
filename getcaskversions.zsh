@@ -1,15 +1,15 @@
 #!/bin/zsh
 
-#
+
 # getcaskversions
 #
 # List current cask versions
 #
 # @author    Tony Smith
-# @copyright 2020, Tony Smith
-# @version   1.0.1
+# @copyright 2021, Tony Smith
+# @version   1.0.2
 # @license   MIT
-#
+
 
 casks="$GIT/homebrew-smittytone/Casks"
 if cd "$casks"; then
@@ -23,4 +23,7 @@ if cd "$casks"; then
             fi
         done < "$cask"
     done
+else
+    echo "ERROR -- Casks folder '${casks}' not found"
+    exit 1
 fi
