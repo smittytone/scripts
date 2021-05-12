@@ -1,15 +1,14 @@
 #!/bin/zsh
 
-#
 # cppy.zsh
 #
 # Copy a code file to a CircuitPython device with UF2 bootloader
 #
 # @author    Tony Smith
-# @copyright 2020, Tony Smith
-# @version   1.0.1
+# @copyright 2021, Tony Smith
+# @version   1.0.2
 # @license   MIT
-#
+
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
@@ -23,9 +22,9 @@ show_help() {
     echo -e "Options:\n"
     echo -e "  -h / --help   Show this help page\n"
     echo -e "Description:\n"
-    echo "  Copies the specified file(s) to the CIRCUITPY drive, if mounted."
-    echo "  The first file will be renamed code.py, but subsequent files will"
-    echo "  be copeied unchanged. Only .py and .mpy files will be copied."
+    echo    "  Copies the specified file(s) to the CIRCUITPY drive, if mounted."
+    echo    "  The first file will be renamed 'code.py', but subsequent files will"
+    echo -e "  be copied unchanged. Only .py and .mpy files will be copied.\n"
     exit 0
 }
 
@@ -35,24 +34,24 @@ show_error() {
 }
 
 # Runtime start
-target="/volumes/CIRCUITPY"
+local target="/volumes/CIRCUITPY"
 
 # Process the arguments
-code_file=""
-lib_files=()
+local code_file=""
+local lib_files=()
 typeset -i arg_count=0
 
 for arg in "$@"; do
     # Temporarily convert argument to lowercase, zsh-style
     # And check for options first
-    check_arg=${arg:l}
+    local check_arg=${arg:l}
     if [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
     fi
 
     # The arg is not an option so check its extension to
     # see if it is a file to copy
-    ext=${arg:e}
+    local ext=${arg:e}
     if [[ "$ext" = "py" || "$ext" = "mpy" ]]; then
         # Only proceed for '.py' and '.mpy' files
         if [[ arg_count -eq 0 ]]; then
