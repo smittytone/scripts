@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   3.3.0
+# @version   3.3.1
 # @license   MIT
 #
 
@@ -18,6 +18,7 @@ APP_VERSION="3.2.0"
 typeset -i do_music=1
 typeset -i do_books=1
 target_vol=2TB-APFS
+source_dir="$HOME"
 d_sources=("/Comics" "/OneDrive/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
@@ -36,7 +37,7 @@ do_sync() {
     echo -n "Syncing ${name}... "
 
     # Prepare a readout of changed files ONLY (rsync does not do this)
-    local list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".DS_Store")
+    local list=$(rsync -az "$source_dir/$1" "$2" --itemize-changes --exclude ".DS_Store")
     local lines=$(grep '>' < <(echo -e "$list"))
 
     # Check we have files to report
@@ -64,7 +65,7 @@ show_help() {
     echo -e "todisk $APP_VERSION\n"
     echo -e "Usage:\n"
     echo -e "  todisk [-m] [-b] [<drive_name>]\n"
-    echo -e "sOptions:\n"
+    echo -e "Options:\n"
     echo "  -m / --music   Backup music only. Default: backup both"
     echo "  -b / --books   Backup eBooks only. Default: backup both"
     echo "  <drive_name>   Optional drive name. Default: 2TB-APFS"
