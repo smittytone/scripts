@@ -6,9 +6,9 @@
 # Command line tool release preparation script
 #
 # @author    Tony Smith
-# @copyright 2020 Tony Smith
-# @version   3.1.1
-# @license   MIT
+# @copyright 2021 Tony Smith
+# @version   3.1.4
+# @license   TBD
 #
 
 
@@ -17,17 +17,17 @@ show_help() {
     echo -e "\npackcli -- create a signed and notarized app package\n"
     echo -e "Usage: packcli.zsh [OPTIONS]\n"
     echo "Options:"
-    echo    "  -s / --source       - The location of the target project. Default: current directory."
-    echo    "  -n / --name         - The target tool's name. If no name is supplied, packcli uses"
-    echo    "                        the name of the source project."
-    echo    "  -b / --bundleid     - The target tool's bundle ID. This is not optional."
-    echo    "  -v / --version      - The target tool's version. Default: 1.0.0."
-    echo    "  -a / --add          - Add scripts from the project's pkgscripts directory."
-    echo    "  -u / --user         - Your Apple Developer username."
-    echo    "  -c / --cert         - Your Apple Developer Installer certificate name, eg."
-    echo    "                        'Developer ID Installer: Fred Bloggs (ABCDEF1234)'."
-    echo    "  -d / --debug        - Enable extra debugging."
-    echo -e "  -h / --help         - This help page.\n"
+    echo    "  -s / --source    - The location of the target project. Default: current directory."
+    echo    "  -n / --name      - The target tool's name. If no name is supplied, packcli uses"
+    echo    "                     the name of the source project."
+    echo    "  -b / --bundleid  - The target tool's bundle ID. This is not optional."
+    echo    "  -v / --version   - The target tool's version. Default: 1.0.0."
+    echo    "  -a / --add       - Add scripts from the project's pkgscripts directory."
+    echo    "  -u / --user      - Your Apple Developer username."
+    echo    "  -c / --cert      - Your Apple Developer Installer certificate name, eg."
+    echo    "                     'Developer ID Installer: Fred Bloggs (ABCDEF1234)'."
+    echo    "  -d / --debug     - Enable extra debugging."
+    echo -e "  -h / --help      - This help page.\n"
 }
 
 
@@ -131,16 +131,28 @@ if [[ "$cert_name" = "none" ]]; then
     exit 1
 fi
 
+# Check for script additions
+extra=""
+if [[ $add_scripts -eq 1 ]]; then
+    if [[ ! -e "$app_source/pkgscripts" ]]; then
+        echo "[ERROR] \'pkgscripts\' directory missing from $app_source "
+        exit 1
+    fi
+
+    extra="--scripts $app_source/pkgscripts"
+fi
+
 # Debug output
 if [[ $debug -eq 1 ]]; then
-    echo "    App: $app_name"
-    echo "Version: $app_version"
-    echo "   Path: $app_source/build/$app_name"
-    echo "    PKG: $app_source/build/$app_name-$app_version.pkg"
+    echo "      App: $app_name"
+    echo "Bundle ID: $bundle_id"
+    echo "  Version: $app_version"
+    echo "     Path: $app_source/build/$app_name"
+    echo "      PKG: $app_source/build/$app_name-$app_version.pkg"
 fi
 
 # Build the package
-cd "$app_nource"  || exit 1
+cd "$app_source"  || exit 1
 echo "Building $app_name... "
 success=$(xcodebuild clean install)
 if [[ -z "$success" ]]; then
@@ -149,8 +161,9 @@ fi
 
 # Build and sign the package
 echo "Making and signing the package... "
-success=$(pkgbuild --root build/pkgroot --identifier "$bundle_id.pkg" --install-location "/" --sign "$cert_name" --version "$app_version" "build/$app_name-$app_version.pkg")
+success=$(pkgbuild $extra --root build/pkgroot --identifier "$bundle_id.pkg" --install-location "/" --sign "$cert_name" --version "$app_version" "build/$app_name-$app_version.pkg")
 if [[ -z "$success" ]]; then
+    echo "[Error] packcli"
     exit 1
 fi
 
