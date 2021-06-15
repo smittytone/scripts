@@ -7,14 +7,17 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version   1.2.0
+# @version   1.3,o
 
-app_version="1.2.0"
+app_version="1.3.0"
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
 do_show=1
-
+repos=()
+states=()
+versions=()
+max=0
 
 # FROM 1.1.0
 # Display the version if requested
@@ -24,12 +27,26 @@ get_version() {
         result=$(grep '# @version' < <(echo -e "$script"))
         result=$(tr -s " " < <(echo -e "$result"))
         version=$(echo "$result" | cut -d " " -s -f 3)
+        repos+=(${1:t})
+        versions+=($version)
         if [[ "$2" == "N" ]]; then
-            echo "${1:t} not changed from version $version"
+            states+=("Unchanged")
+            #echo "  ${1:t} unchanged at version $version"
         else
-            echo "Updated ${1:t} to version $version"
+            states+=("Updated")
+            #echo "* ${1:t} updated to version $version"
         fi
+
+        if [[ ${#1:t} -gt $max ]] max=${#1:t}
     fi
+}
+
+# FROM 1.3.0
+# Print the output table header
+print_header() {
+    printf '%-*s | %-9s | %s\n' $max "Utility" "State" "Version"
+    printf '-%.0s' {0..$max}
+    printf '+-----------+--------\n'
 }
 
 # FROM 1.1.0
@@ -79,8 +96,15 @@ if [[ -e $source_file ]]; then
             chmod +x $target_file
         done < $source_file
     else
-        echo "'$scripts_dir' does not exits... exiting"
+        echo "'$scripts_dir' does not exist... exiting"
     fi
 else
-    echo "'$source_file' does not exits... exiting"
+    echo "'$source_file' does not exist... exiting"
 fi
+
+# Display the output
+# FROM 1.3.0 -- as a table
+print_header
+for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
+    printf '%-*s | %-9s | %s\n' $max ${repos[i]} ${states[i]} ${versions[i]}
+done
