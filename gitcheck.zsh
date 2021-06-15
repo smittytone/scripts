@@ -6,12 +6,11 @@
 #
 # @author    Tony Smith
 # @copyright 2021, Tony Smith
-# @version   1.1.0
+# @version   1.1.1
 # @license   MIT
 
 
 local max=0
-local output=0
 local repos=()
 local states=()
 
@@ -34,19 +33,18 @@ if cd "$GIT"; then
                 local unmerged=$(git status)
                 unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
                 if [[ -n "$unmerged" ]]; then
-                    state="unmerged changes"
+                    state="unmerged"
                 fi
 
                 local uncommitted=$(git status --porcelain --ignore-submodules)
                 if [[ -n "$uncommitted" ]]; then
-                    state="uncommitted changes"
+                    state="uncommitted"
                 fi
 
                 if [[ -n "$state" ]]; then
                     states+=("$state")
                     repos+=("$repo")
                     if [[ ${#repo} -gt $max ]] max=${#repo}
-                    output=1
                 fi
 
                 cd ..
@@ -55,12 +53,12 @@ if cd "$GIT"; then
     done
 fi
 
-if [[ $output -eq 0 ]]; then
+if [[ ${#repos} -eq 0 ]]; then
     echo "All repos up to date"
 else
     echo "Repos with changes:"
     for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-        printf '%*s has %s\n' $max ${repos[i]} ${states[i]}
+        printf '%*s has %s changes\n' $max ${repos[i]} ${states[i]}
     done
 fi
 
