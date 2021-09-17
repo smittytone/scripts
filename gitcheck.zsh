@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2021, Tony Smith
-# @version   1.1.1
+# @version   1.1.2
 # @license   MIT
 
 
@@ -24,6 +24,8 @@ if [[ ! -d "$GIT" ]]; then
     exit 1
 fi
 
+# FROM 1.2.1 Add progress marker
+echo -n "Checking"
 if cd "$GIT"; then
     # Process the files
     for repo in *; do
@@ -49,14 +51,17 @@ if cd "$GIT"; then
 
                 cd ..
             fi
+
+            # FROM 1.2.1 Add progress marker
+            echo -n "."
         fi
     done
 fi
 
 if [[ ${#repos} -eq 0 ]]; then
-    echo "All repos up to date"
+    echo -e "\nAll repos up to date"
 else
-    echo "Repos with changes:"
+    echo -e "\nRepos with changes:"
     for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
         printf '%*s has %s changes\n' $max ${repos[i]} ${states[i]}
     done
