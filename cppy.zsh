@@ -6,13 +6,13 @@
 #
 # @author    Tony Smith
 # @copyright 2021, Tony Smith
-# @version   1.0.2
+# @version   1.0.3
 # @license   MIT
 
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="1.0.0"
+APP_VERSION="1.0.3"
 
 # Functions
 show_help() {
@@ -31,6 +31,7 @@ show_help() {
 # FROM 1.0.2
 show_error() {
     echo "${APP_NAME} error: $1" 1>&2
+    exit 1
 }
 
 # Runtime start
@@ -47,6 +48,7 @@ for arg in "$@"; do
     local check_arg=${arg:l}
     if [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
+        exit 0
     fi
 
     # The arg is not an option so check its extension to
@@ -68,14 +70,12 @@ done
 
 # Check that the drive is mounted
 if ! [[ -e "$target" ]]; then
-    echo "$target not mounted -- cannot continue"
-    exit 1
+    show_error "$target not mounted -- cannot continue"
 fi
 
-# Bail of no files were provided
+# Bail if no files were provided
 if [[ arg_count -eq 0 ]]; then
-    echo "No Python files to copy -- cannot continue"
-    exit 1
+    show_error "No Python files to copy -- cannot continue"
 fi
 
 # Copy the primary file
