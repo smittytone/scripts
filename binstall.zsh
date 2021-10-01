@@ -7,9 +7,9 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version   1.3,o
+# @version   1.3.1
 
-app_version="1.3.0"
+app_version="1.3.1"
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
@@ -23,18 +23,16 @@ max=0
 # Display the version if requested
 get_version() {
     if [[ $do_show -eq 1 ]]; then
-        script=$(cat "$1")
-        result=$(grep '# @version' < <(echo -e "$script"))
-        result=$(tr -s " " < <(echo -e "$result"))
-        version=$(echo "$result" | cut -d " " -s -f 3)
+        script=$(cat "${1}")
+        result=$(grep '# @version' < <(echo -e "${script}"))
+        result=$(tr -s " " < <(echo -e "${result}"))
+        version=$(echo "${result}" | cut -d " " -s -f 3)
         repos+=(${1:t})
-        versions+=($version)
+        versions+=(${version})
         if [[ "$2" == "N" ]]; then
             states+=("Unchanged")
-            #echo "  ${1:t} unchanged at version $version"
         else
             states+=("Updated")
-            #echo "* ${1:t} updated to version $version"
         fi
 
         if [[ ${#1:t} -gt $max ]] max=${#1:t}
@@ -57,8 +55,8 @@ for arg in "$@"; do
         do_show=0
     fi
 
-    if [[ "$arg" == "--version" ]]; then
-        echo "binstall $app_version"
+    if [[ "$arg" == "-v" || "$arg" == "--version" ]]; then
+        echo "binstall ${app_version}"
         exit 0
     fi
 done
