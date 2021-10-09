@@ -13,7 +13,7 @@
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="3.2.0"
+APP_VERSION="3.3.1"
 
 typeset -i do_music=1
 typeset -i do_books=1
