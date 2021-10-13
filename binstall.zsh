@@ -66,7 +66,7 @@ for arg in "$@"; do
         do_show=0
     fi
 
-    if [[ "$arg" == "-q" || "$arg" == "--quiet" ]]; then
+    if [[ "$arg" == "-l" || "$arg" == "--list" ]]; then
         do_list=1
     fi
 
