@@ -42,15 +42,15 @@ get_version() {
 }
 
 # FROM 1.3.0
-# Print the output table header
+# Print the main output table header
 print_header_main() {
     printf '| %-*s | %-9s | %s\n+-' $max "Utility" "State" "Version"
     printf '-%.0s' {0..$max}
     printf '+-----------+--------\n'
 }
 
-# FROM 1.3.0
-# Print the output table header
+# FROM 1.4.0
+# Print the list output table header
 print_header_list() {
     printf '| %-*s | %-8s |\n+-' $max "Utility" "Version"
     printf '-%.0s' {0..$max}
