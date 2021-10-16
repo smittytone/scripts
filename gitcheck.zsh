@@ -33,6 +33,9 @@ for arg in "$@"; do
     check_arg=${arg:l}
     if [[ "$check_arg" = "--branches" || "$check_arg" = "-b" ]]; then
         show_branches=1
+    else
+        echo "Unknown command ${arg}"
+        exit 1
     fi
 done
 
