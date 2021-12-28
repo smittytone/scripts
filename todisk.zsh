@@ -6,27 +6,27 @@
 # Backup to Disk Script
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
-# @version   3.3.1
+# @copyright 2019-21, Tony Smith
+# @version   3.4.0
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="3.3.1"
+APP_VERSION="3.4.0"
 
 typeset -i do_music=1
 typeset -i do_books=1
 target_vol=2TB-APFS
 source_dir="$HOME"
-d_sources=("/Comics" "/OneDrive/eBooks")
+d_sources=("Comics" "Library/Mobile Documents/com~apple~CloudDocs/Documents/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word"
            "/Music/Instrumental")
 # FROM 3.2.0
 # Add user fonts
-f_sources=("/Library/Fonts")
+f_sources=("Library/Fonts")
 
 # Functions
 do_sync() {

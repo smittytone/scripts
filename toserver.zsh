@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-21, Tony Smith
-# @version   5.6.0
+# @version   5.5.0
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.4.0"
+APP_VERSION="5.5.0"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -25,7 +25,7 @@ typeset -i do_books=1
 typeset -i do_music=1
 server_auth="$HOME/.config/sync/bookmarks"
 target_vol="NONE"
-d_sources=("/Comics" "/OneDrive/eBooks")
+d_sources=("/Comics" "/Library/Mobile Documents/com~apple~CloudDocs/Documents/eBooks")
 m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Doctor Who"
            "/Music/Electronic" "/Music/Folk" "/Music/Pop" "/Music/Metal" "/Music/Rock"
            "/Music/SFX" "/Music/Singles" "/Music/Soundtracks" "/Music/Spoken Word"
