@@ -5,8 +5,8 @@
 # Display $GIT directory repos with unmerged or uncommitted changes
 #
 # @author    Tony Smith
-# @copyright 2021, Tony Smith
-# @version   1.3.0
+# @copyright 2022, Tony Smith
+# @version   1.3.1
 # @license   MIT
 
 
@@ -55,7 +55,7 @@ if cd "$GIT"; then
                     branches+=("$branch")
                 else
                     # Determine repo states, but only those that are not up to date
-                    local unmerged=$(git status)
+                    local unmerged=$(git status --ignore-submodules)
                     unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
                     if [[ -n "$unmerged" ]]; then
                         state="unmerged"
