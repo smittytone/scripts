@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-"""
-MicroPython Checker 1.0.1
-=========================
-
-Copyright © 2021, Tony Smith (@smittytone)
-License: MIT
-
-Pre-requisites:
-1. `requests` library -- `pip3 install requests`
-"""
+#
+# MicroPython Checker
+#
+# Create a baseline Raspberry Pi Pico C-language project
+#
+# @author    Tony Smith
+# @copyright 2021, Tony Smith
+# @version   1.0.2
+# @license   MIT
+#
+# @Pre-requisites: `requests` library [`pip3 install requests`]
+#
 
 import requests
 import argparse
