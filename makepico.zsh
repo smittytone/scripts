@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2021, Tony Smith
-# @version   2.2.0
+# @version   2.3.0
 # @license   MIT
 #
 
@@ -16,27 +16,31 @@
 # Check that PICO_SDK_PATH is defined
 # and the SDK is installed
 if [[ -z "${PICO_SDK_PATH}" ]]; then
-    echo "Error — environment variable PICO_SDK_PATH not set"
-    exit 1
+    show_error "Environment variable PICO_SDK_PATH not set"
 else
     ls "${PICO_SDK_PATH}" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
-        echo "Error — Pico SDK not installed at ${PICO_SDK_PATH}"
-        exit 1
+        show_error "Pico SDK not installed at ${PICO_SDK_PATH}"
     fi
 fi
 
 
 show_help() {
-    echo -e "\nmakepico 2.2.0\n\nInitialise a Pi Pico Project\n"
-    echo -e "Usage:\n  makepico [path/name] [-c] [-d] [-n your name] [-h]\n"
+    echo -e "\nmakepico 2.3.0\n\nInitialise a Pi Pico Project\n"
+    echo -e "Usage:\n  makepico [path/to/project/name] [-c] [-d] [-n your name] [-h]\n"
     echo    "Options:"
     echo    "  -c / --cpp     Set up the project for C++. Default: false"
+    echo    "  -a / --asm     Set up the project for ASM. Default: false"
     echo    "  -d / --debug   Set up the project for SWD. Default: false"
     echo    "  -n / --name    Your name for the comments. Default: <YOU>"
-    echo    "  -v / --version The project\'s inital version. Default: 1.0.0"
+    echo    "  -v / --version The project's inital version. Default: 1.0.0"
     echo    "  -h / --help    This help screen"
     echo
+}
+
+show_error() {
+    echo "[ERROR] $1"
+    exit 1
 }
 
 make_project() {
@@ -52,7 +56,7 @@ make_project() {
     project_name=${1:t:l}
     project_path=${1}
 
-    # Create initial C files
+    # Create initial C/CXX/ASM files
     make_source_files "${1}"
 
     # Copy over the .make file from the SDK
@@ -60,8 +64,7 @@ make_project() {
     if cp "${PICO_SDK_PATH}/external/${file}" "${project_path}/${file}"; then
         # NOP
     else
-        echo "Error - could not copy the ${file} file"
-        exit 1
+        show_error "Could not copy the ${file} file"
     fi
 
     # Make the CMakeLists.txt file for this project
@@ -86,100 +89,117 @@ make_source_files() {
         file_ext="cpp"
         project_type="C++"
     fi
+    # FROM 2.3.0
+    if [[ $do_asm -eq 1 ]]; then
+        file_ext="S"
+        project_type="ASM"
+    fi
 
     echo "Creating ${project_type} project files..."
     project_name=${1:t}
     source_file=${1:t:l}
 
     write_header "$project_name" "${1}/main.${file_ext}"
-    write_header "$project_name" "${1}/main.h"
 
-    # FROM 2.0.0
-    # Write main() function
-    {
-        echo "#include \"main.h\""
-        echo
-        echo 'int main() {'
-        echo '    // Use for debugging'
-        echo '    stdio_init_all();'
-        echo
-        echo '    return 0;'
-        echo '}'
-    } >> "${1}/main.${file_ext}"
-
-    # FROM 1.3.0
-    # Break into sections for C/C++ usage
-
-    # Add header guard
-    {
-        echo "#ifndef _${project_name:u}_MAIN_HEADER_"
-        echo "#define _${project_name:u}_MAIN_HEADER_"
-        echo
-    } >> "${1}/main.h"
-
-    # C++ standard libraries or C standard libraries
-    if [[ $do_cpp -eq 1 ]]; then
+    if [[ $do_asm -eq 1 ]]; then
+        # FROM 2.3.0
+        # Write main function
         {
-            echo '/*'
-            echo ' * C++ HEADERS'
-            echo ' */'
-            echo '#include <iostream>'
-            echo '#include <string>'
-            echo '#include <vector>'
-            echo '#include <cstdlib>'
-            echo '#include <cstdint>'
-            echo '#include <cstring>'
+            echo ".thumb_func                     @ Use Thumb instructions"
+            echo ".global main                    @ Set entry point"
             echo
-        } >> "${1}/main.h"
+            echo "main:"
+        } >> "${1}/main.${file_ext}"
     else
-        {
-            echo '/*'
-            echo ' * C HEADERS'
-            echo ' */'
-            echo '#include <stdbool.h>'
-            echo '#include <stdio.h>'
-            echo '#include <stdlib.h>'
-            echo '#include <string.h>'
-            echo '#include <time.h>'
-            echo
-        } >> "${1}/main.h"
-    fi
+        write_header "$project_name" "${1}/main.h"
 
-    # Standard Pico libraries
-    {
-        echo '/*'
-        echo ' * PICO HEADERS'
-        echo ' */'
-        echo '#include "pico/stdlib.h"'
-        echo '#include "pico/binary_info.h"'
-        echo '#include "hardware/gpio.h"'
-        echo '#include "hardware/i2c.h"'
-        echo '#include "hardware/spi.h"'
-        echo '#include "hardware/adc.h"'
-        echo '#include "hardware/uart.h"'
-        echo
-    } >> "${1}/main.h"
-
-    if [[ $do_cpp -eq 1 ]]; then
+        # FROM 2.0.0
+        # Write main() function
         {
-            echo '#ifdef __cplusplus'
-            echo 'extern "C" {'
-            echo '#endif'
+            echo "#include \"main.h\""
             echo
-            echo '/*'
-            echo ' * Usual header code here'
-            echo ' */'
+            echo 'int main() {'
+            echo '    // Use for debugging'
+            echo '    stdio_init_all();'
             echo
-            echo '#ifdef __cplusplus'
+            echo '    return 0;'
             echo '}'
-            echo '#endif'
+        } >> "${1}/main.${file_ext}"
+
+        # FROM 1.3.0
+        # Break into sections for C/C++ usage
+
+        # Add header guard
+        {
+            echo "#ifndef _${project_name:u}_MAIN_HEADER_"
+            echo "#define _${project_name:u}_MAIN_HEADER_"
             echo
         } >> "${1}/main.h"
-    fi
 
-    {
-        echo "#endif // _${project_name:u}_MAIN_HEADER_"
-    } >> "${1}/main.h"
+        # C++ standard libraries or C standard libraries
+        if [[ $do_cpp -eq 1 ]]; then
+            {
+                echo '/*'
+                echo ' * C++ HEADERS'
+                echo ' */'
+                echo '#include <iostream>'
+                echo '#include <string>'
+                echo '#include <vector>'
+                echo '#include <cstdlib>'
+                echo '#include <cstdint>'
+                echo '#include <cstring>'
+                echo
+            } >> "${1}/main.h"
+        else
+            {
+                echo '/*'
+                echo ' * C HEADERS'
+                echo ' */'
+                echo '#include <stdbool.h>'
+                echo '#include <stdio.h>'
+                echo '#include <stdlib.h>'
+                echo '#include <string.h>'
+                echo '#include <time.h>'
+                echo
+            } >> "${1}/main.h"
+        fi
+
+        # Standard Pico libraries
+        {
+            echo '/*'
+            echo ' * PICO HEADERS'
+            echo ' */'
+            echo '#include "pico/stdlib.h"'
+            echo '#include "pico/binary_info.h"'
+            echo '#include "hardware/gpio.h"'
+            echo '#include "hardware/i2c.h"'
+            echo '#include "hardware/spi.h"'
+            echo '#include "hardware/adc.h"'
+            echo '#include "hardware/uart.h"'
+            echo
+        } >> "${1}/main.h"
+
+        if [[ $do_cpp -eq 1 ]]; then
+            {
+                echo '#ifdef __cplusplus'
+                echo 'extern "C" {'
+                echo '#endif'
+                echo
+                echo '/*'
+                echo ' * Usual header code here'
+                echo ' */'
+                echo
+                echo '#ifdef __cplusplus'
+                echo '}'
+                echo '#endif'
+                echo
+            } >> "${1}/main.h"
+        fi
+
+        {
+            echo "#endif // _${project_name:u}_MAIN_HEADER_"
+        } >> "${1}/main.h"
+    fi
 }
 
 write_header() {
@@ -209,6 +229,10 @@ make_cmake_file() {
     file_ext="c"
     if [[ $do_cpp -eq 1 ]]; then
         file_ext="cpp"
+    fi
+    # FROM 2.3.0
+    if [[ $do_asm -eq 1 ]]; then
+        file_ext="S"
     fi
 
     {
@@ -254,20 +278,20 @@ make_vscode() {
             echo '{'
             echo '    "version": "0.2.0",'
             echo '    "configurations": ['
-            echo '        {   "name": "Pico Debug",'
+            echo '        {   "type": "cortex-debug",'
+            echo '            "name": "Pico Debug",'
             echo '            "device": "RP2040",'
             echo '            "gdbPath": "arm-none-eabi-gdb",'
             echo '            "cwd": "${workspaceRoot}",'
             echo '            "executable": "${command:cmake.launchTargetPath}",'
             echo '            "request": "launch",'
-            echo '            "type": "cortex-debug",'
             echo '            "servertype": "openocd",'
             echo '            "configFiles": ['
             echo '                "/interface/picoprobe.cfg",'
             echo '                "/target/rp2040.cfg"'
             echo '            ],'
             echo '            "svdFile": "${env:PICO_SDK_PATH}/src/rp2040/hardware_regs/rp2040.svd",'
-            echo '            "runToMain": true,'
+            echo '            "runToEntryPoint": "main",'
             echo '            "postRestartCommands": ['
             echo '                "break main",'
             echo '                "continue"'
@@ -287,8 +311,7 @@ check_path() {
         if mkdir -p "${1}" >> /dev/null; then
             echo "Creating project directory..."
         else
-            echo "Error — could not create path for project ${project_name}"
-            exit 1
+            show_error "Could not create path for project ${project_name}"
         fi
     fi
 }
@@ -298,6 +321,7 @@ check_path() {
 projects=()
 do_swd=0
 do_cpp=0
+do_asm=0
 users_name="<YOU>"
 proj_version="1.0.0"
 next_is_arg=0
@@ -309,29 +333,30 @@ for arg in "$@"; do
         # The argument should be a value (previous argument was an option)
         if [[ ${arg:0:1} = "-" ]]; then
             # Next value is an option: ie. missing value
-            echo "Error -- Missing value for ${last_arg}"
-            exit 1
+            show_error "Missing value for ${last_arg}"
         fi
 
         # Set the appropriate internal value
         case "$next_is_arg" in
             1) users_name=$arg ;;
             2) proj_version=$arg ;;
-            *) echo "Error -- Unknown argument" exit 1 ;;
+            *) show_error "Unknown argument" exit 1 ;;
         esac
 
         # Reset
         next_is_arg=0
     else
-        if   [[ "$upper_arg" == "-N" || "$upper_arg" == "--NAME"  ]]; then
+        if   [[ "$upper_arg" == "-N" || "$upper_arg" == "--NAME"    ]]; then
             next_is_arg=1
-        elif [[ "$upper_arg" == "-C" || "$upper_arg" == "--CPP"   ]]; then
+        elif [[ "$upper_arg" == "-C" || "$upper_arg" == "--CPP"     ]]; then
             do_cpp=1
-        elif [[ "$upper_arg" == "-D" || "$upper_arg" == "--DEBUG" ]]; then
+        elif [[ "$upper_arg" == "-A" || "$upper_arg" == "--ASM "    ]]; then
+            do_asm=1
+        elif [[ "$upper_arg" == "-D" || "$upper_arg" == "--DEBUG"   ]]; then
             do_swd=1
         elif [[ "$upper_arg" == "-V" || "$upper_arg" == "--VERSION" ]]; then
             next_is_arg=2
-        elif [[ "$upper_arg" == "-H" || "$upper_arg" == "--HELP"  ]]; then
+        elif [[ "$upper_arg" == "-H" || "$upper_arg" == "--HELP"    ]]; then
             show_help
             exit 0
         else
@@ -341,6 +366,11 @@ for arg in "$@"; do
         last_arg=$uarg
     fi
 done
+
+# FROM 2.3.0 Watch out for conflicting project types
+if [[ $do_cpp -eq 1 && do_asm -eq 1 ]]; then
+    show_error "Conflicting project types selected"
+fi
 
 if [[ ${#projects[@]} -gt 0 ]]; then
     for project in "${projects[@]}"; do
