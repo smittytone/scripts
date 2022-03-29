@@ -7,9 +7,9 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version   1.4.2
+# @version   1.5.0
 
-app_version="1.4.2"
+app_version="1.5.0"
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
@@ -21,6 +21,13 @@ versions=()
 name_max=0
 ver_max=7
 
+# FROM 1.5.0
+# Colours
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+white=$(tput setaf 7 && tput bold)
+normal=$(tput sgr0)
+bar="${white}|${normal}"
 
 # FROM 1.1.0
 # Display the version if requested
@@ -34,9 +41,9 @@ get_version() {
         versions+=(${version})
 
         if [[ "$2" == "N" ]]; then
-            states+=("Up to date")
+            states+=("${green}Up to date${normal}")
         else
-            states+=("Updated")
+            states+=("${yellow}Updated${normal}")
         fi
 
         if [[ ${#1:t} -gt ${name_max} ]] name_max=${#1:t}
@@ -49,20 +56,22 @@ get_version() {
 # FROM 1.4.1 -- span column three to max version string size,
 #               pass in string lengths
 print_header_main() {
-    printf '| %-*s | %-10s | %-*s |\n+-' ${1} "Utility" "State" ${2} "Version"
-    printf '-%.0s' {0..${1}}
-    printf '+------------+-'
-    printf '-%.0s' {0..${2}}
-    printf '+\n'
+    printf "${white}| %-*s | %-*s | %-10s |\n+-" ${1} "Utility" ${2} "Version" "State"
+    printf "-%.0s" {0..${1}}
+    printf "+"
+    printf "-%.0s" {0..${2}}
+    printf "-+------------+${normal}\n"
 }
 
 # FROM 1.4.0
 # Print the list output table header
 # FROM 1.4.1 -- pass in string lengths
 print_header_list() {
-    printf '| %-*s | %-8s |\n+-' ${1} "Utility" "Version"
-    printf '-%.0s' {0..${1}}
-    printf '+----------+\n'
+    printf "${white}| %-*s | %-*s |\n+-" ${1} "Utility" ${2} "Version"
+    printf "-%.0s" {0..${1}}
+    printf "+"
+    printf "-%.0s" {0..${2}}
+    printf "-+${normal}\n"
 }
 
 # FROM 1.1.0
@@ -139,14 +148,14 @@ fi
 # FROM 1.4.1 -- pass string lengths to function calls
 if [[ ${do_list} -eq 0 ]]; then
     print_header_main ${name_max} ${ver_max}
-    format_string='| %-*s | %-9s | %-*s |\n'
+    format_string="${bar} %-*s ${bar} %-*s ${bar} %-9s ${bar} \n"
     for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-        printf ${format_string} ${name_max} ${repos[i]} ${states[i]} ${ver_max} ${versions[i]}
+        printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]} ${states[i]}
     done
 else
-    print_header_list ${name_max}
-    format_string='| %-*s | %-8s | \n'
+    print_header_list ${name_max} ${ver_max}
+    format_string="${bar} %-*s ${bar} %-*s ${bar}\n"
     for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-        printf ${format_string} ${name_max} ${repos[i]} ${versions[i]}
+        printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]}
     done
 fi
