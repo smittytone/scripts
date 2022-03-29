@@ -46,6 +46,7 @@ get_version() {
             states+=("${yellow}Updated${normal}")
         fi
 
+        # Set the version number and app name max column width
         if [[ ${#1:t} -gt ${name_max} ]] name_max=${#1:t}
         if [[ ${#version:t} -gt ${ver_max} ]] ver_max=${#version:t}
     fi
@@ -57,9 +58,7 @@ get_version() {
 #               pass in string lengths
 print_header_main() {
     printf "${white}| %-*s | %-*s | %-10s |\n+-" ${1} "Utility" ${2} "Version" "State"
-    printf "-%.0s" {0..${1}}
-    printf "+"
-    printf "-%.0s" {0..${2}}
+    print_mid ${1} ${2}
     printf "-+------------+${normal}\n"
 }
 
@@ -68,10 +67,19 @@ print_header_main() {
 # FROM 1.4.1 -- pass in string lengths
 print_header_list() {
     printf "${white}| %-*s | %-*s |\n+-" ${1} "Utility" ${2} "Version"
+    print_mid ${1} ${2}
+    printf "-+${normal}\n"
+}
+
+print_mid() {
     printf "-%.0s" {0..${1}}
     printf "+"
     printf "-%.0s" {0..${2}}
-    printf "-+${normal}\n"
+}
+
+print_err_and_exit() {
+    echo "[ERROR] ${1}"
+    exit 1
 }
 
 # FROM 1.1.0
@@ -95,7 +103,7 @@ done
 
 # Check for a ~/bin directory and make if it's not there yet
 if [[ ! -e ${bin_dir} ]]; then
-    mkdir -p ${bin_dir} || echo 'Could not create ~/bin -- exiting' ; exit 1
+    mkdir -p ${bin_dir} || print_err_and_exit 'Could not create ~/bin -- exiting'
 fi
 
 # Load in the list of scripts
@@ -136,10 +144,10 @@ if [[ -e ${source_file} ]]; then
             fi
         done < ${source_file}
     else
-        echo "'${scripts_dir}' does not exist... exiting"
+        print_err_and_exit "'${scripts_dir}' does not exist... exiting"
     fi
 else
-    echo "'${source_file}' does not exist... exiting"
+    print_err_and_exit "'${source_file}' does not exist... exiting"
 fi
 
 # Display the output
