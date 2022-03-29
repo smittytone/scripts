@@ -7,9 +7,9 @@
 #      ie. $GIT must be set, and
 #      to list the files to be copied and made executable
 #
-# @version   1.4.1
+# @version   1.4.2
 
-app_version="1.4.1"
+app_version="1.4.2"
 bin_dir=$HOME/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
@@ -34,7 +34,7 @@ get_version() {
         versions+=(${version})
 
         if [[ "$2" == "N" ]]; then
-            states+=("Unchanged")
+            states+=("Up to date")
         else
             states+=("Updated")
         fi
@@ -49,9 +49,9 @@ get_version() {
 # FROM 1.4.1 -- span column three to max version string size,
 #               pass in string lengths
 print_header_main() {
-    printf '| %-*s | %-9s | %-*s |\n+-' ${1} "Utility" "State" ${2} "Version"
+    printf '| %-*s | %-10s | %-*s |\n+-' ${1} "Utility" "State" ${2} "Version"
     printf '-%.0s' {0..${1}}
-    printf '+-----------+-'
+    printf '+------------+-'
     printf '-%.0s' {0..${2}}
     printf '+\n'
 }
