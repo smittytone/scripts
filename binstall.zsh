@@ -8,23 +8,23 @@
 #      $GIT/scripts as source of script list and scripts,
 #      respectively. And $GIT must be set.
 #
-# @version   1.5.0
+# @version   1.5.1
 # @author    Tony Smith (@smittytone)
 # @copyright 2022
 # @licence   MIT
 
-app_version="1.5.0"
+app_version="1.5.1"
 bin_dir=/usr/local/bin
-source_file=$GIT/dotfiles/Mac/keyscripts
-scripts_dir=$GIT/scripts
-do_show=1
-do_list=0
+source_file="$GIT/dotfiles/Mac/keyscripts"
+scripts_dir="$GIT/scripts"
 repos=()
 states=()
 versions=()
-update_count=0
-name_max=0
-ver_max=7
+typeset -i update_count=0
+typeset -i name_max=0
+typeset -i ver_max=7
+typeset -i do_show=1
+typeset -i do_list=0
 
 # FROM 1.5.0
 # Colours
@@ -47,7 +47,7 @@ get_version() {
     if [[ "$2" == "N" ]]; then
         states+=("${green}Up to date${normal}")
     else
-        states+=("${yellow}Updated${normal}")
+        states+=("${yellow}Updated   ${normal}")
         ((update_count++))
     fi
 
@@ -61,7 +61,7 @@ get_version() {
 # FROM 1.4.1 -- span column three to max version string size,
 #               pass in string lengths
 print_header_main() {
-    printf "${white}| %-*s | %-*s | %-10s |\n+-" ${1} "Utility" ${2} "Version" "State"
+    printf "${white}| %-*s | %-*s | %-10s |\n+-" ${1} Utility ${2} Version State
     print_mid ${1} ${2}
     printf "-+------------+${normal}\n"
 }
@@ -70,7 +70,7 @@ print_header_main() {
 # Print the list output table header
 # FROM 1.4.1 -- pass in string lengths
 print_header_list() {
-    printf "${white}| %-*s | %-*s |\n+-" ${1} "Utility" ${2} "Version"
+    printf "${white}| %-*s | %-*s |\n+-" ${1} Utility ${2} Version
     print_mid ${1} ${2}
     printf "-+${normal}\n"
 }
@@ -99,8 +99,8 @@ show_help() {
 }
 
 # Parse args
-arg_value=0
-arg_count=0
+typeset -i arg_value=0
+typeset -i arg_count=0
 for arg in "$@"; do
     arg=${arg:l}
     if [[ $arg_value -gt 0 ]]; then
@@ -111,8 +111,8 @@ for arg in "$@"; do
         fi
 
         # Set the appropriate internal value
-        case "$arg_value" in
-            1) bin_dir=${arg} && if [[ do_show -eq 1 ]] echo "Installation directory set to ${bin_dir}" ;;
+        case $arg_value in
+            1) bin_dir="${arg}" && if [[ do_show -eq 1 ]] echo "Installation directory set to ${bin_dir}" ;;
             *) print_err_and_exit "Unknown argument" ;;
         esac
 
@@ -146,13 +146,13 @@ if [[ $do_list -eq 1 && $do_show -eq 0 ]]; then
 fi
 
 # Check for a bin directory and make if it's not there yet
-if [[ ! -e ${bin_dir} ]]; then
-    mkdir -p ${bin_dir} || print_err_and_exit "Could not create ${bin_dir} -- exiting"
+if [[ ! -e "${bin_dir}" ]]; then
+    mkdir -p "${bin_dir}" || print_err_and_exit "Could not create ${bin_dir} -- exiting"
 fi
 
 # Load in the list of scripts
-if [[ -e ${source_file} ]]; then
-    if [[ -e ${scripts_dir} ]]; then
+if [[ -e "${source_file}" ]]; then
+    if [[ -e "${scripts_dir}" ]]; then
         # Read in each line of 'keyscripts', each of which
         # is the name of a script to copy, eg. 'update.zsh'
         while IFS= read -r line; do
@@ -166,13 +166,13 @@ if [[ -e ${source_file} ]]; then
                 diff_result="DO"
 
                 if [[ -e ${target_file} ]]; then
-                    diff_result=$(diff ${target_file} ${scripts_dir}/${line})
+                    diff_result=$(diff ${target_file} "${scripts_dir}/${line}")
                 fi
 
                 # FROM 1.0.1
                 # Only copy if the file is different
                 if [[ -n ${diff_result} ]]; then
-                    cp ${scripts_dir}/${line} ${target_file}
+                    cp "${scripts_dir}/${line}" ${target_file}
                     get_version ${target_file} Y
                 else
                     get_version ${target_file} N
@@ -186,7 +186,7 @@ if [[ -e ${source_file} ]]; then
                     get_version $target_file N
                 fi
             fi
-        done < ${source_file}
+        done < "${source_file}"
     else
         print_err_and_exit "'${scripts_dir}' does not exist... exiting"
     fi
