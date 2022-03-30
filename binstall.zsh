@@ -2,15 +2,19 @@
 
 # binstall.zsh
 #
-# install key scripts into $HOME/bin
-# NOTE Depends upon $GIT/dotfiles/Mac/keyscripts
-#      ie. $GIT must be set, and
-#      to list the files to be copied and made executable
+# Install key scripts into /usr/local/bin or alternative directory.
+#
+# NOTE Depends upon $GIT/dotfiles/Mac/keyscripts and
+#      $GIT/scripts as source of script list and scripts,
+#      respectively. And $GIT must be set.
 #
 # @version   1.5.0
+# @author    Tony Smith (@smittytone)
+# @copyright 2022
+# @licence   MIT
 
 app_version="1.5.0"
-bin_dir=$HOME/bin
+bin_dir=/usr/local/bin
 source_file=$GIT/dotfiles/Mac/keyscripts
 scripts_dir=$GIT/scripts
 do_show=1
@@ -18,6 +22,7 @@ do_list=0
 repos=()
 states=()
 versions=()
+update_count=0
 name_max=0
 ver_max=7
 
@@ -32,24 +37,23 @@ bar="${white}|${normal}"
 # FROM 1.1.0
 # Display the version if requested
 get_version() {
-    if [[ $do_show -eq 1 ]]; then
-        script=$(cat "${1}")
-        result=$(grep '# @version' < <(echo -e "${script}"))
-        result=$(tr -s " " < <(echo -e "${result}"))
-        version=$(echo "${result}" | cut -d " " -s -f 3)
-        repos+=(${1:t})
-        versions+=(${version})
+    script=$(cat "${1}")
+    result=$(grep '# @version' < <(echo -e "${script}"))
+    result=$(tr -s " " < <(echo -e "${result}"))
+    version=$(echo "${result}" | cut -d " " -s -f 3)
+    repos+=(${1:t})
+    versions+=(${version})
 
-        if [[ "$2" == "N" ]]; then
-            states+=("${green}Up to date${normal}")
-        else
-            states+=("${yellow}Updated${normal}")
-        fi
-
-        # Set the version number and app name max column width
-        if [[ ${#1:t} -gt ${name_max} ]] name_max=${#1:t}
-        if [[ ${#version:t} -gt ${ver_max} ]] ver_max=${#version:t}
+    if [[ "$2" == "N" ]]; then
+        states+=("${green}Up to date${normal}")
+    else
+        states+=("${yellow}Updated${normal}")
+        ((update_count++))
     fi
+
+    # Set the version number and app name max column width
+    if [[ ${#1:t} -gt ${name_max} ]] name_max=${#1:t}
+    if [[ ${#version:t} -gt ${ver_max} ]] ver_max=${#version:t}
 }
 
 # FROM 1.3.0
@@ -82,28 +86,68 @@ print_err_and_exit() {
     exit 1
 }
 
-# FROM 1.1.0
-# Check args to silence version display
+show_help() {
+    echo -e "\nbinstall\n"
+    echo -e "Usage:\n  binstall [-l] [-q] [-v] [-h] [-t path/to/install/directory]\n"
+    echo    "Options:"
+    echo    "  -l / --list          Just list scripts current states"
+    echo    "  -q / --quiet         Don't show script version and state information"
+    echo    "  -v / --version       Display the utility's version and exit"
+    echo    "  -t / --target [path] Specify an install directory. Default: /usr/local/bin"
+    echo    "  -h / --help          This help screen"
+    echo
+}
+
+# Parse args
+arg_value=0
+arg_count=0
 for arg in "$@"; do
     arg=${arg:l}
+    if [[ $arg_value -gt 0 ]]; then
+        # The argument should be a value (previous argument was an option)
+        if [[ ${arg:0:1} = "-" ]]; then
+            # Next value is an option: ie. missing value
+            print_err_and_exit "Missing value for ${args[((arg_value - 1))]}"
+        fi
 
-    if [[ "$arg" == "-q" || "$arg" == "--quiet" ]]; then
-        do_show=0
+        # Set the appropriate internal value
+        case "$arg_value" in
+            1) bin_dir=${arg} && if [[ do_show -eq 1 ]] echo "Installation directory set to ${bin_dir}" ;;
+            *) print_err_and_exit "Unknown argument" ;;
+        esac
+
+        arg_value=0
+    else
+        if [[ "${arg}" == "-q" || "${arg}" == "--quiet" ]]; then
+            do_show=0
+        elif [[ "${arg}" == "-l" || "${arg}" == "--list" ]]; then
+            do_list=1
+        elif [[ "${arg}" == "-t" || "${arg}" == "--target" ]]; then
+            arg_value=1
+        elif [[ "${arg}" == "-h" || "${arg}" == "--help" ]]; then
+            show_help
+            exit 0
+        elif [[ "${arg}" == "-v" || "${arg}" == "--version" ]]; then
+            echo "binstall ${app_version}"
+            exit 0
+        fi
     fi
 
-    if [[ "$arg" == "-l" || "$arg" == "--list" ]]; then
-        do_list=1
-    fi
-
-    if [[ "$arg" == "-v" || "$arg" == "--version" ]]; then
-        echo "binstall ${app_version}"
-        exit 0
+    ((arg_count++))
+    if [[ $arg_count -eq $# && $arg_value -ne 0 ]]; then
+        print_err_and_exit "Missing value for option ${arg}"
     fi
 done
 
-# Check for a ~/bin directory and make if it's not there yet
+# FROM 1.5.0
+# Check for incompatible flags
+if [[ $do_list -eq 1 && $do_show -eq 0 ]]; then
+    print_err_and_exit "Incompatable flags chosen: you can't list files quietly -- exiting"
+fi
+
+# Check for a bin directory and make if it's not there yet
 if [[ ! -e ${bin_dir} ]]; then
-    mkdir -p ${bin_dir} || print_err_and_exit 'Could not create ~/bin -- exiting'
+    mkdir -p ${bin_dir} || print_err_and_exit "Could not create ${bin_dir} -- exiting"
 fi
 
 # Load in the list of scripts
@@ -112,11 +156,11 @@ if [[ -e ${source_file} ]]; then
         # Read in each line of 'keyscripts', each of which
         # is the name of a script to copy, eg. 'update.zsh'
         while IFS= read -r line; do
-            target_file=$HOME/bin/${line:t:r}
+            target_file="${bin_dir}/${line:t:r}"
 
             # FROM 1.4.0 -- Don't copy, just get the version,
             # if we're just listing files
-            if [[ ${do_list} -eq 0 ]]; then
+            if [[ $do_list -eq 0 ]]; then
                 # FROM 1.0.1 -- check of the source and target are different
                 # FROM 1.0.2 -- don't block install of uninstalled scripts
                 diff_result="DO"
@@ -128,7 +172,7 @@ if [[ -e ${source_file} ]]; then
                 # FROM 1.0.1
                 # Only copy if the file is different
                 if [[ -n ${diff_result} ]]; then
-                    cp ${scripts_dir}/${line $target_file}
+                    cp ${scripts_dir}/${line} ${target_file}
                     get_version ${target_file} Y
                 else
                     get_version ${target_file} N
@@ -154,16 +198,24 @@ fi
 # FROM 1.3.0 -- as a table
 # FROM 1.4.0 -- with an alternative version-only list
 # FROM 1.4.1 -- pass string lengths to function calls
-if [[ ${do_list} -eq 0 ]]; then
-    print_header_main ${name_max} ${ver_max}
-    format_string="${bar} %-*s ${bar} %-*s ${bar} %-9s ${bar} \n"
-    for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-        printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]} ${states[i]}
-    done
+if [[ $do_show -eq 1 ]]; then
+    if [[ $do_list -eq 0 ]]; then
+        print_header_main ${name_max} ${ver_max}
+        format_string="${bar} %-*s ${bar} %-*s ${bar} %-9s ${bar} \n"
+        for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
+            printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]} ${states[i]}
+        done
+    else
+        print_header_list ${name_max} ${ver_max}
+        format_string="${bar} %-*s ${bar} %-*s ${bar}\n"
+        for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
+            printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]}
+        done
+    fi
 else
-    print_header_list ${name_max} ${ver_max}
-    format_string="${bar} %-*s ${bar} %-*s ${bar}\n"
-    for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-        printf ${format_string} ${name_max} ${repos[i]} ${ver_max} ${versions[i]}
-    done
+    case "$update_count" in
+        0) echo "No scripts updated" ;;
+        1) echo "1 script updated" ;;
+        *) echo "$update_count scripts updated" ;;
+    esac
 fi
