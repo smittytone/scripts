@@ -8,12 +8,12 @@
 #      $GIT/scripts as source of script list and scripts,
 #      respectively. And $GIT must be set.
 #
-# @version   1.5.1
+# @version   1.6.0
 # @author    Tony Smith (@smittytone)
 # @copyright 2022
 # @licence   MIT
 
-app_version="1.5.1"
+app_version="1.6.0"
 bin_dir=/usr/local/bin
 source_file="$GIT/dotfiles/Mac/keyscripts"
 scripts_dir="$GIT/scripts"
@@ -25,6 +25,9 @@ typeset -i name_max=0
 typeset -i ver_max=7
 typeset -i do_show=1
 typeset -i do_list=0
+typeset -i source_changed=0
+typeset -i scripts_changed=0
+typeset -i bin_changed=0
 
 # FROM 1.5.0
 # Colours
@@ -86,14 +89,26 @@ print_err_and_exit() {
     exit 1
 }
 
+# FROM 1.6.0
+print_message() {
+    if [[ $do_show -eq 1 ]] echo "${1}"
+}
+
+show_version() {
+    echo "binstall ${app_version}"
+}
 show_help() {
-    echo -e "\nbinstall\n"
+    echo
+    show_version
+    echo
     echo -e "Usage:\n  binstall [-l] [-q] [-v] [-h] [-t path/to/install/directory]\n"
     echo    "Options:"
     echo    "  -l / --list          Just list scripts current states"
     echo    "  -q / --quiet         Don't show script version and state information"
     echo    "  -v / --version       Display the utility's version and exit"
     echo    "  -t / --target [path] Specify an install directory. Default: /usr/local/bin"
+    echo    "  -f / --file   [path] Specify a script-list file. Default: [git]/dotfiles/Mac/keyscripts"
+    echo    "  -s / --source [path] Specify a script source directory. Default: [git]/scripts"
     echo    "  -h / --help          This help screen"
     echo
 }
@@ -102,7 +117,7 @@ show_help() {
 typeset -i arg_value=0
 typeset -i arg_count=0
 for arg in "$@"; do
-    arg=${arg:l}
+    larg=${arg:l}
     if [[ $arg_value -gt 0 ]]; then
         # The argument should be a value (previous argument was an option)
         if [[ ${arg:0:1} = "-" ]]; then
@@ -112,23 +127,29 @@ for arg in "$@"; do
 
         # Set the appropriate internal value
         case $arg_value in
-            1) bin_dir="${arg}" && if [[ do_show -eq 1 ]] echo "Installation directory set to ${bin_dir}" ;;
+            1) bin_dir="${arg}" && bin_changed=1 ;;
+            2) scripts_dir="${arg}" && scripts_changed=1 ;;
+            3) source_file="${arg}" && source_changed=1 ;;
             *) print_err_and_exit "Unknown argument" ;;
         esac
 
         arg_value=0
     else
-        if [[ "${arg}" == "-q" || "${arg}" == "--quiet" ]]; then
+        if [[ "${larg}" == "-q" || "${larg}" == "--quiet" ]]; then
             do_show=0
-        elif [[ "${arg}" == "-l" || "${arg}" == "--list" ]]; then
+        elif [[ "${larg}" == "-l" || "${larg}" == "--list" ]]; then
             do_list=1
-        elif [[ "${arg}" == "-t" || "${arg}" == "--target" ]]; then
+        elif [[ "${larg}" == "-t" || "${larg}" == "--target" ]]; then
             arg_value=1
-        elif [[ "${arg}" == "-h" || "${arg}" == "--help" ]]; then
+        elif [[ "${larg}" == "-s" || "${larg}" == "--scripts" ]]; then
+            arg_value=2
+        elif [[ "${larg}" == "-f" || "${larg}" == "--file" ]]; then
+            arg_value=3
+        elif [[ "${larg}" == "-h" || "${larg}" == "--help" ]]; then
             show_help
             exit 0
-        elif [[ "${arg}" == "-v" || "${arg}" == "--version" ]]; then
-            echo "binstall ${app_version}"
+        elif [[ "${larg}" == "-v" || "${larg}" == "--version" ]]; then
+            show_version
             exit 0
         fi
     fi
@@ -149,6 +170,12 @@ fi
 if [[ ! -e "${bin_dir}" ]]; then
     mkdir -p "${bin_dir}" || print_err_and_exit "Could not create ${bin_dir} -- exiting"
 fi
+
+# FROM 1.6.0
+# Messages
+if [[ $bin_changed -ne 0 ]] print_message "Installation directory set to ${bin_dir}"
+if [[ $source_changed -ne 0 ]] print_message "File list set to ${source_file}"
+if [[ $scripts_changed -ne 0 ]] print_message "Scripts directory set to ${scripts_dir}"
 
 # Load in the list of scripts
 if [[ -e "${source_file}" ]]; then
