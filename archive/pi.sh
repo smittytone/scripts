@@ -18,11 +18,11 @@ fi
 
 pitype=Zero
 
-if [ "$choice" = "P" ]; then
+if [[ "$choice" = "P" ]]; then
     pitype=Standard
 fi
 
-if ! [ -e "tmp" ]; then
+if ! [[ -e "tmp" ]]; then
     mkdir tmp
 fi
 
