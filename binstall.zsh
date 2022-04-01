@@ -8,12 +8,12 @@
 #      $GIT/scripts as source of script list and scripts,
 #      respectively. And $GIT must be set.
 #
-# @version   1.6.0
+# @version   1.6.1
 # @author    Tony Smith (@smittytone)
 # @copyright 2022
 # @licence   MIT
 
-app_version="1.6.0"
+app_version="1.6.1"
 bin_dir=/usr/local/bin
 source_file="$GIT/dotfiles/Mac/keyscripts"
 scripts_dir="$GIT/scripts"
@@ -85,8 +85,12 @@ print_mid() {
 }
 
 print_err_and_exit() {
-    echo "[ERROR] ${1}"
+    print_err ${1}
     exit 1
+}
+
+print_err() {
+    echo "[ERROR] ${1}"
 }
 
 # FROM 1.6.0
@@ -192,21 +196,27 @@ if [[ -e "${source_file}" ]]; then
                 # FROM 1.0.2 -- don't block install of uninstalled scripts
                 diff_result="DO"
 
-                if [[ -e ${target_file} ]]; then
-                    diff_result=$(diff ${target_file} "${scripts_dir}/${line}")
-                fi
+                # FROM 1.6.1 -- check source script exists
+                if [[ -f "${scripts_dir}/${line}" ]]; then
+                    if [[ -f ${target_file} ]]; then
+                        diff_result=$(diff ${target_file} "${scripts_dir}/${line}")
+                    fi
 
-                # FROM 1.0.1
-                # Only copy if the file is different
-                if [[ -n ${diff_result} ]]; then
-                    cp "${scripts_dir}/${line}" ${target_file}
-                    get_version ${target_file} Y
+                    # FROM 1.0.1
+                    # Only copy if the file is different
+                    if [[ -n ${diff_result} ]]; then
+                        cp "${scripts_dir}/${line}" ${target_file}
+                        get_version ${target_file} Y
+                    else
+                        get_version ${target_file} N
+                    fi
+
+                    # Make the file executable
+                    chmod +x ${target_file}
                 else
-                    get_version ${target_file} N
+                    # Not a 'stop script' error
+                    print_err "${line} in the file list does not reference an actual script"
                 fi
-
-                # Make the file executable
-                chmod +x ${target_file}
             else
                 # Just get the version for each source file
                 if [[ -e $target_file ]]; then
