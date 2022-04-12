@@ -6,8 +6,8 @@
 # Backup to Server Script
 #
 # @author    Tony Smith
-# @copyright 2019-21, Tony Smith
-# @version   5.5.0
+# @copyright 2019-22, Tony Smith
+# @version   5.5.1
 # @license   MIT
 #
 
@@ -45,7 +45,7 @@ do_sync() {
     echo -n "  ${name}... "
 
     # Prepare a readout of changed files ONLY (rsync does not do this)
-    list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".*")
+    list=$(rsync -az "$HOME/$1" "$2" --itemize-changes --exclude ".*" --exclude "*.photoslibrary")
     lines=$(grep '>' < <(echo -e "$list"))
 
     # Check we have files to report
