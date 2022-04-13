@@ -14,6 +14,7 @@ unsetopt nomatch
 pi_type=Zero
 pi_zip_file=NONE
 app_version="2.1.0"
+debug=1
 # Colours
 red="\e[40;31m"
 bold="\e[40;1m"
@@ -29,48 +30,67 @@ show_error_and_exit() {
 }
 
 get_pi_zip_file() {
-    pi_zip_file=$(/bin/ls *.zip)
+    show_debug "File type: ${1:e:l}"
+    if [[ "${1:e:l}" == "zip" ]]; then
+        pi_zip_file=$(/bin/ls *.zip 2> /dev/null)
+    else
+        pi_zip_file=$(/bin/ls *.xz 2> /dev/null)
+    fi
 }
 
 show_version() {
     echo -e "${green}Version ${app_version}${reset}"
 }
 
+show_debug() {
+    if [[ $debug -eq 1 ]]; then
+        echo -e "${yellow}${bold}[DEBUG]${reset} $1"
+    fi
+}
+
 # RUNTIME START
 # Check input PiOS download location
 URL=${1}
 
+if [[ ! -f /usr/local/opt/openssl/bin/openssl ]]; then
+    show_error_and_exit "This app requires OpenSSL. Please install it using Homebrew (brew install openssl@3) and then retry this app"
+fi
+
 clear
 echo -e "${bold}${white}macOS ${red}Raspberry Pi${white} Image Installer with optional WiFi setup${reset}"
 show_version
-read -k -s "choice?Install image on a standard Pi [P] or a Pi Zero [Z] image "
+read -k -s "choice?Install for a standard Pi [P] or a Pi Zero [Z] image (or hit any other key to exit) "
 echo
 
 choice=${choice:u}
 if [[ "${choice}" != "P" && "${choice}" != "Z" ]] exit 0
 if [[ "${choice}" = "P" ]] pi_type=Standard
 
-if [[ ! -d "tmp" ]]; then
+if [[ ! -e tmp ]]; then
+    show_debug "No tmp directory... creating one"
     mkdir tmp || show_error_and_exit "Could not create 'tmp' directory at this location"
 fi
 
 cd tmp || show_error_and_exit "Could not enter 'tmp' directory"
 
 # Get the PiOS image
-if [[ ! -e "p.img" ]]; then
-    get_pi_zip_file
-    if [[ ! -e "${pi_zip_file}" ]]; then
+if [[ ! -f p.img ]]; then
+    get_pi_zip_file ${URL}
+    show_debug "Archive file: ${pi_zip_file}"
+
+    if [[ ! -f "${pi_zip_file}" ]]; then
         # No zip file available, so download URL
         if [[ -z ${URL} ]]; then
             show_error_and_exit "No PiOS download URL specified.\nDownloads available at 'https://www.raspberrypi.com/software/operating-systems/'"
             # eg. https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip
         fi
-        if [[ ${URL:e:l} != "zip" ]] show_error_and_exit "Please supply a .zip file URL"
+        if [[ ${URL:e:l} != "zip" && ${URL:e:l} != "xz" ]] show_error_and_exit "Please supply a .zip file URL"
 
         # Get URL
         echo "Downloading Raspberry Pi ${pi_type} OS image... "
         curl -O -L -# ${URL}
-        get_pi_zip_file
+        get_pi_zip_file ${URL}
+        show_debug "Archive file: ${pi_zip_file}"
     fi
 
     read "choice?Enter SHA 256 or just hit [ENTER] to bypass this check "
@@ -80,7 +100,7 @@ if [[ ! -e "p.img" ]]; then
         sha=$(echo "${sha}" | cut -d " " -f 1)
         echo "Download SHA 256: ${sha}"
         echo " Entered SHA 256: ${choice}"
-        if [[ ! "${choice}" = "${sha}" ]]; then
+        if [[ "${choice}" = "${sha}" ]]; then
             echo "SHA256 values match"
         else
             show_error_and_exit "SHAs do not match -- do not proceed with this file"
@@ -89,8 +109,15 @@ if [[ ! -e "p.img" ]]; then
 
     # Unzip the image file
     echo "Decompressing Raspberry Pi ${pi_type} OS image... "
-    unzip ${pi_zip_file} > /dev/null 2>&1
+    if [[ ${URL:e:l} == "zip" ]]; then
+        unzip -o ${pi_zip_file} > /dev/null 2>&1
+    else
+        xz -d -k ${pi_zip_file} > /dev/null 2>&1
+    fi
+
     mv *.img p.img
+else
+    show_debug "PiOS image already downloaded"
 fi
 
 read -k -s "choice?Insert SD card and press any key when it has appeared on the desktop "
@@ -113,13 +140,13 @@ while [[ ${ok} -eq 0 ]]; do
 
     if diskutil unmountdisk "${unmount_name}"; then
         # Copy across the PiOS disk image
-        if [ -e "p.img" ]; then
+        if [ -f p.img ]; then
             echo "About to copy Raspberry Pi ${pi_type} OS image to SD card ${unmount_name}... "
-            read -k -s "key?Are you sure? [Y]es, [N]o or [C]ancel Setup "
+            read -k -s "key?Are you sure? [Y]es, [N]o or [E]xit Setup "
             echo
 
-            if [ ${key:u} != "Y" ]; then
-                if [ ${key:u} = "C" ]; then
+            if [[ ${key:u} != "Y" ]]; then
+                if [[ ${key:u} = "E" ]]; then
                     exit 0
                 else
                     continue
@@ -161,7 +188,7 @@ while [[ ${ok} -eq 0 ]]; do
         done
 
         echo "Setting up a user account for \"${username}\""
-        epw=$(echo "${password}" | openssl passwd -6 -stdin)
+        epw=$(echo "${password}" | /usr/local/opt/openssl/bin/openssl passwd -6 -stdin)
         echo -e "${username}:${epw}" > "/Volumes/boot/userconf.txt"
 
         # Set up WiFi
@@ -185,7 +212,7 @@ while [[ ${ok} -eq 0 ]]; do
 
         # All done...
         echo "Cleaning up... "
-        diskutil unmountdisk /Volumes/boot
+        sudo diskutil unmountdisk /Volumes/boot
         cd ..
         rm -r tmp
         ok=1
