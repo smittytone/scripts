@@ -2,7 +2,7 @@
 
 # Pi Image Installation
 #
-# @version   2.0.0
+# @version   2.1.0
 # @author    Tony Smith (@smittytone)
 # @copyright 2022
 # @licence   MIT
@@ -13,7 +13,7 @@ unsetopt nomatch
 # GLOBALS
 pi_type=Zero
 pi_zip_file=NONE
-app_version="2.0.0"
+app_version="2.1.0"
 # Colours
 red="\e[40;31m"
 bold="\e[40;1m"
@@ -140,6 +140,29 @@ while [[ ${ok} -eq 0 ]]; do
             echo "Enabling SSH... "
             touch "/Volumes/boot/ssh"
         fi
+
+        # Set up user account
+        while; do
+            read "username?Enter your new system username "
+            if [[ -n "${username}" ]]; then
+                break
+            else
+                echo "[ERROR] Please enter a non-zero username"
+            fi
+        done
+
+        while; do
+            read "password?Enter your new system password "
+            if [[ -n "${password}" ]]; then
+                break
+            else
+                echo "[ERROR] Please enter a non-zero password"
+            fi
+        done
+
+        echo "Setting up a user account for \"${username}\""
+        epw=$(echo "${password}" | openssl passwd -6 -stdin)
+        echo -e "${username}:${epw}" > "/Volumes/boot/userconf.txt"
 
         # Set up WiFi
         read "ssid?Enter your WiFi SSID "
