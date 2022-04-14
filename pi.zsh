@@ -11,17 +11,19 @@
 unsetopt nomatch
 
 # GLOBALS
-pi_type=Zero
+pi_type=Standard
 pi_zip_file=NONE
 app_version="2.1.0"
-debug=1
+debug=0
 # Colours
 red="\e[40;31m"
+rasp="\e[107;31m"
 bold="\e[40;1m"
 reset="\e[0m"
 green="\e[40;32m"
 yellow="\e[40;33m"
 white="\e[40;97m"
+head="\e[107;30m"
 
 # FUNCTIONS
 show_error_and_exit() {
@@ -50,28 +52,36 @@ show_debug() {
 
 # RUNTIME START
 # Check input PiOS download location
-URL=${1}
+for var in "$@"; do
+    if [[ ${var:u} = "-D" || ${var:u} = "--DEBUG" ]]; then
+        debug=1
+    else
+        URL=${var}
+    fi
+done
 
+# Get the Mac CPU type for the OpenSSL location
+# NOTE Actual values will depend on how you set up Homebrew
 CPU=$(uname -p)
 if [[ "$CPU" == "arm" ]]; then
-    osl_path=/opt/homebrew/opt/openssl/bin/openssl
+    openssl_path=/opt/homebrew/opt/openssl/bin/openssl
 else
-    osl_path=/usr/local/opt/openssl/bin/openssl
+    openssl_path=/usr/local/opt/openssl/bin/openssl
 fi
 
-if [[ ! -f "${osl_path}" ]]; then
+if [[ ! -f "${openssl_path}" ]]; then
     show_error_and_exit "This app requires OpenSSL. Please install it using Homebrew (brew install openssl@3) and then retry this app"
 fi
 
+# Show intro
 clear
-echo -e "${bold}${white}macOS ${red}Raspberry Pi${white} Image Installer with optional WiFi setup${reset}"
+echo -e "${bold}${head} macOS ${rasp}Raspberry Pi${head} Image Installer with Optional WiFi Setup ${reset}"
 show_version
-read -k -s "choice?Install for a standard Pi [P] or a Pi Zero [Z] image (or hit any other key to exit) "
+read -k -s "choice?Install for a standard Pi [P] or a Pi Zero [Z] image (default: standard) "
 echo
 
 choice=${choice:u}
-if [[ "${choice}" != "P" && "${choice}" != "Z" ]] exit 0
-if [[ "${choice}" = "P" ]] pi_type=Standard
+if [[ "${choice}" = "Z" ]] pi_type=Zero
 
 if [[ ! -e tmp ]]; then
     show_debug "No tmp directory... creating one"
@@ -133,7 +143,9 @@ echo
 typeset -i ok=0
 while [[ ${ok} -eq 0 ]]; do
     echo "Disk list... "
-    diskutil list external
+    # NOTE Adding 'external' to following command doesn't always work:
+    #      Mac SD card slots list cards is internal (macOS 12.4 at least)
+    diskutil list
 
     read "disk_num?Enter the SD card's disk number (eg. 2 for /dev/disk2) "
 
@@ -195,8 +207,8 @@ while [[ ${ok} -eq 0 ]]; do
         done
 
         echo "Setting up a user account for \"${username}\""
-        epw=$(echo "${password}" | "${osl_path}" passwd -6 -stdin)
-        echo -e "${username}:${epw}" > "/Volumes/boot/userconf.txt"
+        epw=$(echo "${password}" | "${openssl_path}" passwd -6 -stdin)
+        echo "${username}:${epw}" > "/Volumes/boot/userconf.txt"
 
         # Set up WiFi
         read "ssid?Enter your WiFi SSID "
@@ -215,7 +227,7 @@ while [[ ${ok} -eq 0 ]]; do
         cp "${src}" /Volumes/boot
 
         # Fix mouse slowness
-        echo "console=serial0,115200 console=tty1 root=PARTUUID=cebdaeb9-02 rootfstype=ext4 fsck.repair=yes rootwait quiet init=/usr/lib/raspi-config/init_resize.sh splash plymouth.ignore-serial-consoles usbhid.mousepoll=8" > /Volumes/boot/cmdline.txt
+        echo " usbhid.mousepoll=8" >> /Volumes/boot/cmdline.txt
 
         # All done...
         echo "Cleaning up... "
