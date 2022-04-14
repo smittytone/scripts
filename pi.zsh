@@ -52,7 +52,14 @@ show_debug() {
 # Check input PiOS download location
 URL=${1}
 
-if [[ ! -f /usr/local/opt/openssl/bin/openssl ]]; then
+CPU=$(uname -p)
+if [[ "$CPU" == "arm" ]]; then
+    osl_path=/opt/homebrew/opt/openssl/bin/openssl
+else
+    osl_path=/usr/local/opt/openssl/bin/openssl
+fi
+
+if [[ ! -f "${osl_path}" ]]; then
     show_error_and_exit "This app requires OpenSSL. Please install it using Homebrew (brew install openssl@3) and then retry this app"
 fi
 
@@ -188,7 +195,7 @@ while [[ ${ok} -eq 0 ]]; do
         done
 
         echo "Setting up a user account for \"${username}\""
-        epw=$(echo "${password}" | /usr/local/opt/openssl/bin/openssl passwd -6 -stdin)
+        epw=$(echo "${password}" | "${osl_path}" passwd -6 -stdin)
         echo -e "${username}:${epw}" > "/Volumes/boot/userconf.txt"
 
         # Set up WiFi
