@@ -2,7 +2,7 @@
 
 # Pi Image Installation
 #
-# @version   2.1.0
+# @version   2.1.1
 # @author    Tony Smith (@smittytone)
 # @copyright 2022
 # @licence   MIT
@@ -13,7 +13,7 @@ unsetopt nomatch
 # GLOBALS
 pi_type=Standard
 pi_zip_file=NONE
-app_version="2.1.0"
+app_version="2.1.1"
 debug=0
 # Colours
 red="\e[40;31m"
@@ -101,7 +101,7 @@ if [[ ! -f p.img ]]; then
             show_error_and_exit "No PiOS download URL specified.\nDownloads available at 'https://www.raspberrypi.com/software/operating-systems/'"
             # eg. https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf.zip
         fi
-        if [[ ${URL:e:l} != "zip" && ${URL:e:l} != "xz" ]] show_error_and_exit "Please supply a .zip file URL"
+        if [[ ${URL:e:l} != "zip" && ${URL:e:l} != "xz" ]] show_error_and_exit "Please supply an archive file URL"
 
         # Get URL
         echo "Downloading Raspberry Pi ${pi_type} OS image... "
@@ -227,7 +227,9 @@ while [[ ${ok} -eq 0 ]]; do
         cp "${src}" /Volumes/boot
 
         # Fix mouse slowness
-        echo " usbhid.mousepoll=8" >> /Volumes/boot/cmdline.txt
+        in_file=$(cat /Volumes/boot/cmdline.txt)
+        in_file=${in_file:0:-1}
+        echo "${in_file} usbhid.mousepoll=8" >> /Volumes/boot/cmdline.txt
 
         # All done...
         echo "Cleaning up... "
