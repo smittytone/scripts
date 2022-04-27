@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-22, Tony Smith
-# @version   5.5.1
+# @version   5.5.2
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.5.0"
+APP_VERSION="5.5.2"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -33,7 +33,7 @@ m_sources=("/Music/Alternative" "/Music/Classical" "/Music/Comedy" "/Music/Docto
 
 # FROM 5.2.0
 # Add user fonts
-b_sources=("/Library/Fonts" "/Pictures" "/Documents")
+b_sources=("/Library/Fonts" "/Pictures" "/Documents" "/Library/CloudStorage/OneDrive-Personal/Programming")
 
 # From 4.0.0
 # Functions
