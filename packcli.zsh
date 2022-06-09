@@ -90,12 +90,12 @@ for arg in "$@"; do
         fi
     else
         case ${is_arg} in
-            2) app_name="${arg}"    ;;
-            3) app_dir="${arg}"  ;;
-            4) bundle_id="${arg}"   ;;
+            2) app_name="${arg}" ;;
+            3) app_dir="${arg}" ;;
+            4) bundle_id="${arg}" ;;
             5) app_version="${arg}" ;;
-            6) user_name="${arg}"   ;;
-            7) cert_name="${arg}"   ;;
+            6) user_name="${arg}" ;;
+            7) cert_name="${arg}" ;;
             8) scripts_dir="${arg}" ;;
             9) profile_name="${arg}" ;;
             *) show_error_then_exit "Option selected without expected parameter: ${is_arg}" ;;
@@ -188,6 +188,7 @@ if [[ ${debug} -eq  1 ]]; then
     echo "Notarization completed after ${n_time} seconds. Job ID: ${job_id}"
 fi
 
+# Get the notarization status from the response
 status_line=$(grep -m 1 '  status:' < <(echo -e "${response}"))
 status_result=$(echo "${status_line}" | cut -d ":" -s -f 2 | cut -d " " -f 2)
 
@@ -195,6 +196,7 @@ if [[ ${status_result} != "Accepted" ]]; then
     show_error_then_exit "Notarization failed with status q${status_result}"
 fi
 
+# Staple the notarization result
 echo "Adding notarization to build/${app_name}-${app_version}.pkg "
 success=$(xcrun stapler staple "build/${app_name}-${app_version}.pkg")
 if [[ -z "${success}" ]]; then
