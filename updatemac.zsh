@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2019-20, Tony Smith
-# @version   4.2.1
+# @version   4.3.0
 # @license   MIT
 #
 
@@ -85,10 +85,10 @@ fi
 
 #FROM 4.1.0
 # binstall
-bin_dir=$HOME/bin
+bin_dir=/usr/local/bin
 scripts_dir=$GIT/scripts
 if [[ ! -e $bin_dir ]]; then
-    mkdir -p $bin_dir || echo 'Could not create ~/bin'
+    mkdir -p $bin_dir || echo 'Could not create ${bin_dir}'
 fi
 if [[ -e $scripts_dir/binstall.zsh ]]; then
     cp $scripts_dir/binstall.zsh $bin_dir/binstall
@@ -108,7 +108,7 @@ fi
 if [[ "$choice" = "F" ]]; then
     echo "Updating additional config files... "
     cp -nvR "$file_source/Mac/Services/" "$file_target/Services"
-    cp -nvR "$file_source/Mac/Quicklook/" "$file_target/Quicklook"
+    #cp -nvR "$file_source/Mac/Quicklook/" "$file_target/Quicklook"
 
     # FROM 1.5.0 -- Add 64-bit libdvdcss
     # FROM 4.2.1 -- Remove: this should be installed via homebrew
@@ -119,8 +119,8 @@ if [[ "$choice" = "F" ]]; then
     cp -nv "$file_source/Mac/HomebrewMeDark.terminal" "$HOME/Desktop/HomebrewMeDark.terminal"
     echo "Terminal settings files 'HomebrewMe' and 'HomebrewMeDark' copied to desktop. To use them, open Terminal > Preferences > Profiles and import"
 
-    cp -nv "$file_source/Mac/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
-    echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
+    #cp -nv "$file_source/Mac/pixelmator_shapes.pxs" "$HOME/Desktop/pixelmator_shapes.pxs"
+    #echo "Pixelmater shapes file 'pixelmator_shapes.pxs' copied to desktop. To use it, open Pixelmator > File > Import..."
 
     # FROM 2.0.0
     # Install Xcode CLI if necessary

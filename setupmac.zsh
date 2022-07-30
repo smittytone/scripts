@@ -72,7 +72,7 @@ target="$HOME/GitHub"
 
 cd "$target" || exit 1
 [[ ! -e scripts ]] && git clone https://github.com/smittytone/scripts.git
-[[ ! -e doftiles ]] && git clone https://github.com/smittytone/dotfiles.git
+[[ ! -e dotfiles ]] && git clone https://github.com/smittytone/dotfiles.git
 
 # Run the app settings script
 # FROM 1.0.5 correct called script's name
@@ -99,7 +99,7 @@ if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install
     # FROM 2.2.0
     echo "Installing My Applications... "
     brew tap smittytone/homebrew-smittytone
-    apps=("mnu" "pdfmaker" "ascii" "the-valley")
+    apps=("mnu" "pdfmaker" "imageprep" "ascii" "the-valley")
     for app in "${apps[@]}"; do
         brew install --cask "$app"
     done
@@ -108,8 +108,8 @@ else
     errors+="Brew installation"
 fi
 
-echo "Installing Cocoapods (requires authorizaton)... "
-sudo gem install cocoapods
+#echo "Installing Cocoapods (requires authorizaton)... "
+#sudo gem install cocoapods
 
 echo "Installing Pylint... "
 pip3 install pylint
@@ -134,8 +134,8 @@ read -k -s "key?Press [ENTER] to open websites for other app downloads, or [S] t
 echo
 key=${key:l}
 if [[ "$key" != "s" ]]; then
-    open http://www.dropbox.com
-    open https://desktop.github.com
+    #open http://www.dropbox.com
+    #open https://desktop.github.com
     open http://www.rogueamoeba.com/piezo
     open https://www.bresink.com/osx/TinkerTool/download.php
     open http://www.audacityteam.org/download/mac/
