@@ -24,14 +24,6 @@ echo "macOS Install Script $APP_VERSION"
 # REMOVED FROM 2.3.0 -- Update macOS
 # sudo softwareupdate --install --all
 
-# Install Xcode CLI
-if xcode-select --install; then
-    echo "Xcode CLI installed"
-else
-    echo "Xcode CLI already installed or could not be installed"
-    errors+="Xcode CLI installation"
-fi
-
 # Apply preferred Energy Saver settings
 sudo pmset -a lessbright 0
 sudo pmset -a disksleep 10
@@ -64,6 +56,14 @@ chflags hidden "$HOME/Public"
 echo "Public"
 echo "Showing the Library folder..."
 chflags nohidden "$HOME/Library"
+
+# Install Xcode CLI
+if xcode-select --install; then
+    echo "Xcode CLI installed"
+else
+    echo "Xcode CLI already installed or could not be installed"
+    errors+="Xcode CLI installation"
+fi
 
 # Set up git and clone key repos
 echo "Preparing Git..."

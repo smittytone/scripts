@@ -141,6 +141,7 @@ if [[ "$choice" = "F" ]]; then
     # Run the various macOS config scriptlets
     echo "Configuring macOS... "
     if cd "$file_source/Mac/config"; then
+        chmod +x .
         for task in *; do
             echo $task
             ./$task
