@@ -95,7 +95,7 @@ chflags nohidden "$HOME/Library"
 echo "Installing Brew... "
 if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
     echo "Installing Brew-sourced Utilities... "
-    apps=("bash" "nano" "coreutils" "gitup" "jq" "ncurses" "readline" "shellcheck" "libdvdcss" "node" "python3" "hugo")
+    apps=(bash nano coreutils gitup jq ncurses readline shellcheck libdvdcss node python3 hugo "sass/sass/sass" sphinx-doc)
     for app in "${apps[@]}"; do
         brew install "$app"
     done
@@ -109,10 +109,13 @@ if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install
     # FROM 2.2.0
     echo "Installing My Applications... "
     brew tap smittytone/homebrew-smittytone
-    apps=("mnu" "pdfmaker" "imageprep" "ascii" "the-valley")
+    apps=(mnu pdfmaker imageprep ascii the-valley utit)
     for app in "${apps[@]}"; do
         brew install --cask "$app"
     done
+
+    # FROM 3.0.0
+    brew link --force sphinx-doc
 else
     echo "Could not install Brew"
     errors+="Brew installation"
@@ -136,8 +139,8 @@ scripts/configmac.zsh
 #echo "Installing Cocoapods (requires authorizaton)... "
 #sudo gem install cocoapods
 
-echo "Installing Pylint... "
-pip3 install pylint
+echo "Installing Python modules... "
+pip3 install pylint sphinx-rtd-theme
 
 # FROM 2.1.0
 # Install node packages
