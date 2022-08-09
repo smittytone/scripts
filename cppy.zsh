@@ -5,14 +5,14 @@
 # Copy a code file to a CircuitPython device with UF2 bootloader
 #
 # @author    Tony Smith
-# @copyright 2021, Tony Smith
-# @version   1.0.3
+# @copyright 2022, Tony Smith
+# @version   1.1.0
 # @license   MIT
 
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="1.0.3"
+APP_VERSION="1.1.0"
 
 # Functions
 show_help() {
@@ -30,7 +30,7 @@ show_help() {
 
 # FROM 1.0.2
 show_error() {
-    echo "${APP_NAME} error: $1" 1>&2
+    echo "[ERROR] $1" 1>&2
     exit 1
 }
 
@@ -46,7 +46,7 @@ for arg in "$@"; do
     # Temporarily convert argument to lowercase, zsh-style
     # And check for options first
     local check_arg=${arg:l}
-    if [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
+    if [[ "${check_arg}" = "--help" || "${check_arg}" = "-h" ]]; then
         show_help
         exit 0
     fi
@@ -59,18 +59,18 @@ for arg in "$@"; do
         if [[ arg_count -eq 0 ]]; then
             # The first item is the one that will
             # become 'code.py' on the device
-            code_file="$arg"
+            code_file="${arg}"
             ((arg_count += 1))
         else
             # Add a library file to the list
-            lib_files+=("$arg")
+            lib_files+=("${arg}")
         fi
     fi
 done
 
 # Check that the drive is mounted
-if ! [[ -e "$target" ]]; then
-    show_error "$target not mounted -- cannot continue"
+if ! [[ -e "${target}" ]]; then
+    show_error "${target} not mounted -- cannot continue"
 fi
 
 # Bail if no files were provided
@@ -78,14 +78,14 @@ if [[ arg_count -eq 0 ]]; then
     show_error "No Python files to copy -- cannot continue"
 fi
 
-# Copy the primary file
-echo "Copying $code_file to $target/code.py..."
-cp "$code_file" "$target/code.py"
-
 # Check if there are other files, eg. libs, to copy
 if [[ ${#lib_files[@]} -gt 0 ]]; then
-    for file in "$lib_files"; do
-        echo "Copying $file to $target/${file:t}..."
-        cp "$file" "$target"
+    for file in ${lib_files}; do
+        echo "Copying ${file} to ${target}/lib/${file:t}..."
+        cp "${file}" "${target}/lib"
     done
 fi
+
+# Copy the primary file
+echo "Copying ${code_file} to ${target}/code.py..."
+cp "${code_file}" "${target}/code.py"
