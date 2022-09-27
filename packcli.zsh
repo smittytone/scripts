@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2022 Tony Smith
-# @version   4.0.0
+# @version   4.0.1
 # @license   TBD
 #
 
@@ -30,6 +30,7 @@ show_help() {
     echo    "  -c / --cert {name}       Your Apple Developer Installer certificate name, eg."
     echo    "                           'Developer ID Installer: Fred Bloggs (ABCDEF1234)'."
     echo    "  -a / --add {path}        Add scripts to the package. Default: the project's pkgscripts directory."
+    echo    "  -z                       Build the app but do not package it."
     echo    "  -d / --debug             Enable debugging messages."
     echo -e "  -h / --help              This help page.\n"
 }
@@ -52,6 +53,7 @@ cert_name=none
 typeset -i is_arg=0
 typeset -i add_scripts=0
 typeset -i debug=0
+typeset -i no_pack=0
 
 # Process the command line arguments
 for arg in "$@"; do
@@ -84,9 +86,12 @@ for arg in "$@"; do
         elif [[ "${var}" = "-p" || "${var}" = "--profile" ]]; then
             # Next arg should be the the profile name
             is_arg=9
+        elif [[ "${var}" = "-z" ]]; then
+            # Don't create a package
+            no_pack=1
         else
             # An unknown arg included: warn and bail
-            show_error_then_exit "[ERROR] Unknown option (${arg}) included"
+            show_error_then_exit "Unknown option (${arg}) included"
         fi
     else
         case ${is_arg} in
@@ -118,31 +123,33 @@ if [[ "${bundle_id}" = "none" ]]; then
     fi
 fi
 
-# FROM 4.0.0 -- Confirm we have a profile name
-if [[ "${profile_name}" = "none" ]]; then
-    show_error_then_exit "No keychain profile provided"
-fi
-
 # FROM 4.0.0 -- Correctly set default app name
 if [[ "${app_name}" = "untitled" ]]; then
     app_name="$PWD"
     app_name="${app_name:t}"
 fi
 
-# FROM 3.1.0 -- Confirm we have a cert name
-if [[ "${cert_name}" = "none" ]]; then
-    show_error_then_exit "You must provide a certificate ID with the -c/--cert switch"
-fi
+if [[ ${no_pack} -eq 0 ]]; then
+    # FROM 4.0.0 -- Confirm we have a profile name
+    if [[ "${profile_name}" = "none" ]]; then
+        show_error_then_exit "No keychain profile provided"
+    fi
 
-# Check for script additions
-if [[ ${add_scripts} -eq 1 ]]; then
-    if [[ ! -e "${scripts_dir}" ]]; then
-        show_error_then_exit "Could not locate scripts directory ${scripts_dir}"
+    # FROM 3.1.0 -- Confirm we have a cert name
+    if [[ "${cert_name}" = "none" ]]; then
+        show_error_then_exit "You must provide a certificate ID with the -c/--cert switch"
+    fi
+
+    # Check for script additions
+    if [[ ${add_scripts} -eq 1 ]]; then
+        if [[ ! -e "${scripts_dir}" ]]; then
+            show_error_then_exit "Could not locate scripts directory ${scripts_dir}"
+        fi
     fi
 fi
 
 # Debug output
-if [[ ${debug} -eq 1 ]]; then
+if [[ ${debug} -eq 1 && ${no_pack} -eq 0 ]]; then
     echo "      App: ${app_name}"
     echo "Bundle ID: ${bundle_id}"
     echo "  Version: ${app_version}"
@@ -156,9 +163,16 @@ fi
 # Build the package
 echo "Building ${app_name}... "
 if [[ ${debug} -eq 1 ]]; then
-    xcodebuild clean install || show_error_then_exit "Could not build app"
+    xcodebuild clean install -target "${app_name}" || show_error_then_exit "Could not build app"
 else
-    xcodebuild -quiet clean install || show_error_then_exit "Could not build app"
+    xcodebuild -quiet clean install -target "${app_name}" || show_error_then_exit "Could not build app"
+fi
+
+# FROM 4.0.1
+# Exit if no package is required
+if [[ ${no_pack} -eq 1 ]]; then
+    echo "Binary compiled to ${app_dir}/build/pkgroot/usr/local/bin/${app_name}"
+    exit 0
 fi
 
 # Build and sign the package
@@ -168,6 +182,7 @@ if [[ ${add_scripts} -eq 1 ]]; then
 else
     success=$(pkgbuild --root build/pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
 fi
+
 if [[ -z "${success}" ]]; then
     show_error_then_exit "Failed to make the package"
 fi
