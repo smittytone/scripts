@@ -112,17 +112,6 @@ done
 # Switch to app source directory
 cd "${app_dir}" || show_error_then_exit "Could not switch to app directory"
 
-# FROM 4.0.0 -- Check bundle ID before we proceed
-if [[ "${bundle_id}" = "none" ]]; then
-    plist_path=$(find . -name 'Info.plist')
-    if [[ -n "${plist_path}" ]]; then
-        # Extract bundle ID from project info.plist file
-        bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "${plist_path}")
-    else
-        show_error_then_exit "No bundle ID specified or found"
-    fi
-fi
-
 # FROM 4.0.0 -- Correctly set default app name
 if [[ "${app_name}" = "untitled" ]]; then
     app_name="$PWD"
@@ -130,6 +119,17 @@ if [[ "${app_name}" = "untitled" ]]; then
 fi
 
 if [[ ${no_pack} -eq 0 ]]; then
+    # FROM 4.0.0 -- Check bundle ID before we proceed
+    if [[ "${bundle_id}" = "none" ]]; then
+        plist_path=$(find . -name 'Info.plist')
+        if [[ -n "${plist_path}" ]]; then
+            # Extract bundle ID from project info.plist file
+            bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "${plist_path}")
+        else
+            show_error_then_exit "No bundle ID specified or found"
+        fi
+    fi
+
     # FROM 4.0.0 -- Confirm we have a profile name
     if [[ "${profile_name}" = "none" ]]; then
         show_error_then_exit "No keychain profile provided"
