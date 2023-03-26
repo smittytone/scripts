@@ -7,13 +7,13 @@
 #
 # @author    Tony Smith
 # @copyright 2019-22, Tony Smith
-# @version   5.5.2
+# @version   5.5.4
 # @license   MIT
 #
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="5.5.2"
+APP_VERSION="5.5.4"
 
 typeset -i do_music=1
 typeset -i do_books=1
@@ -21,8 +21,6 @@ typeset -i do_docus=1
 typeset -i count=0
 typeset -i music_mounted=0
 typeset -i home_mounted=0
-typeset -i do_books=1
-typeset -i do_music=1
 server_auth="$HOME/.config/sync/bookmarks"
 target_vol="NONE"
 d_sources=("/Comics" "/Library/Mobile Documents/com~apple~CloudDocs/Documents/eBooks")
