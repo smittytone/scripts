@@ -5,7 +5,7 @@
 #
 # App release preparation script
 #
-# @author    Tony Smith
+# @author    Tony Smith (@smittytone)
 # @copyright 2023 Tony Smith
 # @version   4.0.5
 # @license   MIT
@@ -13,7 +13,7 @@
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION="4.0.4"
+APP_VERSION="4.0.5"
 
 typeset -i is_arg=0
 typeset -i add_scripts=0
