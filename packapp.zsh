@@ -6,8 +6,8 @@
 # App release preparation script
 #
 # @author    Tony Smith
-# @copyright 2020, Tony Smith
-# @version   4.0.4
+# @copyright 2023 Tony Smith
+# @version   4.0.5
 # @license   MIT
 #
 
@@ -32,9 +32,11 @@ cert="none"
 show_help() {
     echo -e "\npackapp -- create a signed and notarized app package\n"
     echo "This script requires an Apple Developer Account. You will need to set up an app key"
-    echo "for the Apple ID linked to your Developer Account, and to have saved this key in your"
-    echo "Mac's keychain under the ID 'AC_PASSWORD'. Pass the keychain item's account name to"
+    echo "for the Apple ID to which your Developer Account is linked, and to have saved this app key"
+    echo "in your Mac's keychain under the ID 'AC_PASSWORD'. Pass the keychain item's account name to"
     echo "the script as your username."
+    echo "Get the app key by signing into 'https://appleid.apple.com/account/home' and visiting"
+    echo "Sign-In and Security > App-Specific Passwords > Generate an app-specific password."
     echo -e "\nUsage: packapp [OPTIONS] <app-path>\n"
     echo "Options:"
     echo "  -s / --scripts [path]  - Add pre- and/or post-install scripts to the package."
