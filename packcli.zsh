@@ -5,9 +5,9 @@
 #
 # Command line tool release preparation script
 #
-# @author    Tony Smith
-# @copyright 2022 Tony Smith
-# @version   4.0.1
+# @author    Tony Smith (@smittytone)
+# @copyright 2023 Tony Smith
+# @version   4.0.2
 # @license   TBD
 #
 
@@ -18,6 +18,8 @@ show_help() {
     echo "This script requires an Apple Developer Account. You will need to set up a 2FA app key"
     echo "for the Apple ID linked to your Developer Account, and to have saved this key in your"
     echo "Mac's keychain. Pass the keychain item's name to the script as your profile."
+    echo "Get the app key by signing into 'https://appleid.apple.com/account/home' and visiting"
+    echo "Sign-In and Security > App-Specific Passwords > Generate an app-specific password."
     echo -e "Usage: packcli.zsh [OPTIONS]\n"
     echo "Options:"
     echo    "  -s / --source {path}     The location of the target project. Default: current directory."
