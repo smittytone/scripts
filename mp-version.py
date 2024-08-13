@@ -6,8 +6,8 @@
 # Create a baseline Raspberry Pi Pico C-language project
 #
 # @author    Tony Smith
-# @copyright 2021, Tony Smith
-# @version   1.0.2
+# @copyright 2024, Tony Smith
+# @version   1.1.0
 # @license   MIT
 #
 # @Pre-requisites: `requests` library [`pip3 install requests`]
@@ -38,6 +38,8 @@ highest = [0,0,0]
 # Get the current version as an arg
 parser = argparse.ArgumentParser(description="Compare your current MicroPython version with the latest")
 parser.add_argument("-v", "--version", metavar="x.y.z", type=str, help="A MicroPython version, eg. 1.16.1", required=False)
+parser.add_argument("-i", "--ignore-previews", dest="ignore", action='store_true', help="Whether proview releases should be ignored or listed", required=False)
+parser.set_defaults(ignore=False)
 args = parser.parse_args()
 
 # Check any parsed version
@@ -67,15 +69,22 @@ if response.status_code == 200:
                 if name[0] == "v": name = name[1:]
                 parts = name.split(".")
                 if len(parts) == 2: parts.append("0")
-                version = [int(parts[0]), int(parts[1]), int(parts[2])]
+                is_preview = False
+                if  "preview" in parts[2]:
+                    parts[2] = parts[2].split("-")[0]
+                    is_preview = True
+                version = [int(parts[0]), int(parts[1]), int(parts[2]), is_preview]
                 parts = version
 
-                if compare(version, MAJOR): continue
-                if compare(version, MINOR): continue
-                if highest[PATCH] < parts[PATCH]: highest = parts
+                if (is_preview and not args.ignore) or not is_preview:
+                    if compare(version, MAJOR): continue
+                    if compare(version, MINOR): continue
+                    if highest[PATCH] < parts[PATCH]: highest = parts
 
         # Only compare version if one was supplied
         highest_version = str(highest[0]) + "." + str(highest[1]) + "." + str(highest[2])
+        if highest[3]:
+            highest_version += " (PREVIEW)"
         if args.version != None:
             match = 0
             for i in range(0,3):
