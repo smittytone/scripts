@@ -7,8 +7,8 @@
 #
 # @shell     bash -- requires 5.0.0+
 # @author    Tony Smith
-# @copyright 2021, Tony Smith
-# @version   1.2.0
+# @copyright 2024, Tony Smith
+# @version   1.3.0
 # @license   MIT
 #
 
@@ -41,7 +41,7 @@ m_a_sizes=(16 32 64 96 128 256 512 1024)
 m_t_sizes=(32 64 96)
 w_a_sizes=(216 196 172 100 88 87 80 58 55 48)
 w_c_sizes=(224 203 182 64 58 52 50 44 40 36 32)
-i_a_sizes=(40 60 58 87 80 120 180 20 29 76 152 167 1024)
+i_a_sizes=(40 60 58 87 76 114 80 120 180 128 192 136 152 167 1024)
 s_w_sizes=(64 128)
 # FROM 1.2.0
 names=(macos_appicon macos_toolbar watchos_app_icon watchos_comp_icon ios_app_icon web_app_icon)
