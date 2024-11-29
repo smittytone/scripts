@@ -60,22 +60,22 @@ while (length > 0):
     crc = crc >> 8
     crc ^= crc16_table[index]
 
-print(crc, f'{format(crc, "04x")}')
+print(crc, f'0x{format(crc, "04x")}')
 
-crc = 0xffff
+crc = 0xFFFF
 poly_reversed = 0xA001
 
 for i in range(0, len(data)):
-    crc ^= data[i];
+    crc ^= data[i]
     for j in range(0, 8):
-        cry = crc & 0x0001;
-        crc = crc >> 1;
+        cry = crc & 0x0001
+        crc = crc >> 1
         if (cry > 0):
             crc ^= poly_reversed
 
-s = f'{format(crc, "04x")}'
+s = f'0x{format(crc, "04x")}'
 d = []
 for c in s:
     a = ord(c)
-    d.append(f'{format(a, "02x")}')
+    d.append(f'0x{format(a, "02x")}')
 print(crc, s, d)
