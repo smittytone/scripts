@@ -3,15 +3,18 @@
 #
 # MicroPython Checker
 #
-# Create a baseline Raspberry Pi Pico C-language project
+# Print the latest version of MicroPython (https://micropython.org) available
 #
 # @author    Tony Smith
 # @copyright 2024, Tony Smith
-# @version   1.1.0
+# @version   1.2.0
 # @license   MIT
 #
 # @Pre-requisites: `requests` library [`pip3 install requests`]
 #
+# ΝΟΤΕS
+#
+# 1.2.0 - Inverts behaviour: previews must now be requested with --include-previews
 
 import requests
 import argparse
@@ -26,32 +29,33 @@ def compare(b, i):
         return True
     return False
 
+
 # semver index values
 MAJOR = 0
 MINOR = 1
 PATCH = 2
 
 # Versions
-current = [0,0,0]
-highest = [0,0,0]
+current = [0, 0, 0]
+highest = [0, 0, 0]
 
 # Get the current version as an arg
 parser = argparse.ArgumentParser(description="Compare your current MicroPython version with the latest")
 parser.add_argument("-v", "--version", metavar="x.y.z", type=str, help="A MicroPython version, eg. 1.16.1", required=False)
-parser.add_argument("-i", "--ignore-previews", dest="ignore", action='store_true', help="Whether proview releases should be ignored or listed", required=False)
-parser.set_defaults(ignore=False)
+parser.add_argument("-i", "--include-previews", dest="ignore", action='store_false', help="Whether proview releases should be listed", required=False)
+parser.set_defaults(ignore=True)
 args = parser.parse_args()
 
 # Check any parsed version
-if args.version != None:
+if args.version is not None:
     try:
         parts = args.version.split(".")
         if len(parts) > 3: throw
-        if len(parts) == 3: current = [int(parts[0]),int(parts[1]),int(parts[2])]
-        if len(parts) == 2: current = [int(parts[0]),int(parts[1]),0]
-        if len(parts) == 1: current = [int(parts[0]),0,0]
-    except Exception as e:
-        print("ERROR -- could not process", args.version, "as a version number")
+        if len(parts) == 3: current = [int(parts[0]), int(parts[1]), int(parts[2])]
+        if len(parts) == 2: current = [int(parts[0]), int(parts[1]), 0]
+        if len(parts) == 1: current = [int(parts[0]), 0, 0]
+    except Exception as _:
+        print("[ERROR] Could not process", args.version, "as a version number")
         sys.exit(1)
 
 # Get the latest MicroPython version
@@ -70,7 +74,7 @@ if response.status_code == 200:
                 parts = name.split(".")
                 if len(parts) == 2: parts.append("0")
                 is_preview = False
-                if  "preview" in parts[2]:
+                if "preview" in parts[2]:
                     parts[2] = parts[2].split("-")[0]
                     is_preview = True
                 version = [int(parts[0]), int(parts[1]), int(parts[2]), is_preview]
@@ -85,9 +89,9 @@ if response.status_code == 200:
         highest_version = str(highest[0]) + "." + str(highest[1]) + "." + str(highest[2])
         if highest[3]:
             highest_version += " (PREVIEW)"
-        if args.version != None:
+        if args.version is not None:
             match = 0
-            for i in range(0,3):
+            for i in range(0, 3):
                 if highest[i] == current[i]: match += 1
             if match == 3:
                 print("You have the current version of MicroPython", highest_version)
@@ -96,6 +100,6 @@ if response.status_code == 200:
         else:
             print("Micropython current release is", highest_version)
     except Exception as e:
-        print("ERROR -- could not parse response from GitHub", e)
+        print("[ERROR] Could not parse response from GitHub", e)
 else:
-    print("ERROR -- unable to access MicroPython repo")
+    print("[ERROR] Unable to access MicroPython repo")
