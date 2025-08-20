@@ -5,9 +5,9 @@
 #
 # Command line tool release preparation script
 #
-# @author    Tony Smith (@smittytone)
-# @copyright 2023 Tony Smith
-# @version   4.0.2
+# @author    Tony Smith
+# @copyright 2025 Tony Smith
+# @version   5.0.0
 # @license   TBD
 #
 
@@ -18,8 +18,6 @@ show_help() {
     echo "This script requires an Apple Developer Account. You will need to set up a 2FA app key"
     echo "for the Apple ID linked to your Developer Account, and to have saved this key in your"
     echo "Mac's keychain. Pass the keychain item's name to the script as your profile."
-    echo "Get the app key by signing into 'https://appleid.apple.com/account/home' and visiting"
-    echo "Sign-In and Security > App-Specific Passwords > Generate an app-specific password."
     echo -e "Usage: packcli.zsh [OPTIONS]\n"
     echo "Options:"
     echo    "  -s / --source {path}     The location of the target project. Default: current directory."
@@ -32,7 +30,9 @@ show_help() {
     echo    "  -c / --cert {name}       Your Apple Developer Installer certificate name, eg."
     echo    "                           'Developer ID Installer: Fred Bloggs (ABCDEF1234)'."
     echo    "  -a / --add {path}        Add scripts to the package. Default: the project's pkgscripts directory."
-    echo    "  -z                       Build the app but do not package it."
+    echo    "  -z                       Don’t create or upload the package: build app only."
+    echo    "  -x {path}                Package an Xcode-exported app. Specify path to the directory holding the"
+    echo    "                           export app directory, which should be named after the app (ie. no date)"
     echo    "  -d / --debug             Enable debugging messages."
     echo -e "  -h / --help              This help page.\n"
 }
@@ -43,6 +43,11 @@ show_error_then_exit() {
     exit 1
 }
 
+xbuild() {
+    xcodebuild clean build -project "${1}.xcodeproj" -scheme "${1}" -configuration Release -derivedDataPath ${2} -destination "platform=macOS,arch=${3}" "${4}" || show_error_then_exit "Could not build app"
+}
+
+
 # Setup
 setopt nomatch
 app_name=untitled
@@ -52,6 +57,7 @@ scripts_dir="${app_dir}/pkgscripts"
 bundle_id=none
 profile_name=none
 cert_name=none
+pkg_dir=""
 typeset -i is_arg=0
 typeset -i add_scripts=0
 typeset -i debug=0
@@ -88,6 +94,9 @@ for arg in "$@"; do
         elif [[ "${var}" = "-p" || "${var}" = "--profile" ]]; then
             # Next arg should be the the profile name
             is_arg=9
+        elif [[ "${var}" = "-x" ]]; then
+            # Package a binary
+            is_arg=1
         elif [[ "${var}" = "-z" ]]; then
             # Don't create a package
             no_pack=1
@@ -97,6 +106,7 @@ for arg in "$@"; do
         fi
     else
         case ${is_arg} in
+            1) pkg_dir="${arg}" ;;
             2) app_name="${arg}" ;;
             3) app_dir="${arg}" ;;
             4) bundle_id="${arg}" ;;
@@ -120,18 +130,19 @@ if [[ "${app_name}" = "untitled" ]]; then
     app_name="${app_name:t}"
 fi
 
-if [[ ${no_pack} -eq 0 ]]; then
-    # FROM 4.0.0 -- Check bundle ID before we proceed
-    if [[ "${bundle_id}" = "none" ]]; then
-        plist_path=$(find . -name 'Info.plist')
-        if [[ -n "${plist_path}" ]]; then
-            # Extract bundle ID from project info.plist file
-            bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "${plist_path}")
-        else
-            show_error_then_exit "No bundle ID specified or found"
-        fi
+# FROM 5.0.0 -- Check bundle ID before we proceed and get the scheme name
+#               MUST match the bundle ID
+if [[ "${bundle_id}" = "none" ]]; then
+    plist_path=$(find . -name 'Info.plist')
+    if [[ -n "${plist_path}" ]]; then
+        # Extract bundle ID from project info.plist file
+        bundle_id=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "${plist_path}")
+    else
+        show_error_then_exit "No bundle ID specified or found"
     fi
+fi
 
+if [[ ${no_pack} -eq 0 && -z "${pkg_dir}" ]]; then
     # FROM 4.0.0 -- Confirm we have a profile name
     if [[ "${profile_name}" = "none" ]]; then
         show_error_then_exit "No keychain profile provided"
@@ -151,38 +162,55 @@ if [[ ${no_pack} -eq 0 ]]; then
 fi
 
 # Debug output
-if [[ ${debug} -eq 1 && ${no_pack} -eq 0 ]]; then
+if [[ ${debug} -eq 1 && ${no_pack} -eq 0 && -z "${pkg_dir}" ]]; then
     echo "      App: ${app_name}"
     echo "Bundle ID: ${bundle_id}"
     echo "  Version: ${app_version}"
     echo "     Path: ${app_dir}/build/${app_name}"
     echo "      PKG: ${app_dir}/build/${app_name}-${app_version}.pkg"
+    echo "   Scheme: ${app_name}"
     if [[ ${add_scripts} -eq 1 ]]; then
         echo "  Scripts: ${scripts_dir}"
     fi
 fi
 
 # Build the package
-echo "Building ${app_name}... "
-if [[ ${debug} -eq 1 ]]; then
-    xcodebuild clean install -target "${app_name}" || show_error_then_exit "Could not build app"
-else
-    xcodebuild -quiet clean install -target "${app_name}" || show_error_then_exit "Could not build app"
+if [[ -z "${pkg_dir}" ]]; then
+    echo "Building ${app_name}... "
+    build_dir="$PWD/build"
+    derived_data_arm=${build_dir}/DerivedDataArm
+    derived_data_intel=${build_dir}/DerivedDataIntel;
+
+    if [[ ${debug} -eq 1 ]]; then
+        xbuild "${app_name}" "${derived_data_arm}" arm64 "-verbose"
+        xbuild "${app_name}" "${derived_data_intel}" x86_64 "-verbose"
+    else
+        xbuild "${app_name}" "${derived_data_arm}" arm64 "-quiet"
+        xbuild "${app_name}" "${derived_data_intel}" x86_64 "-quiet"
+    fi
 fi
+
+# FROM 5.0.0
+# Build a Universal Binary
+echo "Making a Universal Binary... "
+pkg_dir="pkgroot/usr/local/bin"
+mkdir -p "${pkg_dir}"
+lipo -create -output "${pkg_dir}/${app_name}" "${derived_data_arm}/Build/Products/Release/${app_name}" "${derived_data_intel}/Build/Products/Release/${app_name}" || show_error_then_exit "Could not build universal binary"
 
 # FROM 4.0.1
 # Exit if no package is required
 if [[ ${no_pack} -eq 1 ]]; then
-    echo "Binary compiled to ${app_dir}/build/pkgroot/usr/local/bin/${app_name}"
+    echo "Binary compiled to ${pkg_dir}/${app_name}"
     exit 0
 fi
 
 # Build and sign the package
 echo "Making and signing the package... "
+[[ -d "build" ]] || mkdir build
 if [[ ${add_scripts} -eq 1 ]]; then
-    success=$(pkgbuild --scripts "${scripts_dir}" --root build/pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
+    success=$(pkgbuild --scripts "${scripts_dir}" --root pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
 else
-    success=$(pkgbuild --root build/pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
+    success=$(pkgbuild --root pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
 fi
 
 if [[ -z "${success}" ]]; then
@@ -193,7 +221,7 @@ fi
 # NOTE altool is now deprecated
 echo "Requesting package notarization... this may take some time "
 n_time=$(date +%s)
-response=$(xcrun notarytool submit "build/${app_name}-${app_version}.pkg" --wait -p ${profile_name})
+response=$(xcrun notarytool submit "build/${app_name}-${app_version}.pkg" --wait -p "${profile_name}")
 
 # Get the notarization job ID from the response
 e_time=$(date +%s)
@@ -202,7 +230,7 @@ job_id=$(echo "${job_id_line}" | cut -d ":" -s -f 2 | cut -d " " -f 2)
 
 if [[ ${debug} -eq  1 ]]; then
     n_time=$((e_time - n_time))
-    echo "Notarization completed after ${n_time} seconds. Job ID: ${job_id}"
+    echo "Notarization completed after ${n_time} seconds. Job ID: ${job_id} -> ${response}"
 fi
 
 # Get the notarization status from the response
@@ -210,7 +238,7 @@ status_line=$(grep -m 1 '  status:' < <(echo -e "${response}"))
 status_result=$(echo "${status_line}" | cut -d ":" -s -f 2 | cut -d " " -f 2)
 
 if [[ ${status_result} != "Accepted" ]]; then
-    show_error_then_exit "Notarization failed with status q${status_result}"
+    show_error_then_exit "Notarization failed with status ${status_result}\n${response}"
 fi
 
 # Staple the notarization result
@@ -234,4 +262,5 @@ if [[ -d "${app_dir}/manpage" ]]; then
 fi
 
 rm -rf "build"
+rm -rf "pkgroot"
 exit 0
