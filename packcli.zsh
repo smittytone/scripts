@@ -7,7 +7,7 @@
 #
 # @author    Tony Smith
 # @copyright 2025 Tony Smith
-# @version   5.0.0
+# @version   5.0.1
 # @license   TBD
 #
 
@@ -33,6 +33,7 @@ show_help() {
     echo    "  -z                       Don’t create or upload the package: build app only."
     echo    "  -x {path}                Package an Xcode-exported app. Specify path to the directory holding the"
     echo    "                           export app directory, which should be named after the app (ie. no date)"
+    echo    "  -u                       Binary will be made universal automatically so don't do it here"
     echo    "  -d / --debug             Enable debugging messages."
     echo -e "  -h / --help              This help page.\n"
 }
@@ -43,8 +44,14 @@ show_error_then_exit() {
     exit 1
 }
 
-xbuild() {
+# Build a single-architecture binary
+build_single() {
     xcodebuild clean build -project "${1}.xcodeproj" -scheme "${1}" -configuration Release -derivedDataPath ${2} -destination "platform=macOS,arch=${3}" "${4}" || show_error_then_exit "Could not build app"
+}
+
+# Build a universal binary
+build_universal() {
+    xcodebuild clean build -project "${1}.xcodeproj" -scheme "${1}" -configuration Release -derivedDataPath ${2} "${3}" || show_error_then_exit "Could not build app"
 }
 
 
@@ -62,6 +69,7 @@ typeset -i is_arg=0
 typeset -i add_scripts=0
 typeset -i debug=0
 typeset -i no_pack=0
+typeset -i is_uni=0
 
 # Process the command line arguments
 for arg in "$@"; do
@@ -97,6 +105,9 @@ for arg in "$@"; do
         elif [[ "${var}" = "-x" ]]; then
             # Package a binary
             is_arg=1
+        elif [[ "${var}" = "-u" ]]; then
+            # Build is already universal
+            is_uni=1
         elif [[ "${var}" = "-z" ]]; then
             # Don't create a package
             no_pack=1
@@ -179,23 +190,38 @@ if [[ -z "${pkg_dir}" ]]; then
     echo "Building ${app_name}... "
     build_dir="$PWD/build"
     derived_data_arm=${build_dir}/DerivedDataArm
-    derived_data_intel=${build_dir}/DerivedDataIntel;
+    derived_data_intel=${build_dir}/DerivedDataIntel
 
-    if [[ ${debug} -eq 1 ]]; then
-        xbuild "${app_name}" "${derived_data_arm}" arm64 "-verbose"
-        xbuild "${app_name}" "${derived_data_intel}" x86_64 "-verbose"
+    if [[ ${is_uni} -eq 1 ]]; then
+        if [[ ${debug} -eq 1 ]]; then
+            build_universal "${app_name}" "${derived_data_arm}" "-verbose"
+        else
+            build_universal "${app_name}" "${derived_data_arm}" "-quiet"
+        fi
     else
-        xbuild "${app_name}" "${derived_data_arm}" arm64 "-quiet"
-        xbuild "${app_name}" "${derived_data_intel}" x86_64 "-quiet"
+        if [[ ${debug} -eq 1 ]]; then
+            build_single "${app_name}" "${derived_data_arm}" arm64 "-verbose"
+            build_single "${app_name}" "${derived_data_intel}" x86_64 "-verbose"
+        else
+            build_single "${app_name}" "${derived_data_arm}" arm64 "-quiet"
+            build_single "${app_name}" "${derived_data_intel}" x86_64 "-quiet"
+        fi
     fi
 fi
 
 # FROM 5.0.0
 # Build a Universal Binary
-echo "Making a Universal Binary... "
 pkg_dir="pkgroot/usr/local/bin"
 mkdir -p "${pkg_dir}"
-lipo -create -output "${pkg_dir}/${app_name}" "${derived_data_arm}/Build/Products/Release/${app_name}" "${derived_data_intel}/Build/Products/Release/${app_name}" || show_error_then_exit "Could not build universal binary"
+if [[ ${is_uni} -ne 1 ]]; then
+    echo "Making a Universal Binary..."
+    pkg_dir="pkgroot/usr/local/bin"
+    mkdir -p "${pkg_dir}"
+    lipo -create -output "${pkg_dir}/${app_name}" "${derived_data_arm}/Build/Products/Release/${app_name}" "${derived_data_intel}/Build/Products/Release/${app_name}" || show_error_then_exit "Could not build universal binary"
+else
+    # Move already-built universal to the package root
+    mv "${derived_data_arm}/Build/Products/Release/${app_name}" "${pkg_dir}/${app_name}"
+fi
 
 # FROM 4.0.1
 # Exit if no package is required
@@ -205,7 +231,7 @@ if [[ ${no_pack} -eq 1 ]]; then
 fi
 
 # Build and sign the package
-echo "Making and signing the package... "
+echo "Making and signing the package..."
 [[ -d "build" ]] || mkdir build
 if [[ ${add_scripts} -eq 1 ]]; then
     success=$(pkgbuild --scripts "${scripts_dir}" --root pkgroot --identifier "${bundle_id}.pkg" --install-location "/" --sign "${cert_name}" --version "${app_version}" "build/${app_name}-${app_version}.pkg")
