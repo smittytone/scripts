@@ -6,14 +6,16 @@
 # Backup to Disk Script
 #
 # @author    Tony Smith
-# @copyright 2025, Tony Smith
-# @version   1.0.1
+# @copyright 2026, Tony Smith
+# @version   1.1.0
 # @license   MIT
 #
 
 typeset -i do_music=1
 typeset -i do_books=1
+typeset -i do_arbitrary=0
 target_disk="500GB"
+source_dir=""
 # Arrays of directory paths: local machine, music server mount, home server mount
 local_sources=('Library/Mobile Documents/com~apple~CloudDocs/Documents/eBooks')
 music_sources=(Alternative Classical Comedy 'Doctor Who' Electronic Folk Pop Metal Rock
@@ -49,7 +51,7 @@ do_sync() {
         while IFS= read -r line; do
             # rsync 2.6.x use 'cut -c 11-'; below is for 3.3.x
             local trimmed=$(echo "${line}" | cut -c 14-)
-            number=$(printf "%03d" ${count})
+            number=$(printf "%04d" ${count})
             [[ -n "${trimmed}" ]] && echo "    ${number}. /${trimmed}"
             ((count++))
         done <<< "$lines"
@@ -59,13 +61,14 @@ do_sync() {
 }
 
 show_help() {
-    echo "media-backup"
     echo "Usage:"
-    echo "  media-backup {-m|-b} {drive_name}"
-    echo "Options:"
+    echo "  media-backup [-m|-b] [drive_name]"
+    echo "  media-backup -o <directory path> [drive_name]"
+    echo -e "\nOptions:"
     echo "  -m / --music   Backup music only. Default: backup both"
     echo "  -b / --books   Backup eBooks only. Default: backup both"
-    echo "  <drive_name>   Optional drive name. Default: 500GB"
+    echo "  -o / --other   Backup an arbitrary directory (required)"
+    echo "  [drive_name]   Optional drive name. Default: 500GB"
     echo
 }
 
@@ -87,17 +90,25 @@ for arg in "$@"; do
     elif [[ "${check_arg}" = "--music" || "${check_arg}" = "-m" ]]; then
         do_books=0
         ((arg_count += 1))
+    elif [[ "${check_arg}" = "--other" || "${check_arg}" = "-o" ]]; then
+        do_books=0
+        do_music=0
+        do_arbitrary=1
     elif [[ "${check_arg}" = "--help" || "${check_arg}" = "-h" ]]; then
         show_help
         exit 0
     else
-        target_disk="${arg}"
+        if [[ ${do_arbitrary} -eq 1 && -z ${source_dir} ]]; then
+            source_dir="${arg}"
+        else
+            target_disk="${arg}"
+        fi
         ((arg_count += 1))
     fi
 done
 
 # Check that the user is not excluding both jobs
-[[ ${do_books} -eq 0 && ${do_music} -eq 0 ]] && show_error_and_exit "Mutually exclusive options set -- backup cannot continue"
+[[ ${do_books} -eq 0 && ${do_music} -eq 0 && ${do_arbitrary} -eq 0 ]] && show_error_and_exit "Mutually exclusive options set -- backup cannot continue"
 
 # Set the target path based on supplied disk name (or default)
 target_path="/Volumes/${target_disk}"
@@ -132,6 +143,16 @@ if [[ -d "${target_path}" ]]; then
             done
         else
             show_error_and_exit "${bold}Music${normal} server not mounted"
+        fi
+    fi
+
+    # Sync arbitrary sources
+    if [[ ${do_arbitrary} -eq 1 ]]; then
+        if [[ -d "${source_dir}" ]]; then
+            echo "${bold}Arbitrary directory ${source_dir}${normal}"
+            do_sync "${source_dir}" "${target_path}"
+        else
+            show_error_and_exit "${bold}${source_dir}${normal} can not be found."
         fi
     fi
 else
