@@ -7,13 +7,14 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   1.1.0
+# @version   1.2.0
 # @license   MIT
 #
 
 typeset -i do_music=1
 typeset -i do_books=1
 typeset -i do_arbitrary=0
+typeset -i digits=3
 target_disk="500GB"
 source_dir=""
 # Arrays of directory paths: local machine, music server mount, home server mount
@@ -26,6 +27,14 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 
 # Functions
+set_digits() {
+    # Count the number of digits required for the printf format string
+    [ "${1}" -gt 999999 ] && digits=7
+    [ "${1}" -gt 99999  ] && digits=6
+    [ "${1}" -gt 9999   ] && digits=5
+    [ "${1}" -gt 999    ] && digits=4
+}
+
 do_sync() {
     # Sync the source to the target
     # Arg 1 should be the source directory
@@ -45,13 +54,15 @@ do_sync() {
         while IFS= read -r line; do
             ((count++))
         done <<< "${lines}"
+        set_digits "${count}"
+        format="%0${digits}d"
         echo "${count} files changed:"
         # Output the files changed
         count=1
         while IFS= read -r line; do
             # rsync 2.6.x use 'cut -c 11-'; below is for 3.3.x
             local trimmed=$(echo "${line}" | cut -c 14-)
-            number=$(printf "%04d" ${count})
+            number=$(printf "${format}" ${count})
             [[ -n "${trimmed}" ]] && echo "    ${number}. /${trimmed}"
             ((count++))
         done <<< "$lines"
