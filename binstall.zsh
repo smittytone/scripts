@@ -101,6 +101,7 @@ print_message() {
 show_version() {
     echo "binstall ${app_version}"
 }
+
 show_help() {
     echo
     show_version
@@ -167,7 +168,7 @@ done
 # FROM 1.5.0
 # Check for incompatible flags
 if [[ $do_list -eq 1 && $do_show -eq 0 ]]; then
-    print_err_and_exit "Incompatable flags chosen: you can't list files quietly -- exiting"
+    print_err_and_exit "Incompatible flags chosen: you can't list files quietly -- exiting"
 fi
 
 # Check for a bin directory and make if it's not there yet
