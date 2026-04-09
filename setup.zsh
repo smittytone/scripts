@@ -27,7 +27,7 @@ function show_errors() {
 
 APP_NAME=$(basename $0)
 APP_NAME=${APP_NAME:t}
-APP_VERSION=4.0.0
+APP_VERSION=4.0.1
 errors=()
 
 # FROM 3.0.0 -- Get macOS verison
@@ -47,7 +47,6 @@ read -k -s "key?Continue? [Y/N] "
 [[ "${key:u}" != "Y" ]] && echo && exit 1
 echo
 
-: '
 # Apply preferred Energy Saver settings
 # NOTE Must be run as root
 sudo pmset -b displaysleep 60
@@ -87,13 +86,13 @@ chflags nohidden "$HOME/Library"
 if [[ -n $(which brew) ]]; then
     echo "Installing Brew-sourced CLI tools... "
     brew update
-    apps=(bash nano coreutils gitup jq ncurses readline shellcheck libdvdcss python3 hugo "sass/sass/sass" sphinx-doc "cloudflare/cloudflare/cloudflared")
+    apps=(bash nano coreutils gitup jq ncurses readline shellcheck libdvdcss python3 hugo "sass/sass/sass" sphinx-doc)
     for app in "${apps[@]}"; do
         brew install "${app}"
     done
 
     echo "Installing Applications... "
-    apps=(handbrake skype firefox omnidisksweeper)
+    apps=(handbrake firefox omnidisksweeper)
     for app in "${apps[@]}"; do
         brew install --cask "${app}"
     done
