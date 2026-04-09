@@ -7,13 +7,14 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   1.2.0
+# @version   1.3.0
 # @license   MIT
 #
 
 typeset -i do_music=1
 typeset -i do_books=1
 typeset -i do_arbitrary=0
+typeset -i do_docs=0
 typeset -i digits=3
 target_disk="500GB"
 source_dir=""
@@ -21,6 +22,7 @@ source_dir=""
 local_sources=('Library/Mobile Documents/com~apple~CloudDocs/Documents/eBooks')
 music_sources=(Alternative Classical Comedy 'Doctor Who' Electronic Folk Pop Metal Rock
                SFX Singles Soundtracks 'Spoken Word' Instrumental)
+docs_sources=(Finances Property Miscellaneous)
 home_sources=(Comics)
 
 bold=$(tput bold)
@@ -74,10 +76,12 @@ do_sync() {
 show_help() {
     echo "Usage:"
     echo "  media-backup [-m|-b] [drive_name]"
+    echo "  media-backup -d [drive_name]"
     echo "  media-backup -o <directory path> [drive_name]"
     echo -e "\nOptions:"
     echo "  -m / --music   Backup music only. Default: backup both"
     echo "  -b / --books   Backup eBooks only. Default: backup both"
+    echo "  -d / --docs    Backup documents only. Default: don't backup"
     echo "  -o / --other   Backup an arbitrary directory (required)"
     echo "  [drive_name]   Optional drive name. Default: 500GB"
     echo
@@ -100,6 +104,14 @@ for arg in "$@"; do
         ((arg_count += 1))
     elif [[ "${check_arg}" = "--music" || "${check_arg}" = "-m" ]]; then
         do_books=0
+        ((arg_count += 1))
+    elif [[ "${check_arg}" = "--docs" || "${check_arg}" = "-d" ]]; then
+        do_docs=1
+        do_music=0
+        do_books=0
+        # Following set to make use of pre-existing checks
+        do_arbitrary=1
+        source_dir=NONE
         ((arg_count += 1))
     elif [[ "${check_arg}" = "--other" || "${check_arg}" = "-o" ]]; then
         do_books=0
@@ -155,6 +167,23 @@ if [[ -d "${target_path}" ]]; then
         else
             show_error_and_exit "${bold}Music${normal} server not mounted"
         fi
+    fi
+
+    # FROM 1.3.0
+    if [[ ${do_docs} -eq 1 ]]; then
+        new_folder=$(date "+%Y-%m-%d")
+        new_folder="${target_path}/${new_folder}"
+        mkdir "${new_folder}" > /dev/null 2>&1
+        if [ $? -eq 0  ]; then
+            for source in "${docs_sources[@]}"; do
+                do_sync "${HOME}/Documents/${source}" "${new_folder}"
+            done
+        else
+            show_error_and_exit "${folder} can’t be created. You may have backed up already today"
+        fi
+
+        # Clear to avoid the mext check
+        do_arbitrary=0
     fi
 
     # Sync arbitrary sources
