@@ -5,8 +5,8 @@
 # Display $GIT directory repos with unmerged or uncommitted changes
 #
 # @author    Tony Smith
-# @copyright 2022, Tony Smith
-# @version   1.3.2
+# @copyright 2026, Tony Smith
+# @version   1.4.1
 # @license   MIT
 
 
@@ -20,14 +20,11 @@ local repos=()
 local states=()
 local branches=()
 local show_branches=0
+local git_dir="${GH}"
+local git_dir_name='$GH'
 
-if [[ -z "$GIT" ]]; then
-    show_error_and_exit 'Environment variable "$GIT" not set with your Git directory'
-fi
-
-if [[ ! -d "$GIT" ]]; then
-    show_error_and_exit 'Directory referenced by environment variable "$GIT" does not exist'
-fi
+[[ -z "${git_dir}" ]] && show_error_and_exit "Environment variable ${git_dir_name} not set with your Git directory"
+[[ ! -d "${git_dir}" ]] && show_error_and_exit "Directory referenced by environment variable ${git_dir_name} does not exist"
 
 # FROM 1.3.1
 # Process the arguments
@@ -43,7 +40,7 @@ done
 
 # FROM 1.2.1 -- Add progress marker
 echo -n "Checking"
-if cd "$GIT"; then
+if cd "${git_dir}"; then
     # Process the files
     for repo in *; do
         if [[ -d "${repo}" && -d "${repo}/.git" ]]; then
@@ -59,16 +56,12 @@ if cd "$GIT"; then
                     # Determine repo states, but only those that are not up to date
                     local unmerged=$(git status --ignore-submodules)
                     unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
-                    if [[ -n "${unmerged}" ]]; then
-                        state="unmerged"
-                    fi
+                    [[ -n "${unmerged}" ]] && state="unmerged"
 
                     local uncommitted=$(git status --porcelain --ignore-submodules)
-                    if [[ -n "${uncommitted}" ]]; then
-                        state="uncommitted"
-                    fi
+                    [[ -n "${uncommitted}" ]] && state="uncommitted"
 
-                    if [[ -n "$state" ]]; then
+                    if [[ -n "${state}" ]]; then
                         states+=("${state}")
                         repos+=("${repo}")
 
