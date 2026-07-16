@@ -6,9 +6,27 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.0.1
+# @version   2.1.0
 # @license   MIT
 
+
+##################################################################
+#                     USER-DEFINED VARIABLES                     #
+##################################################################
+#
+# Update the following array variables for your specific needs.
+# They are currently populated with example values.
+#
+# Remember, shell script array elements are separated by spaces only,
+# not commas!
+#
+# A mandatory array of paths for the directory or directories holding your repos.
+local git_dirs=("${HOME}/GitHub\ Folder" "${HOME}/GitLab\ Folder" "${HOME}/Codeberg\ Folder")
+# An optional array of the git service names associated with each of the directories listed above. This is used for reporting only.
+local git_service_names=("GitHub" "GitLab" "CodeBerg")
+
+
+# Functions
 show_error_and_exit() {
     echo "\033[31m[ERROR]\033[39m $1"
     exit 1
@@ -20,7 +38,7 @@ show_warning() {
 
 gather() {
     local max=0
-    
+
     # Add spacers between services
     if [[ ${#repos} -gt 0 ]]; then
         repos+=("=")
@@ -73,18 +91,11 @@ local states=()
 local branches=()
 local show_branches=0
 local maxes=()
-local git_dirs=("${GH}" "${GL}")
-local git_dir_names=('$GH' '$GL')
-local git_service_names=("GitHub" "GitLab")
 
-# FROM 2.0.1
-# Check we have the right service info
-[[ ${#git_dirs[@]} -eq ${#git_dir_names[@]} && ${#git_dirs[@]} -eq ${#git_service_names[@]} ]] || show_error_and_exit "Mis-set git service values"
-
-# Check sources and env vars
+# Check source directories
+[ ${#git_dirs} -eq 0 ] && show_error_and_exit 'No git directories defined. Update the script to add them to the `git_dirs` array'
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
-    [[ -z "${git_dirs[i]}" ]] && show_error_and_exit "Environment variable ${git_dir_names[i]} not set with your local ${git_service_names[i]} directory"
-    [[ ! -d "${git_dirs[i]}" ]] && show_warning "Directory referenced by environment variable ${git_dir_names[i]} does not exist"
+    [[ ! -d "${git_dirs[i]}" ]] && show_error_and_exit "Directory ${git_dirs[i]} does not exist"
 done
 
 # FROM 1.3.1
@@ -117,7 +128,7 @@ else
     if [[ "$show_branches" -eq 1 ]]; then
         printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-            if [[ "${repos[i]}" == "=" ]]; then 
+            if [[ "${repos[i]}" == "=" ]]; then
                 ((service+=1))
                 printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:\n"
                 max=${maxes[${service}]}
@@ -128,7 +139,7 @@ else
     else
         printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
-            if [[ "${repos[i]}" == "=" ]]; then 
+            if [[ "${repos[i]}" == "=" ]]; then
                 ((service+=1))
                 printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
                 max=${maxes[${service}]}
