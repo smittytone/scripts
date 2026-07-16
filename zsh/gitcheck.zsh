@@ -6,13 +6,16 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.0.0
+# @version   2.0.1
 # @license   MIT
 
-
 show_error_and_exit() {
-    echo "[ERROR] $1"
+    echo "\033[31m[ERROR]\033[39m $1"
     exit 1
+}
+
+show_warning() {
+    echo "\033[31m[WARNING]\033[39m $1"
 }
 
 gather() {
@@ -39,7 +42,7 @@ gather() {
                 else
                     # Determine repo states, but only those that are not up to date
                     local unmerged=$(git status --ignore-submodules)
-                    unmerged=$(grep 'is ahead' < <((echo -e "$unmerged")))
+                    unmerged=$(grep 'is ahead' < <((echo -e "${unmerged}")))
                     [[ -n "${unmerged}" ]] && state="unmerged"
 
                     local uncommitted=$(git status --porcelain --ignore-submodules)
@@ -74,10 +77,14 @@ local git_dirs=("${GH}" "${GL}")
 local git_dir_names=('$GH' '$GL')
 local git_service_names=("GitHub" "GitLab")
 
+# FROM 2.0.1
+# Check we have the right service info
+[[ ${#git_dirs[@]} -eq ${#git_dir_names[@]} && ${#git_dirs[@]} -eq ${#git_service_names[@]} ]] || show_error_and_exit "Mis-set git service values"
+
 # Check sources and env vars
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
     [[ -z "${git_dirs[i]}" ]] && show_error_and_exit "Environment variable ${git_dir_names[i]} not set with your local ${git_service_names[i]} directory"
-    [[ ! -d "${git_dirs[i]}" ]] && show_error_and_exit "Directory referenced by environment variable ${git_dir_names[i]} does not exist"
+    [[ ! -d "${git_dirs[i]}" ]] && show_warning "Directory referenced by environment variable ${git_dir_names[i]} does not exist"
 done
 
 # FROM 1.3.1
@@ -95,7 +102,8 @@ done
 # FROM 1.2.1 -- Add progress marker
 echo -n "Checking"
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
-    if cd "${git_dirs[i]}"; then
+    # FROM 2.0.1 -- Don't display missing dirs
+    if cd "${git_dirs[i]}" 2>/dev/null; then
         gather
     fi
 done
@@ -107,25 +115,25 @@ else
     local max=${maxes[1]}
     local service=1
     if [[ "$show_branches" -eq 1 ]]; then
-        echo -e "\nLocal repo current branches (${git_service_names[${service}]}):"
+        printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
             if [[ "${repos[i]}" == "=" ]]; then 
                 ((service+=1))
-                echo -e "\nLocal repo current branches (${git_service_names[${service}]}):"
+                printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:\n"
                 max=${maxes[${service}]}
             else
-                printf '%*s is on %s\n' ${max} ${repos[i]} ${branches[i]}
+                printf '\033[1m%*s\033[0m is on \033[1m%s\033[0m\n' ${max} "${repos[i]}" "${branches[i]}"
             fi
         done
     else
-        echo -e "\nLocal repos with changes (${git_service_names[${service}]}):"
+        printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
             if [[ "${repos[i]}" == "=" ]]; then 
                 ((service+=1))
-                echo -e "\nLocal repos with changes (${git_service_names[${service}]}):"
+                printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
                 max=${maxes[${service}]}
             else
-                printf '%*s has %s changes\n' ${max} ${repos[i]} ${states[i]}
+                printf '\033[1m%*s\033[0m has \033[1m%s\033[0m changes\n' ${max} "${repos[i]}" "${states[i]}"
             fi
         done
     fi
