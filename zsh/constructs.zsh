@@ -30,8 +30,11 @@ show_help() {
 EOF
 }
 
-
 # Use `if` clauses even for simple comparisons as they are more clear,
 # less errror prone and can be extended more easily, eg.
 if [ -z "$1" ]; then err "assert_nz $2"; fi
 if ! "$@"; then err "command failed: $*"; fi
+
+# The following construct sets a variable to the value of another if it
+# exists, or to a default value if not:
+var="${possibly_non_existent_variable:-default_value}"
