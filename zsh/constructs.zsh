@@ -34,6 +34,15 @@ say_verbose() {
     if [ "${is_verbose}" ]; then say "$1"; fi
 }
 
+# Run a command that should never fail. If the command fails execution,
+# it will immediately terminate with an error showing the failing command.
+# NOTE `"$@"` expands all the functions args.
+ensure() {
+    if ! "$@"; then err "command failed: $*"; fi
+}
+# usage example:
+_dir="$(ensure mktemp -d)" || return 1
+
 # Function to display help info
 show_help() {
     cat <<EOF
