@@ -18,9 +18,20 @@ run_as_admin() {
     fi
 }
 
-# Function to output a WARNING message, passed by argument, to stderr
-show_warning() {
+# Function to output a WARNING message, passed by argument, to stderr.
+warn() {
     printf '[WARNING] %s\n' "$1" >&2
+}
+
+# Function to output any message, passed by argument, to stderr.
+say() {
+    printf '%s\n' "$1" >&2
+}
+
+# Function to output any message, passed by argument, to stderr - provided
+# we're in verbose mode.
+say_verbose() {
+    if [ "${is_verbose}" ]; then say "$1"; fi
 }
 
 # Function to display help info
