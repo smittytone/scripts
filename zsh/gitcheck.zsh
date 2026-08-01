@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 # gitcheck.zsh
 #
@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.1.0
+# @version   2.1.1
 # @license   MIT
 
 
@@ -21,19 +21,20 @@
 # not commas!
 #
 # A mandatory array of paths for the directory or directories holding your repos.
-local git_dirs=("${HOME}/GitHub\ Folder" "${HOME}/GitLab\ Folder" "${HOME}/Codeberg\ Folder")
+local git_dirs=("${HOME}/GitHub" "${HOME}/GitLab" "${HOME}/GitHub/Codeberg")
 # An optional array of the git service names associated with each of the directories listed above. This is used for reporting only.
-local git_service_names=("GitHub" "GitLab" "CodeBerg")
-
+local git_service_names=("GitHub GitLab Codeberg")
+# FROM 2.1.1
+local spaces=$(printf ' %.0s' {1..20})
 
 # Functions
 show_error_and_exit() {
-    echo "\033[31m[ERROR]\033[39m $1"
+    printf "\033[31m[ERROR]\033[39m $1\n"
     exit 1
 }
 
 show_warning() {
-    echo "\033[31m[WARNING]\033[39m $1"
+    printf "\033[31m[WARNING]\033[39m $1\n"
 }
 
 gather() {
@@ -49,11 +50,11 @@ gather() {
     # Process the files
     for repo in *; do
         if [[ -d "${repo}" && -d "${repo}/.git" ]]; then
-            if cd "${repo}"; then
+            if cd "${repo}" 2>/dev/null; then
                 local state=""
-                if [[ "$show_branches" -eq 1 ]]; then
+                if [ "${show_branches}" -eq 1 ]; then
                     # FROM 1.3.1 -- determine repo current branches
-                    repos+=("$repo")
+                    repos+=("${repo}")
                     if [[ ${#repo} -gt ${max} ]] max=${#repo}
                     local branch=$(git branch --show-current)
                     branches+=("${branch}")
@@ -61,12 +62,12 @@ gather() {
                     # Determine repo states, but only those that are not up to date
                     local unmerged=$(git status --ignore-submodules)
                     unmerged=$(grep 'is ahead' < <((echo -e "${unmerged}")))
-                    [[ -n "${unmerged}" ]] && state="unmerged"
+                    if [[ -n "${unmerged}" ]] state="unmerged"
 
                     local uncommitted=$(git status --porcelain --ignore-submodules)
-                    [[ -n "${uncommitted}" ]] && state="uncommitted"
+                    if [[ -n "${uncommitted}" ]] state="uncommitted"
 
-                    if [[ -n "${state}" ]]; then
+                    if [ -n "${state}" ]; then
                         states+=("${state}")
                         repos+=("${repo}")
 
@@ -78,7 +79,7 @@ gather() {
             fi
 
             # FROM 1.2.1 Add progress marker
-            echo -n "."
+            printf "."
         fi
     done
 
@@ -93,9 +94,9 @@ local show_branches=0
 local maxes=()
 
 # Check source directories
-[ ${#git_dirs} -eq 0 ] && show_error_and_exit 'No git directories defined. Update the script to add them to the `git_dirs` array'
+if [[ ${#git_dirs} -eq 0 ]] show_error_and_exit 'No git directories defined. Update the script to add them to the `git_dirs` array'
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
-    [[ ! -d "${git_dirs[i]}" ]] && show_error_and_exit "Directory ${git_dirs[i]} does not exist"
+    if [[ ! -d "${git_dirs[i]}" ]] show_error_and_exit "Directory ${git_dirs[i]} does not exist"
 done
 
 # FROM 1.3.1
@@ -111,7 +112,7 @@ for arg in "$@"; do
 done
 
 # FROM 1.2.1 -- Add progress marker
-echo -n "Checking"
+printf "Checking"
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
     # FROM 2.0.1 -- Don't display missing dirs
     if cd "${git_dirs[i]}" 2>/dev/null; then
@@ -120,13 +121,13 @@ for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
 done
 
 if [[ ${#repos} -eq 0 ]]; then
-    echo -e "\nAll local repos up to date"
+    printf "\nAll local repos up to date\n"
 else
     # FROM 1.3.1 -- show repo current branches, or states
     local max=${maxes[1]}
     local service=1
     if [[ "$show_branches" -eq 1 ]]; then
-        printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:\n"
+        printf "\rLocal \033[1m${git_service_names[${service}]}\033[0m repo current branches:${spaces}\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
             if [[ "${repos[i]}" == "=" ]]; then
                 ((service+=1))
@@ -137,7 +138,7 @@ else
             fi
         done
     else
-        printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
+        printf "\rLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:${spaces}\n"
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
             if [[ "${repos[i]}" == "=" ]]; then
                 ((service+=1))

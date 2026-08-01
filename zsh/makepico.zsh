@@ -1,45 +1,43 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
-#
 # makepico.zsh
 #
 # Create a baseline Raspberry Pi Pico C-language project
 #
 # @author    Tony Smith
-# @copyright 2021, Tony Smith
-# @version   2.3.0
+# @copyright 2026, Tony Smith
+# @version   2.4.0
 # @license   MIT
-#
 
+# Globals
+projects=()
+typeset -i do_swd=0
+typeset -i do_cpp=0
+typeset -i do_asm=0
+typeset -i next_is_arg=0
+users_name="<YOU>"
+proj_version="1.0.0"
+last_arg=""
 
-# FROM 1.0.2
-# Check that PICO_SDK_PATH is defined
-# and the SDK is installed
-if [[ -z "${PICO_SDK_PATH}" ]]; then
-    show_error "Environment variable PICO_SDK_PATH not set"
-else
-    ls "${PICO_SDK_PATH}" >/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        show_error "Pico SDK not installed at ${PICO_SDK_PATH}"
-    fi
-fi
-
-
+# Functions
 show_help() {
-    echo -e "\nmakepico 2.3.0\n\nInitialise a Pi Pico Project\n"
-    echo -e "Usage:\n  makepico [path/to/project/name] [-c] [-d] [-n your name] [-h]\n"
-    echo    "Options:"
-    echo    "  -c / --cpp     Set up the project for C++. Default: false"
-    echo    "  -a / --asm     Set up the project for ASM. Default: false"
-    echo    "  -d / --debug   Set up the project for SWD. Default: false"
-    echo    "  -n / --name    Your name for the comments. Default: <YOU>"
-    echo    "  -v / --version The project's inital version. Default: 1.0.0"
-    echo    "  -h / --help    This help screen"
-    echo
+    cat << EOF
+makepico 2.4.0
+Initialise a Pi Pico Project
+Usage:
+    makepico [path/to/project/name] [-c] [-d] [-n your name] [-h]
+Options:
+   -c / --cpp     Set up the project for C++. Default: false
+   -a / --asm     Set up the project for ASM. Default: false
+   -d / --debug   Set up the project for SWD. Default: false
+   -n / --name    Your name for the comments. Default: <YOU>
+   -v / --version The project's inital version. Default: 1.0.0
+   -h / --help    This help screen
+EOF
 }
 
 show_error() {
-    echo "[ERROR] $1"
+    printf "[ERROR] $1\n"
     exit 1
 }
 
@@ -61,10 +59,8 @@ make_project() {
 
     # Copy over the .make file from the SDK
     file="pico_sdk_import.cmake"
-    if cp "${PICO_SDK_PATH}/external/${file}" "${project_path}/${file}"; then
-        # NOP
-    else
-        show_error "Could not copy the ${file} file"
+    if ! cp "${PICO_SDK_PATH}/external/${file}" "${project_path}/${file}" ; then
+       show_error "Could not copy the ${file} file"
     fi
 
     # Make the CMakeLists.txt file for this project
@@ -75,7 +71,7 @@ make_project() {
 
     # And done...
     project_name=${1:t}
-    echo "Project ${project_name} created at ${project_path}"
+    printf "Project ${project_name} created at ${project_path}\n"
 }
 
 make_source_files() {
@@ -85,23 +81,23 @@ make_source_files() {
     # FROM 1.3.0
     file_ext="c"
     project_type="C"
-    if [[ $do_cpp -eq 1 ]]; then
+    if [ "${do_cpp}" -eq 1 ]; then
         file_ext="cpp"
         project_type="C++"
     fi
+
     # FROM 2.3.0
-    if [[ $do_asm -eq 1 ]]; then
+    if [ "${do_asm}" -eq 1 ]; then
         file_ext="S"
         project_type="ASM"
     fi
 
-    echo "Creating ${project_type} project files..."
+    printf "Creating ${project_type} project files...\n"
     project_name=${1:t}
     source_file=${1:t:l}
-
     write_header "$project_name" "${1}/main.${file_ext}"
 
-    if [[ $do_asm -eq 1 ]]; then
+    if [ "${do_asm}" -eq 1 ]; then
         # FROM 2.3.0
         # Write main function
         {
@@ -112,7 +108,6 @@ make_source_files() {
         } >> "${1}/main.${file_ext}"
     else
         write_header "$project_name" "${1}/main.h"
-
         # FROM 2.0.0
         # Write main() function
         {
@@ -137,7 +132,7 @@ make_source_files() {
         } >> "${1}/main.h"
 
         # C++ standard libraries or C standard libraries
-        if [[ $do_cpp -eq 1 ]]; then
+        if [ "${do_cpp}" -eq 1 ]; then
             {
                 echo '/*'
                 echo ' * C++ HEADERS'
@@ -179,7 +174,7 @@ make_source_files() {
             echo
         } >> "${1}/main.h"
 
-        if [[ $do_cpp -eq 1 ]]; then
+        if [ "${do_cpp}" -eq 1 ]; then
             {
                 echo '#ifdef __cplusplus'
                 echo 'extern "C" {'
@@ -220,23 +215,19 @@ write_header() {
 make_cmake_file() {
     # Output lines to the file, interpolating the project name
     # Args: 1 -- project path
-
-    echo "Creating CMakeLists.txt..."
+    printf "Creating CMakeLists.txt...\n"
     project_name=${1:t}
     source_file=${project_name:l}
 
     # FROM 1.3.0
     file_ext="c"
-    if [[ $do_cpp -eq 1 ]]; then
-        file_ext="cpp"
-    fi
+    if [[ ${do_cpp} -eq 1 ]] file_ext="cpp"
+
     # FROM 2.3.0
-    if [[ $do_asm -eq 1 ]]; then
-        file_ext="S"
-    fi
+    if [[ ${do_asm} -eq 1 ]] file_ext="S"
 
     {
-        echo 'cmake_minimum_required(VERSION 3.14)'
+        echo 'cmake_minimum_required(VERSION 3.22)'
         echo 'include(pico_sdk_import.cmake)'
         echo "project(${project_name} VERSION ${proj_version})"
         echo "add_executable(${project_name}"
@@ -261,7 +252,7 @@ make_cmake_file() {
 make_vscode() {
     # FROM 1.0.2
     # Make the vscode settings
-    echo "Configuring VSCode..."
+    printf "Configuring VSCode...\n"
     mkdir "${1}/.vscode"
     {
         echo '{'
@@ -273,7 +264,7 @@ make_vscode() {
     } >> "${1}/.vscode/settings.json"
 
     # Debug flag set? write out an SWD launch config
-    if [[ $do_swd -eq 1 ]]; then
+    if [ "${do_swd}" -eq 1 ]; then
         {
             echo '{'
             echo '    "version": "0.2.0",'
@@ -307,9 +298,9 @@ check_path() {
     # Check the path is valid
     # Args: 1 -- the project path as specified by the user
     project_name={$1:t}
-    if [[ ! -d "${1}" ]]; then
+    if [ ! -d "${1}" ]; then
         if mkdir -p "${1}" >> /dev/null; then
-            echo "Creating project directory..."
+            printf "Creating project directory...\n"
         else
             show_error "Could not create path for project ${project_name}"
         fi
@@ -317,64 +308,63 @@ check_path() {
 }
 
 # Runtime start
-# Get the arguments, which should be project path(s)
-projects=()
-do_swd=0
-do_cpp=0
-do_asm=0
-users_name="<YOU>"
-proj_version="1.0.0"
-next_is_arg=0
-last_arg=""
+# FROM 1.0.2
+# Check that PICO_SDK_PATH is defined
+# and the SDK is installed
+if [ -z "${PICO_SDK_PATH}" ]; then
+    show_error "Environment variable PICO_SDK_PATH not set"
+else
+    if ! ls "${PICO_SDK_PATH}" >/dev/null 2>&1 ; then
+        show_error "Pico SDK not installed at ${PICO_SDK_PATH}"
+    fi
+fi
 
 for arg in "$@"; do
     upper_arg=${arg:u}
-    if [[ $next_is_arg -gt 0 ]]; then
+    if [ "${next_is_arg}" -gt 0 ]; then
         # The argument should be a value (previous argument was an option)
-        if [[ ${arg:0:1} = "-" ]]; then
+        if [ "${arg:0:1}" = "-" ]; then
             # Next value is an option: ie. missing value
             show_error "Missing value for ${last_arg}"
         fi
 
         # Set the appropriate internal value
-        case "$next_is_arg" in
-            1) users_name=$arg ;;
-            2) proj_version=$arg ;;
-            *) show_error "Unknown argument" exit 1 ;;
+        case "${next_is_arg}" in
+            1) users_name=${arg} ;;
+            2) proj_version=${arg} ;;
+            *) show_error "Unknown argument" ;;
         esac
 
         # Reset
         next_is_arg=0
     else
-        if   [[ "$upper_arg" == "-N" || "$upper_arg" == "--NAME"    ]]; then
+        if [[ "${upper_arg}" == "-N" || "${upper_arg}" == "--NAME" ]]; then
             next_is_arg=1
-        elif [[ "$upper_arg" == "-C" || "$upper_arg" == "--CPP"     ]]; then
+        elif [[ "${upper_arg}" == "-C" || "${upper_arg}" == "--CPP" ]]; then
             do_cpp=1
-        elif [[ "$upper_arg" == "-A" || "$upper_arg" == "--ASM "    ]]; then
+        elif [[ "${upper_arg}" == "-A" || "${upper_arg}" == "--ASM" ]]; then
             do_asm=1
-        elif [[ "$upper_arg" == "-D" || "$upper_arg" == "--DEBUG"   ]]; then
+        elif [[ "${upper_arg}" == "-D" || "${upper_arg}" == "--DEBUG" ]]; then
             do_swd=1
-        elif [[ "$upper_arg" == "-V" || "$upper_arg" == "--VERSION" ]]; then
+        elif [[ "${upper_arg}" == "-V" || "${upper_arg}" == "--VERSION" ]]; then
             next_is_arg=2
-        elif [[ "$upper_arg" == "-H" || "$upper_arg" == "--HELP"    ]]; then
+        elif [[ "${upper_arg}" == "-H" || "$upper_arg" == "--HELP" ]]; then
             show_help
             exit 0
         else
-            projects+=("$arg")
+            projects+=("${arg}")
         fi
 
-        last_arg=$uarg
+        last_arg=${upper_arg}
     fi
 done
 
 # FROM 2.3.0 Watch out for conflicting project types
-if [[ $do_cpp -eq 1 && do_asm -eq 1 ]]; then
-    show_error "Conflicting project types selected"
-fi
+if [[ ${do_cpp} -eq 1 && ${do_asm} -eq 1 ]] show_error "Conflicting project types selected"
 
-if [[ ${#projects[@]} -gt 0 ]]; then
+if [ "${#projects[@]}" -gt 0 ]; then
     for project in "${projects[@]}"; do
-        make_project "$project"
+        make_project "${project}"
     done
 else
     show_help

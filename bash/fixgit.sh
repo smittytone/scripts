@@ -6,17 +6,16 @@
 # Fix Git repos when .gitignore is updated but doesn't take
 #
 # @author    Tony Smith
-# @copyright 2019-20, Tony Smith
-# @version   1.0.1
+# @copyright 2026, Tony Smith
+# @version   1.0.2
 # @license   MIT
 #
 
-
-echo "FixGit"
-read -n 1 -s -p "You should be in your project directory. Press [G] to continue, or any other key to cancel " key
+echo FixGit
+read -r -n 1 -s -p "You should be in your project directory. Press [G] to continue, or any other key to cancel " key
 key=${key^^*}
 
-if [ "$key" = "G" ]; then
+if [ "${key}" = "G" ]; then
     git rm -r --cached .
     git add .
     git commit -m "[Git Fixed] .gitignore is now working"
