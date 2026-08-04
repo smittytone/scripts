@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.1.1
+# @version   2.1.2
 # @license   MIT
 
 
@@ -23,7 +23,7 @@
 # A mandatory array of paths for the directory or directories holding your repos.
 local git_dirs=("${HOME}/GitHub" "${HOME}/GitLab" "${HOME}/GitHub/Codeberg")
 # An optional array of the git service names associated with each of the directories listed above. This is used for reporting only.
-local git_service_names=("GitHub GitLab Codeberg")
+local git_service_names=(GitHub GitLab Codeberg)
 # FROM 2.1.1
 local spaces=$(printf ' %.0s' {1..20})
 
