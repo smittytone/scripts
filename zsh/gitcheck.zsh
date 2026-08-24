@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.1.2
+# @version   2.1.4
 # @license   MIT
 
 
@@ -21,7 +21,7 @@
 # not commas!
 #
 # A mandatory array of paths for the directory or directories holding your repos.
-local git_dirs=("${HOME}/GitHub" "${HOME}/GitLab" "${HOME}/GitHub/Codeberg")
+local git_dirs=("${HOME}/GitHub" "${HOME}/GitLab" "${HOME}/Codeberg")
 # An optional array of the git service names associated with each of the directories listed above. This is used for reporting only.
 local git_service_names=(GitHub GitLab Codeberg)
 # FROM 2.1.1
@@ -34,7 +34,7 @@ show_error_and_exit() {
 }
 
 show_warning() {
-    printf "\033[31m[WARNING]\033[39m $1\n"
+    printf "\033[33m[WARNING]\033[39m $1\n"
 }
 
 gather() {
@@ -91,13 +91,23 @@ local repos=()
 local states=()
 local branches=()
 local show_branches=0
+local missing_repos=()
 local maxes=()
-
+local tmp_dirs=()
+local tmp_names=()
+    
 # Check source directories
 if [[ ${#git_dirs} -eq 0 ]] show_error_and_exit 'No git directories defined. Update the script to add them to the `git_dirs` array'
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
-    if [[ ! -d "${git_dirs[i]}" ]] show_error_and_exit "Directory ${git_dirs[i]} does not exist"
+    if [[ -d "${git_dirs[i]}" ]]; then
+        tmp_dirs+=("${git_dirs[i]}")
+        tmp_names[i]=("${git_service_names[i]}")
+    fi
 done
+
+# NOTE TO SELF Array ops should always be in brackets!
+git_dirs=("${tmp_dirs[@]}")
+git_service_names=("${tmp_names[@]}")
 
 # FROM 1.3.1
 # Process the arguments
