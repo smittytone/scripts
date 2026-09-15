@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   2.1.4
+# @version   2.2.0
 # @license   MIT
 
 
@@ -51,7 +51,6 @@ gather() {
     for repo in *; do
         if [[ -d "${repo}" && -d "${repo}/.git" ]]; then
             if cd "${repo}" 2>/dev/null; then
-                local state=""
                 if [ "${show_branches}" -eq 1 ]; then
                     # FROM 1.3.1 -- determine repo current branches
                     repos+=("${repo}")
@@ -59,13 +58,18 @@ gather() {
                     local branch=$(git branch --show-current)
                     branches+=("${branch}")
                 else
+                    # Set base state: if `$1` == 1, show all has been selected
+                    # so make sure `$state` is not empty (this is tested later)
+                    local state=""
+                    if [[ "${1}" -eq 1 ]] state="[0mno"
+
                     # Determine repo states, but only those that are not up to date
                     local unmerged=$(git status --ignore-submodules)
                     unmerged=$(grep 'is ahead' < <((echo -e "${unmerged}")))
-                    if [[ -n "${unmerged}" ]] state="unmerged"
+                    if [[ -n "${unmerged}" ]] state="[33munmerged"
 
                     local uncommitted=$(git status --porcelain --ignore-submodules)
-                    if [[ -n "${uncommitted}" ]] state="uncommitted"
+                    if [[ -n "${uncommitted}" ]] state="[31muncommitted"
 
                     if [ -n "${state}" ]; then
                         states+=("${state}")
@@ -95,7 +99,9 @@ local missing_repos=()
 local maxes=()
 local tmp_dirs=()
 local tmp_names=()
-    
+# FROM 2.2.0
+local show_all=0
+
 # Check source directories
 if [[ ${#git_dirs} -eq 0 ]] show_error_and_exit 'No git directories defined. Update the script to add them to the `git_dirs` array'
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
@@ -116,6 +122,9 @@ for arg in "$@"; do
     check_arg=${arg:l}
     if [[ "${check_arg}" = "--branches" || "${check_arg}" = "-b" ]]; then
         show_branches=1
+    elif [[ "${check_arg}" = "--all" || "${check_arg}" = "-a" ]]; then
+        # NOTE This is only relevant to non-branch listings
+        show_all=1
     else
         show_error_and_exit "Unknown command ${arg}"
     fi
@@ -126,7 +135,7 @@ printf "Checking"
 for (( i = 1 ; i <= ${#git_dirs[@]} ; i++ )); do
     # FROM 2.0.1 -- Don't display missing dirs
     if cd "${git_dirs[i]}" 2>/dev/null; then
-        gather
+        gather "${show_all}"
     fi
 done
 
@@ -148,14 +157,24 @@ else
             fi
         done
     else
-        printf "\rLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:${spaces}\n"
+        if [ "${show_all}" -eq 1 ]; then
+            printf "\rLocal \033[1m${git_service_names[${service}]}\033[0m repos:${spaces}${spaces}\n"
+        else
+            printf "\rLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:${spaces}\n"
+        fi
+
         for (( i = 1 ; i <= ${#repos[@]} ; i++ )); do
             if [[ "${repos[i]}" == "=" ]]; then
                 ((service+=1))
-                printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
+                if [ "${show_all}" -eq 1 ]; then
+                    printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos:\n"
+                else
+                    printf "\nLocal \033[1m${git_service_names[${service}]}\033[0m repos with changes:\n"
+                fi
+
                 max=${maxes[${service}]}
             else
-                printf '\033[1m%*s\033[0m has \033[1m%s\033[0m changes\n' ${max} "${repos[i]}" "${states[i]}"
+                printf '\033[1m%*s\033[0m has \033[1m\033%s\033[0m changes\n' ${max} "${repos[i]}" "${states[i]}"
             fi
         done
     fi
