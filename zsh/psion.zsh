@@ -1,7 +1,9 @@
 #!/usr/bin/env zsh
 
-SPEED_3_A=19200
-SPEED_5_MX=115200
+# version 0.1.2
+
+SPEED_3=19200
+SPEED_5=115200
 
 start_ncpd() {
     result=$(/usr/local/bin/ncpd -e -s "${1}" -b "${2}" 2>&1)
@@ -14,22 +16,21 @@ open_ftp() {
 speed=NONE
 dev=NONE
 for arg in "$@"; do
-    # Temporarily convert argument to lowercase, zsh-style
-    # And check for options first
+    # Temporarily convert argument to lowercase, zsh-style and check for options
     local check_arg=${arg:l}
     if [[ "${check_arg}" = "--help" || "${check_arg}" = "-h" ]]; then
-        printf "Usage: psion /path/to/device/ [--5mx | --3a]\n"
+        printf "Usage: psion /path/to/device/ [-5 | -3]\n"
         exit 0
     fi
 
-    local lc_arg=${arg:l}
-    if [[ "${lc_arg}" = "--5mx" && "${speed}" = NONE ]]; then
-        speed="${SPEED_5_MX}"
+    local type_arg=${arg:0:2}
+    if [[ "${type_arg}" = "-5" && "${speed}" = NONE ]]; then
+        speed="${SPEED_5}"
         continue
     fi
 
-    if [[ "${lc_arg}" = "--3a"  && "${speed}" = NONE ]]; then
-        speed="${SPEED_3_A}"
+    if [[ "${type_arg}" = "-3"  && "${speed}" = NONE ]]; then
+        speed="${SPEED_3}"
         continue
     fi
 
@@ -37,12 +38,12 @@ for arg in "$@"; do
 done
 
 if [ "${speed}" = NONE ]; then
-    printf "🛑 No device type specified. Use '--5mx' or '--3a'\n"
+    printf "🛑 No device type specified. Use '-5' or '-3'\n"
     exit 1
 fi
 
 if [ "${dev}" = NONE ]; then
-    printf "🛑 No device path specified\n" "${dev}"
+    printf "🛑 No device path specified, or no device connected\n"
     exit 2
 fi
 
@@ -52,6 +53,7 @@ if [ ! -e "${dev}" ]; then
 fi
 
 if start_ncpd "${dev}" "${speed}"; then
+    sleep 1
     open_ftp
 else
     printf "🛑 Could not start ncpd"
