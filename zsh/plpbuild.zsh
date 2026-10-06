@@ -10,6 +10,8 @@
 # @license   MIT
 
 set -e
+set -o pipefail
+set -u
 
 macfuse=0
 install=0
@@ -38,13 +40,16 @@ for arg in "$@"; do
         install=1
     elif [[ "${check_arg}" = "--destination" || "${check_arg}" = "-d" ]]; then
         storenext=1
+    elif [[ "${check_arg}" = "--help" || "${check_arg}" = "-h" ]]; then
+        printf "\033[32;1mUsage:\033[0m plpbuild.zsh [--macfuse] [--install] [--destination {path}]\n"
+        exit 0
     else
         printf "🛑 Unknown command %s\n" "${arg}"
         exit 1
     fi
 done
 
-printf "\033[32;1mRunning pre-build checks.\033[0m\n"
+printf "⚙️ \033[32;1mRunning pre-build checks.\033[0m\n"
 # Check for Homebrew
 if [[ -n "$(which brew | grep 'not found')" ]]; then
     printf "🛑 Homebrew not installed\n"
@@ -55,7 +60,9 @@ fi
 # NOTE commented entry is known formula that's not installed, for testing
 dependencies=(autoconf automake coreutils gettext gpg libtool m4 pkgconf readline) # openfasttrace)
 # Add MacFuse if --macfuse | -m flag set
-if [[ "${macfuse}" -eq 1 ]] dependencies+=(macfuse)
+if [ "${macfuse}" -eq 1 ]; then
+    dependencies+=(macfuse)
+fi
 
 # Check dependencies
 for (( i = 1 ; i <= ${#dependencies[@]} ; i++ )); do
@@ -66,8 +73,14 @@ for (( i = 1 ; i <= ${#dependencies[@]} ; i++ )); do
 done
 
 # Check and set location
-ROOT_DIRECTORY="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" &> /dev/null && pwd)"
-BUILD_DIRECTORY="$ROOT_DIRECTORY/build"
+ROOT_DIRECTORY="$PWD"
+BUILD_DIRECTORY="${}/build"
+if [ "${ROOT_DIRECTORY:t}" != "plptools" ]; then
+    printf "🛑 Re-run this script from the cloned plptools repo directory\n"
+    exit 1
+fi
+
+cd "${ROOT_DIRECTORY}"
 
 if [ -z "$(echo "${ROOT_DIRECTORY}" | grep plp)" ]; then
     printf "🛑 Are you in your plptools directory?\n"
@@ -85,31 +98,33 @@ if [ -n "$(echo "${r}" | grep 'No such file or directory')" ]; then
 fi
 
 # Prepare build
-printf "\033[32;1mPreparing build environment.\033[0m\n"
+printf "⚙️ \033[32;1mPreparing build environment.\033[0m\n"
 ./bootstrap --skip-po
 
 export CPPFLAGS="-I$(brew --prefix gettext)/include -I$(brew --prefix readline)/include"
 export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib"
 # Add MacFuse if --macfuse | -m flag set
-if [[ "${macfuse}" -eq 1 ]] export LDFLAGS="${LDFLAGS} -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
+if [ "${macfuse}" -eq 1 ]; then
+    export LDFLAGS="${LDFLAGS} -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
+fi
 
 # Configure build
-printf "\033[32;1mConfiguring build.\033[0m\n"
-./configure --prefix="$BUILD_DIRECTORY" CFLAGS="-g -O0" CXXFLAGS="-g -O0"
+printf "⚙️ \033[32;1mConfiguring build.\033[0m\n"
+./configure --prefix="${BUILD_DIRECTORY}" CFLAGS="-g -O0" CXXFLAGS="-g -O0" --with-drive=m:
 
 # Build
-printf "\033[32;1mBuilding.\033[0m\n"
+printf "🔨 \033[32;1mBuilding.\033[0m\n"
 make
+make install
 
 # Done
-printf "✅ Compiled tools located in ${ROOT_DIRECTORY}/plpftp etc.\n"
+printf "✅ Compiled tools located in ${ROOT_DIRECTORY}/build/bin (plpftp, etc.), ${ROOT_DIRECTORY}/build/sbin (ncpd).\n"
 
 if [ "${install}" -eq  1 ]; then
-    printf "\033[32;1mInstalling to ${target} -- requires password.\033[0m\n"
-    sudo cp ncpd/ncpd "${target}"
-    sudo cp plpftp/plpftp "${target}"
-    sudo cp plpprint/plpprintd "${target}"
-    if [[ "${macfuse}" -eq 1 ]] sudo cp plpfuse/plpfuse "${target}"
-    sudo cp sisinstall/sisinstall "${target}"
+    printf "💻 \033[32;1mInstalling to ${target} -- requires password.\033[0m\n"
+    sudo cp "${ROOT_DIRECTORY}/build/bin/plpftp" "${target}"
+    sudo cp "${ROOT_DIRECTORY}/build/bin/sisinstall" "${target}"
+    sudo cp "${ROOT_DIRECTORY}/build/sbin/ncpd" "${target}"
+    sudo cp "${ROOT_DIRECTORY}/build/sbin/plpprintd" "${target}"
     printf "✅ Compiled tools installed in ${target}\n"
 fi
