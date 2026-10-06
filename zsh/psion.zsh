@@ -19,7 +19,7 @@ for arg in "$@"; do
     # Temporarily convert argument to lowercase, zsh-style and check for options
     local check_arg=${arg:l}
     if [[ "${check_arg}" = "--help" || "${check_arg}" = "-h" ]]; then
-        printf "Usage: psion /path/to/device/ [-5 | -3]\n"
+        printf "\033[32;1mUsage:\033[0m psion.zsh /path/to/device/ [-5 | -3]\n"
         exit 0
     fi
 
