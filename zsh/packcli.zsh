@@ -8,7 +8,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026 Tony Smith
-# @version   7.0.0
+# @version   7.1.0
 # @license   TBD
 
 
@@ -48,6 +48,12 @@ Options:
   --post                   Path to an optional script to run after compilation.
 
 EOF
+}
+
+write_tap() {
+    sha=$(shasum -a 256 "${1}")
+    sha=$(echo "${sha}" | cut -f 1 -d ' ')
+    printf "🔒 DMG SHA 256: %s\n" "${sha}"
 }
 
 # Emit error then exit
@@ -228,7 +234,7 @@ fi
 
 # Build the package
 if [[ -z "${pkg_dir}" ]]; then
-    printf "🏗️ Building ${app_name}...\n"
+    printf "🏗️  Building ${app_name}...\n"
     build_dir="$PWD/.build"
     #rm -rf "${build_dir}"
     if [ "${debug}" -eq 1 ]; then
@@ -298,7 +304,7 @@ if [ -z "${success}" ]; then
 fi
 
 # Confirm stapling
-printf "📋 Checking notarization to ${base_build_dir}/${app_name}-${app_version}.pkg:\n"
+printf "📋 Checking notarization of ${base_build_dir}/${app_name}-${app_version}.pkg:\n"
 output=$(spctl --assess -vvv --type install "${base_build_dir}/${app_name}-${app_version}.pkg" 2>&1)
 result=$(echo "${output}" | grep -m 1 -o 'accepted')
 
@@ -312,19 +318,21 @@ fi
 
 # Make a DMG or copy the files for subsequent use
 if [ "${make_disk}" -eq  1 ]; then
-    printf "💿 Assembling the disk image...\n"
+    printf "💾 Assembling the disk image...\n"
     dmg_version=$(echo ${app_version} | sed 's/-/_/g' | sed 's/\./_/g')
-    hdiutil create "${base_dmg_path}" -size 100MB -type SPARSEBUNDLE -fs HFS+J -volname "${app_name}" -quiet
-    hdiutil attach "${base_dmg_path}" -quiet
+    diskutil quiet image create blank -s 100MB --fs APFS --volname "${app_name}" "${base_dmg_path}"
+    diskutil quiet image attach "${base_dmg_path}"
 
     # Copy the manpage if present
     [ -d "${app_dir}/${man_dir}" ] && cp "${app_dir}/${man_dir}/"* "/Volumes/${app_name}"
 
     # Copy the .pkg file
     if cp -RH "${base_build_dir}/${app_name}-${app_version}.pkg" "/Volumes/${app_name}"; then
-        hdiutil detach "/Volumes/${app_name}" -quiet
-        hdiutil convert "${base_dmg_path}" -format ULMO -o "${HOME}/desktop/${app_name}_${dmg_version}.dmg" -quiet
+        diskutil quiet eject "/Volumes/${app_name}"
+        diskutil quiet image create from -f ULFO "${base_dmg_path}" "${HOME}/desktop/${app_name}_${dmg_version}.dmg" &> /dev/null
         rm -rf "${base_dmg_path}"
+
+        write_tap "${HOME}/desktop/${app_name}_${dmg_version}.dmg"
     else
         show_error_then_exit "Could not copy ${HOME}/desktop/${app_name}-${app_version}.pkg to the DMG"
     fi
