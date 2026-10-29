@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   0.1.0
+# @version   0.1.1
 # @license   MIT
 
 set -e
@@ -74,7 +74,7 @@ done
 
 # Check and set location
 ROOT_DIRECTORY="$PWD"
-BUILD_DIRECTORY="${}/build"
+BUILD_DIRECTORY="${ROOT_DIRECTORY}/build"
 if [ "${ROOT_DIRECTORY:t}" != "plptools" ]; then
     printf "🛑 Re-run this script from the cloned plptools repo directory\n"
     exit 1
