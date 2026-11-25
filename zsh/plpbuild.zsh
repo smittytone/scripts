@@ -6,7 +6,7 @@
 #
 # @author    Tony Smith
 # @copyright 2026, Tony Smith
-# @version   0.1.1
+# @version   0.1.2
 # @license   MIT
 
 set -e
@@ -109,8 +109,11 @@ if [ "${macfuse}" -eq 1 ]; then
 fi
 
 # Configure build
+# NOTE Append the ./configure line with --with-basedir=m: if you would like plpftp to
+#      go straight to the internal memory on a Series 3. However, this will cause
+#      issues if you also use plpftp with a Series 5.
 printf "⚙️ \033[32;1mConfiguring build.\033[0m\n"
-./configure --prefix="${BUILD_DIRECTORY}" CFLAGS="-g -O0" CXXFLAGS="-g -O0" --with-drive=m:
+./configure --prefix="${BUILD_DIRECTORY}" CFLAGS="-g -O0" CXXFLAGS="-g -O0"
 
 # Build
 printf "🔨 \033[32;1mBuilding.\033[0m\n"
